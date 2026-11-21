@@ -15,6 +15,7 @@ import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import { GanttPage, ParetoPage, StatusTimelinePage } from '../pages/components/IndustrialPages'
 import { AreaChartPage, BarChartPage, CartesianChartPage, GaugePage, LineChartPage, PiePage } from '../pages/components/ChartPages'
 import { BreadcrumbPage, NavigationMenuPage, PaginationPage, StepperPage } from '../pages/components/NavPages'
 import {
@@ -125,6 +126,9 @@ export type RouteId =
     | 'c-linechart'
     | 'c-barchart'
     | 'c-cartesian'
+    | 'c-pareto'
+    | 'c-statustimeline'
+    | 'c-gantt'
     | 'c-colorpicker'
     | 'c-fileupload'
     | 'c-timepicker'
@@ -238,6 +242,9 @@ export const routes: RouteMeta[] = [
     { id: 'c-linechart', label: 'LineChart', group: 'data', page: LineChartPage },
     { id: 'c-barchart', label: 'BarChart', group: 'data', page: BarChartPage },
     { id: 'c-cartesian', label: 'CartesianChart', group: 'data', page: CartesianChartPage },
+    { id: 'c-pareto', label: 'Pareto · Control', group: 'data', page: ParetoPage },
+    { id: 'c-statustimeline', label: 'StatusTimeline · Bullet', group: 'data', page: StatusTimelinePage },
+    { id: 'c-gantt', label: 'Gantt · Heatmap · Waterfall', group: 'data', page: GanttPage },
     { id: 'c-pie', label: 'Pie/Donut', group: 'data', page: PiePage },
     { id: 'c-gauge', label: 'Gauge', group: 'data', page: GaugePage },
     { id: 'c-calendar', label: 'Calendar', group: 'data', page: CalendarPage },

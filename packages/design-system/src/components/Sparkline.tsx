@@ -9,6 +9,8 @@ export type SparklineProps = {
     tone?: Tone
     /** 마지막 점 강조 */
     showLast?: boolean
+    /** showLast 별칭 */
+    highlightLast?: boolean
     /** 기준선 (목표 등) */
     reference?: number
     'aria-label'?: string
@@ -24,7 +26,8 @@ const TONE: Record<Tone, string> = {
 }
 
 /** 축 없는 작은 추이 그래프 (카드 · 표 셀) */
-export const Sparkline = ({ data, type = 'line', width = '100%', height = 28, tone = 'accent', showLast = true, reference, 'aria-label': ariaLabel, ...rest }: SparklineProps) => {
+export const Sparkline = ({ data, type = 'line', width = '100%', height = 24, tone = 'accent', showLast: showLastProp, highlightLast, reference, 'aria-label': ariaLabel, ...rest }: SparklineProps) => {
+    const showLast = showLastProp ?? highlightLast ?? true
     if (data.length < 2) return null
     const W = 120
     const H = height
