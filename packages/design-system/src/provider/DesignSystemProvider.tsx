@@ -23,6 +23,7 @@ import type { BorderVariant } from '../components/borderVariant.js'
 import { DesignSystemContext } from './context.js'
 import { FocusStyles } from './FocusStyles.js'
 import { InteractionStyles } from './InteractionStyles.js'
+import { ButtonStyles } from './ButtonStyles.js'
 import { TypographyStyles } from './TypographyStyles.js'
 
 export type FontFamilyOverrides = {
@@ -244,6 +245,7 @@ export const DesignSystemProvider = ({
             <DesignSystemContext.Provider value={value}>
                 <FocusStyles />
                 <InteractionStyles />
+                <ButtonStyles />
                 <TypographyStyles />
                 <div
                     ref={scopeRef}
@@ -263,6 +265,7 @@ export const DesignSystemProvider = ({
         <DesignSystemContext.Provider value={value}>
             <FocusStyles />
             <InteractionStyles />
+            <ButtonStyles />
             <TypographyStyles />
             {children}
         </DesignSystemContext.Provider>
