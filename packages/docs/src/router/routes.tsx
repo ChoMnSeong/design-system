@@ -16,9 +16,8 @@ import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { LineChartPage } from '../pages/components/LineChartPage'
 import { BarChartPage } from '../pages/components/BarChartPage'
-import { BreadcrumbPage } from '../pages/components/BreadcrumbPage'
-import { PaginationPage } from '../pages/components/PaginationPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import { BreadcrumbPage, NavigationMenuPage, PaginationPage, StepperPage } from '../pages/components/NavPages'
 import {
     AccordionPage,
     AppShellPage,
@@ -63,14 +62,12 @@ import {
 } from '../pages/components/ActionPages'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
 import { RatingPage } from '../pages/components/RatingPage'
-import { StepperPage } from '../pages/components/StepperPage'
 import { OTPInputPage } from '../pages/components/OTPInputPage'
 import { CodeBlockPage } from '../pages/components/CodeBlockPage'
 import {
     ImagePage,
     PiePage,
     GaugePage,
-    NavigationMenuPage,
 } from '../pages/components/MorePages'
 import { MarqueePage } from '../pages/components/MarqueePage'
 import {

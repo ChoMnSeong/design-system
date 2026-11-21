@@ -1,260 +1,69 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
-import { mergeStyles } from './types.js'
+import type { HTMLAttributes, ReactNode } from 'react'
 import { IconCheck } from './icons.js'
+
+export type StepStatus = 'wait' | 'process' | 'finish' | 'error' | 'skip'
 
 export type StepperStep = {
     label: ReactNode
     description?: ReactNode
+    /** 지정하지 않으면 current 로 정한다 (앞은 finish, current 는 process, 뒤는 wait) */
+    status?: StepStatus
+    icon?: ReactNode
+    /** 처리 시각 등 보조 정보 */
+    time?: ReactNode
 }
 
 export type StepperProps = {
     steps: StepperStep[]
     current: number
+    orientation?: 'horizontal' | 'vertical'
+    /** @deprecated orientation 을 쓴다 */
     direction?: 'horizontal' | 'vertical'
+    /** number: 번호 · dot: 점 · icon: 단계별 아이콘 */
+    appearance?: 'number' | 'dot' | 'icon'
+    size?: 'sm' | 'md'
+    /** 단계를 눌러 이동 */
+    clickable?: boolean
+    onStepClick?: (index: number) => void
 } & HTMLAttributes<HTMLOListElement>
 
-const dotSize = 24
-const lineThickness = 2
+const STATUS_LABEL: Record<StepStatus, string> = { wait: '대기', process: '진행 중', finish: '완료', error: '오류', skip: '건너뜀' }
 
-const dotBaseStyle = (
-    isCompleted: boolean,
-    isActive: boolean,
-): CSSProperties => ({
-    width: `${dotSize}px`,
-    height: `${dotSize}px`,
-    borderRadius: '50%',
-    flexShrink: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '11px',
-    fontWeight: 700,
-    fontFamily: 'inherit',
-    background:
-        isCompleted || isActive
-            ? 'var(--ds-color-accent-background)'
-            : 'var(--ds-color-background-inset)',
-    color:
-        isCompleted || isActive
-            ? 'var(--ds-color-accent-color)'
-            : 'var(--ds-color-foreground-tertiary)',
-    border: isActive
-        ? `2px solid var(--ds-color-accent-background)`
-        : `1px solid ${
-              isCompleted
-                  ? 'var(--ds-color-accent-background)'
-                  : 'var(--ds-color-border-subtle)'
-          }`,
-    transitionProperty: 'background, background-color, border-color, color, box-shadow, opacity',
-    transitionDuration: '160ms',
-    transitionTimingFunction: 'ease',
-    position: 'relative',
-    zIndex: 1,
-})
-
-const labelTextStyle = (
-    isCompleted: boolean,
-    isActive: boolean,
-): CSSProperties => ({
-    fontSize: '13px',
-    fontWeight: isActive ? 700 : 600,
-    color:
-        isActive || isCompleted
-            ? 'var(--ds-color-foreground-primary)'
-            : 'var(--ds-color-foreground-tertiary)',
-})
-
-const descriptionStyle: CSSProperties = {
-    fontSize: '11px',
-    color: 'var(--ds-color-foreground-tertiary)',
-    marginTop: '2px',
-    lineHeight: 1.4,
-}
-
-export const Stepper = ({
-    steps,
-    current,
-    direction = 'horizontal',
-    style,
-    ...rest
-}: StepperProps) => {
-    if (direction === 'vertical') {
-        return (
-            <ol
-                style={mergeStyles(
-                    {
-                        listStyle: 'none',
-                        margin: 0,
-                        padding: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        width: '100%',
-                    },
-                    style,
-                )}
-                {...rest}
-            >
-                {steps.map((step, idx) => {
-                    const isCompleted = idx < current
-                    const isActive = idx === current
-                    const isLast = idx === steps.length - 1
-                    return (
-                        <li
-                            key={idx}
-                            aria-current={isActive ? 'step' : undefined}
-                            style={{
-                                display: 'grid',
-                                gridTemplateColumns: `${dotSize}px 1fr`,
-                                columnGap: '12px',
-                                rowGap: 0,
-                            }}
-                        >
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    width: `${dotSize}px`,
-                                }}
-                            >
-                                <span style={dotBaseStyle(isCompleted, isActive)}>
-                                    {isCompleted ? (
-                                        <IconCheck size={14} />
-                                    ) : (
-                                        idx + 1
-                                    )}
-                                </span>
-                                {!isLast && (
-                                    <span
-                                        style={{
-                                            width: `${lineThickness}px`,
-                                            flex: 1,
-                                            minHeight: '24px',
-                                            background: isCompleted
-                                                ? 'var(--ds-color-accent-background)'
-                                                : 'var(--ds-color-border-subtle)',
-                                        }}
-                                    />
-                                )}
-                            </div>
-                            <div
-                                style={{
-                                    paddingBottom: !isLast ? '20px' : 0,
-                                    paddingTop: '2px',
-                                    textAlign: 'left',
-                                    minWidth: 0,
-                                }}
-                            >
-                                <div style={labelTextStyle(isCompleted, isActive)}>
-                                    {step.label}
-                                </div>
-                                {step.description && (
-                                    <div style={descriptionStyle}>
-                                        {step.description}
-                                    </div>
-                                )}
-                            </div>
-                        </li>
-                    )
-                })}
-            </ol>
-        )
-    }
-
-    // horizontal
+export const Stepper = ({ steps, current, orientation, direction, appearance = 'number', size = 'md', clickable, onStepClick, ...rest }: StepperProps) => {
+    const ori = orientation ?? direction ?? 'horizontal'
     return (
-        <ol
-            style={mergeStyles(
-                {
-                    listStyle: 'none',
-                    margin: 0,
-                    padding: 0,
-                    display: 'flex',
-                    flexDirection: 'row',
-                    width: '100%',
-                },
-                style,
-            )}
-            {...rest}
-        >
-            {steps.map((step, idx) => {
-                const isCompleted = idx < current
-                const isActive = idx === current
-                const isFirst = idx === 0
-                const isLast = idx === steps.length - 1
-                const leftCompleted = idx <= current
-                const rightCompleted = idx < current
-
-                return (
-                    <li
-                        key={idx}
-                        aria-current={isActive ? 'step' : undefined}
-                        style={{
-                            flex: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            position: 'relative',
-                            minWidth: 0,
-                        }}
-                    >
-                        {!isFirst && (
-                            <span
-                                aria-hidden
-                                style={{
-                                    position: 'absolute',
-                                    top: `${dotSize / 2 - lineThickness / 2}px`,
-                                    left: 0,
-                                    right: '50%',
-                                    height: `${lineThickness}px`,
-                                    marginRight: `${dotSize / 2 + 2}px`,
-                                    background: leftCompleted
-                                        ? 'var(--ds-color-accent-background)'
-                                        : 'var(--ds-color-border-subtle)',
-                                }}
-                            />
-                        )}
-                        {!isLast && (
-                            <span
-                                aria-hidden
-                                style={{
-                                    position: 'absolute',
-                                    top: `${dotSize / 2 - lineThickness / 2}px`,
-                                    left: '50%',
-                                    right: 0,
-                                    height: `${lineThickness}px`,
-                                    marginLeft: `${dotSize / 2 + 2}px`,
-                                    background: rightCompleted
-                                        ? 'var(--ds-color-accent-background)'
-                                        : 'var(--ds-color-border-subtle)',
-                                }}
-                            />
-                        )}
-                        <span style={dotBaseStyle(isCompleted, isActive)}>
-                            {isCompleted ? (
-                                <IconCheck size={14} />
-                            ) : (
-                                idx + 1
+        <ol data-ds-stepper="" data-orientation={ori} data-appearance={appearance} data-size={size} {...rest}>
+            {steps.map((s, i) => {
+                const status: StepStatus = s.status ?? (i < current ? 'finish' : i === current ? 'process' : 'wait')
+                const marker =
+                    appearance === 'dot' ? null : appearance === 'icon' && s.icon ? s.icon : status === 'finish' ? <IconCheck size={14} /> : status === 'error' ? '!' : i + 1
+                const body = (
+                    <>
+                        <span data-slot="marker" aria-hidden>
+                            {marker}
+                        </span>
+                        <span data-slot="text">
+                            <span data-slot="label">{s.label}</span>
+                            {(s.description || s.time) && (
+                                <span data-slot="desc">
+                                    {s.description}
+                                    {s.description && s.time ? ' · ' : ''}
+                                    {s.time}
+                                </span>
                             )}
                         </span>
-                        <div
-                            style={{
-                                marginTop: '8px',
-                                textAlign: 'center',
-                                minWidth: 0,
-                                width: '100%',
-                                padding: '0 4px',
-                            }}
-                        >
-                            <div style={labelTextStyle(isCompleted, isActive)}>
-                                {step.label}
-                            </div>
-                            {step.description && (
-                                <div style={descriptionStyle}>
-                                    {step.description}
-                                </div>
-                            )}
-                        </div>
+                        <span data-ds-sr-only="">{STATUS_LABEL[status]}</span>
+                    </>
+                )
+                return (
+                    <li key={i} data-status={status} aria-current={i === current ? 'step' : undefined}>
+                        {clickable ? (
+                            <button type="button" data-slot="step" onClick={() => onStepClick?.(i)}>
+                                {body}
+                            </button>
+                        ) : (
+                            <div data-slot="step">{body}</div>
+                        )}
                     </li>
                 )
             })}

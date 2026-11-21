@@ -2,11 +2,7 @@ import {
     DonutChart,
     Gauge,
     HStack,
-    IconArrowRight,
-    IconError,
-    IconSearch,
     Image,
-    NavigationMenu,
     PieChart,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
@@ -125,59 +121,3 @@ export const GaugePage = () => (
     </>
 )
 
-export const NavigationMenuPage = () => (
-    <>
-        <PageHeader
-            title="NavigationMenu"
-            description="앱 사이드바용 계층 네비. 아이콘, 배지, 펼침 지원."
-        />
-        <ComponentPreview
-            title="기본"
-            code={`<NavigationMenu
-    activeId="trending"
-    defaultExpanded={['library']}
-    items={[
-        { id: 'home', label: '홈', icon: <IconHome /> },
-        {
-            id: 'library',
-            label: '라이브러리',
-            children: [
-                { id: 'all', label: '전체' },
-                { id: 'fav', label: '즐겨찾기', badge: '12' },
-            ],
-        },
-        { id: 'noti', label: '알림', badge: '3' },
-    ]}
-/>`}
-        >
-            <NavigationMenu
-                activeId="trending"
-                defaultExpanded={['library']}
-                items={[
-                    {
-                        id: 'home',
-                        label: '홈',
-                        icon: <IconArrowRight size={14} />,
-                    },
-                    {
-                        id: 'library',
-                        label: '라이브러리',
-                        icon: <IconSearch size={14} />,
-                        children: [
-                            { id: 'all', label: '전체' },
-                            { id: 'fav', label: '즐겨찾기', badge: '12' },
-                            { id: 'trending', label: '인기' },
-                        ],
-                    },
-                    {
-                        id: 'noti',
-                        label: '알림',
-                        icon: <IconError size={14} />,
-                        badge: '3',
-                    },
-                ]}
-                style={{ width: '240px' }}
-            />
-        </ComponentPreview>
-    </>
-)
