@@ -11,7 +11,7 @@ import { fieldIconSize, type FieldSize } from './types.js'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
 import { IconChevronDown, IconChevronUp, IconMinus, IconPlus } from './icons.js'
-import { FieldBox } from './Field.js'
+import { FieldBox, useFormSize } from './Field.js'
 
 export type NumberInputProps = {
     value?: number | null
@@ -70,7 +70,7 @@ export const NumberInput = ({
     invalid,
     readOnly,
     disabled,
-    size = 'md',
+    size: sizeProp,
     variant: variantProp,
     placeholder,
     fullWidth,
@@ -83,6 +83,7 @@ export const NumberInput = ({
     ...rest
 }: NumberInputProps) => {
     const variant = useBorderVariant(variantProp)
+    const size = useFormSize(sizeProp)
     const [inner, setInner] = useState<number | null>(defaultValue)
     const value = valueProp !== undefined ? valueProp : inner
     const [focused, setFocused] = useState(false)

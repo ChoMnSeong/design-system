@@ -195,3 +195,56 @@ export const FIELD_CSS = `
 [data-ds-variant="glassmorphism"] [data-ds-field][data-readonly] { background: rgba(255, 255, 255, 0.25); }
 [data-ds-variant="glassmorphism"][data-ds-mode="dark"] [data-ds-field][data-readonly] { background: rgba(255, 255, 255, 0.03); }
 `.trim()
+
+/** Label · FormField · Form (보드 3-04) */
+export const FORM_CSS = `
+[data-ds-label] {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ds-color-foreground-secondary);
+}
+[data-ds-label][data-size="md"] { font-size: 14px; }
+[data-ds-label] [data-slot="req"] { color: var(--ds-tone-danger-text); margin-left: 2px; }
+[data-ds-label] [data-slot="opt"] { margin-left: 4px; font-weight: 400; color: var(--ds-color-foreground-tertiary); }
+[data-ds-label] [data-slot="tip"] { display: inline-flex; margin-left: 4px; color: var(--ds-color-foreground-tertiary); cursor: help; border-radius: 50%; }
+[data-ds-label] [data-slot="tip"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 1px; }
+[data-ds-sr-only] { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+[data-ds-form-field] { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+[data-ds-form-field] [data-slot="label"] { display: flex; flex-direction: column; gap: 2px; }
+[data-ds-form-field] [data-slot="desc"] { font-size: 12px; color: var(--ds-color-foreground-tertiary); }
+[data-ds-form-field] [data-slot="body"] { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+[data-ds-form-field] [data-slot="body"] > [data-ds-field],
+[data-ds-form-field] [data-slot="body"] > [data-ds-field-group] { width: 100%; display: flex; }
+[data-ds-form-field] [data-slot="hint"] { font-size: 12px; color: var(--ds-color-foreground-tertiary); }
+[data-ds-form-field] [data-slot="error"] { font-size: 12px; font-weight: 500; color: var(--ds-tone-danger-text); }
+[data-ds-form-field][data-layout="horizontal"] { display: grid; grid-template-columns: var(--_lw, 120px) minmax(0, 1fr); align-items: start; gap: 4px 12px; }
+[data-ds-form-field][data-layout="horizontal"] [data-slot="label"] { min-height: 36px; justify-content: center; }
+[data-ds-form-field][data-layout="horizontal"] [data-slot="label"][data-align="right"] { align-items: flex-end; text-align: right; }
+[data-ds-form-field][data-layout="horizontal"] [data-ds-label] { font-size: 13px; }
+[data-ds-form-field][data-layout="inline"] { flex-direction: row; align-items: center; gap: 8px; }
+[data-ds-form-field][data-layout="inline"] [data-slot="body"] { flex-direction: row; align-items: center; }
+[data-ds-form-field][data-layout="inline"] [data-slot="body"] > [data-ds-field] { width: auto; }
+
+[data-ds-form] > fieldset { display: grid; gap: 16px 20px; margin: 0; padding: 0; border: none; min-width: 0; }
+[data-ds-form][data-layout="inline"] > fieldset { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+/* 읽기 전용 조회 화면: 테두리를 걷어 값만 읽히게 */
+[data-ds-form][data-readonly] [data-ds-field] {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+    color: var(--ds-color-foreground-primary);
+    pointer-events: none;
+    text-align: left;
+}
+[data-ds-form][data-readonly] [data-ds-field] input { text-align: left; }
+[data-ds-form][data-readonly] [data-ds-field] [data-slot="action"],
+[data-ds-form][data-readonly] [data-ds-field] [data-chevron],
+[data-ds-form][data-readonly] [data-ds-field] [data-ds-numberinput] button { display: none; }
+`.trim()

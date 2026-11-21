@@ -12,7 +12,7 @@ import { fieldIconSize, type FieldSize } from './types.js'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
 import { IconClose, IconEye, IconEyeOff } from './icons.js'
-import { FieldAction, FieldBox, FieldSpinner, withAddons } from './Field.js'
+import { FieldAction, FieldBox, FieldSpinner, withAddons, useFormSize } from './Field.js'
 
 /**
  * 입력 마스크.
@@ -111,7 +111,7 @@ const setNativeValue = (node: HTMLInputElement, value: string) => {
 }
 
 export const Input = ({
-    size = 'md',
+    size: sizeProp,
     variant: variantProp,
     invalid = false,
     prefix,
@@ -137,6 +137,7 @@ export const Input = ({
     ...rest
 }: InputProps) => {
     const variant = useBorderVariant(variantProp)
+    const size = useFormSize(sizeProp)
     const innerRef = useRef<HTMLInputElement | null>(null)
     const setRefs = useCallback(
         (node: HTMLInputElement | null) => {

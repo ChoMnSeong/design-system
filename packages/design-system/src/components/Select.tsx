@@ -15,7 +15,7 @@ import { IconCheck, IconChevronDown, IconClose, IconSearch } from './icons.js'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
 import { fieldIconSize, type FieldSize, type Option } from './types.js'
-import { FieldAction, FieldBox, FieldSpinner } from './Field.js'
+import { FieldAction, FieldBox, FieldSpinner, useFormSize } from './Field.js'
 
 export type SelectOption = Option
 
@@ -102,7 +102,7 @@ export const Select = ({
     virtualized,
     clearable,
     maxTagCount,
-    size = 'md',
+    size: sizeProp,
     variant: variantProp,
     invalid,
     readOnly,
@@ -115,6 +115,7 @@ export const Select = ({
     'aria-labelledby': ariaLabelledby,
 }: SelectProps) => {
     const variant = useBorderVariant(variantProp)
+    const size = useFormSize(sizeProp)
     const autoId = useId()
     const id = idProp ?? `ds-select-${autoId}`
     const listId = `${id}-list`

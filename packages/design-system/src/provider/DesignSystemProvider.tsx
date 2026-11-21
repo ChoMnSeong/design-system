@@ -21,6 +21,7 @@ import type { CustomPalette, Palette, PaletteName } from '../palettes/types.js'
 import type { BaseTokens } from '../tokens/types.js'
 import type { BorderVariant } from '../components/borderVariant.js'
 import { DesignSystemContext } from './context.js'
+import { DEFAULT_LOCALE, LocaleContext } from './locale.js'
 import { FocusStyles } from './FocusStyles.js'
 import { InteractionStyles } from './InteractionStyles.js'
 import { ComponentStyles } from './ComponentStyles.js'
@@ -43,6 +44,10 @@ export type DesignSystemProviderProps = {
     paletteOverrides?: PaletteOverrides
     tokenOverrides?: Partial<BaseTokens>
     applyTo?: 'root' | 'scope'
+    /** 날짜·숫자 로케일. DatePicker · Calendar 의 기본값이 된다. */
+    locale?: string
+    /** 주 시작 요일 (0 일요일 · 1 월요일) */
+    weekStartsOn?: 0 | 1
     className?: string
     style?: CSSProperties
     children: ReactNode
@@ -102,6 +107,8 @@ export const DesignSystemProvider = ({
     paletteOverrides,
     tokenOverrides,
     applyTo = 'root',
+    locale = DEFAULT_LOCALE.locale,
+    weekStartsOn = DEFAULT_LOCALE.weekStartsOn,
     className,
     style,
     children,
@@ -240,9 +247,12 @@ export const DesignSystemProvider = ({
         ],
     )
 
+    const localeValue = useMemo(() => ({ locale, weekStartsOn }), [locale, weekStartsOn])
+
     if (applyTo === 'scope') {
         return (
             <DesignSystemContext.Provider value={value}>
+            <LocaleContext.Provider value={localeValue}>
                 <FocusStyles />
                 <InteractionStyles />
                 <ComponentStyles />
@@ -257,17 +267,20 @@ export const DesignSystemProvider = ({
                 >
                     {children}
                 </div>
-            </DesignSystemContext.Provider>
+            </LocaleContext.Provider>
+        </DesignSystemContext.Provider>
         )
     }
 
     return (
         <DesignSystemContext.Provider value={value}>
+            <LocaleContext.Provider value={localeValue}>
             <FocusStyles />
             <InteractionStyles />
             <ComponentStyles />
             <TypographyStyles />
             {children}
+        </LocaleContext.Provider>
         </DesignSystemContext.Provider>
     )
 }

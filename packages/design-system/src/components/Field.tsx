@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode, Ref } from 'react'
+import { createContext, useContext, type HTMLAttributes, type ReactNode, type Ref } from 'react'
 import type { BorderVariant } from './borderVariant.js'
 import type { FieldSize } from './types.js'
 
@@ -14,6 +14,23 @@ export type FieldBoxProps = {
     ref?: Ref<HTMLSpanElement>
 } & HTMLAttributes<HTMLSpanElement>
 
+export type FormContextValue = {
+    layout?: 'vertical' | 'horizontal' | 'inline'
+    labelWidth?: number
+    labelAlign?: 'left' | 'right'
+    size?: FieldSize
+    disabled?: boolean
+    readOnly?: boolean
+}
+/** Form 이 하위 FormField · 입력 컨트롤에 일괄로 내려주는 값. */
+export const FormContext = createContext<FormContextValue | null>(null)
+export const useFormContext = () => useContext(FormContext)
+/** prop 이 없으면 Form 의 size, 그것도 없으면 md */
+export const useFormSize = (size: FieldSize | undefined): FieldSize => {
+    const form = useContext(FormContext)
+    return size ?? form?.size ?? 'md'
+}
+
 /** 입력 컨트롤의 테두리 상자. 스타일은 styles/field.ts. */
 export const FieldBox = ({
     size = 'md',
@@ -26,7 +43,10 @@ export const FieldBox = ({
     align,
     ref,
     ...rest
-}: FieldBoxProps) => (
+}: FieldBoxProps) => {
+    const form = useContext(FormContext)
+    readOnly = readOnly || form?.readOnly
+    return (
     <span
         ref={ref}
         data-ds-field=""
@@ -40,7 +60,8 @@ export const FieldBox = ({
         data-align={align && align !== 'left' ? align : undefined}
         {...rest}
     />
-)
+    )
+}
 
 /** addonBefore · addonAfter 가 있으면 상자 밖에 붙여 감싼다. */
 export const withAddons = (

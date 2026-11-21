@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import {
     Button,
-    Calendar,
     CodeBlock,
     CommandPalette,
     DonutChart,
-    FormField,
     Gauge,
     HStack,
     IconArrowRight,
@@ -16,7 +14,6 @@ import {
     IconSearch,
     IconSun,
     Image,
-    Input,
     Kbd,
     NavigationMenu,
     PieChart,
@@ -110,46 +107,6 @@ export const ScrollAreaPage = () => (
     </>
 )
 
-export const FormFieldPage = () => (
-    <>
-        <PageHeader
-            title="FormField / Form"
-            description="Label + Input + 설명/에러를 한 번에. 폼 보일러플레이트 감소."
-        />
-        <ComponentPreview
-            title="기본"
-            code={`<FormField label="이메일" required description="가입 시 사용한 주소">
-    <Input fullWidth />
-</FormField>`}
-        >
-            <Stack
-                gap={14}
-                style={{ width: '100%', maxWidth: '420px' }}
-            >
-                <FormField
-                    label="이메일"
-                    htmlFor="email"
-                    required
-                    description="가입 시 사용한 주소"
-                >
-                    <Input id="email" type="email" fullWidth />
-                </FormField>
-                <FormField
-                    label="비밀번호"
-                    htmlFor="pwd"
-                    required
-                    error="8자 이상 입력해주세요"
-                >
-                    <Input id="pwd" type="password" invalid fullWidth />
-                </FormField>
-                <FormField label="별명" htmlFor="nick" hint="공개됩니다">
-                    <Input id="nick" fullWidth />
-                </FormField>
-            </Stack>
-        </ComponentPreview>
-    </>
-)
-
 const PIE_DATA = [
     { label: '액션', value: 38 },
     { label: '로맨스', value: 24 },
@@ -218,34 +175,6 @@ export const GaugePage = () => (
         </ComponentPreview>
     </>
 )
-
-export const CalendarPage = () => {
-    const [d, setD] = useState<string | undefined>('2026-05-08')
-    return (
-        <>
-            <PageHeader
-                title="Calendar"
-                description="full month view. markedDates 점 표시, min/maxDate 비활성, weekStartsOn."
-            />
-            <ComponentPreview
-                title="기본"
-                code={`<Calendar
-    value={d}
-    onChange={setD}
-    weekStartsOn={1}
-    markedDates={['2026-05-10', '2026-05-15', '2026-05-20']}
-/>`}
-            >
-                <Calendar
-                    value={d}
-                    onChange={setD}
-                    weekStartsOn={1}
-                    markedDates={['2026-05-10', '2026-05-15', '2026-05-20']}
-                />
-            </ComponentPreview>
-        </>
-    )
-}
 
 const TREE_DATA = [
     {

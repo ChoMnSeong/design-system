@@ -7,7 +7,6 @@ import { TokensPage } from '../pages/TokensPage'
 import { ButtonPage } from '../pages/components/ButtonPage'
 import { InputPage } from '../pages/components/InputPage'
 import { TextareaPage } from '../pages/components/TextareaPage'
-import { LabelPage } from '../pages/components/LabelPage'
 import { CardPage } from '../pages/components/CardPage'
 import { BoxPage } from '../pages/components/BoxPage'
 import { BadgePage } from '../pages/components/BadgePage'
@@ -21,7 +20,6 @@ import { TabsPage } from '../pages/components/TabsPage'
 import { TablePage } from '../pages/components/TablePage'
 import { DialogPage } from '../pages/components/DialogPage'
 import { DrawerPage } from '../pages/components/DrawerPage'
-import { DatePickerPage } from '../pages/components/DatePickerPage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
@@ -35,6 +33,14 @@ import { BreadcrumbPage } from '../pages/components/BreadcrumbPage'
 import { PaginationPage } from '../pages/components/PaginationPage'
 import { AccordionPage } from '../pages/components/AccordionPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import {
+    CalendarPage,
+    DatePickerPage,
+    FileUploadPage,
+    FormFieldPage,
+    LabelPage,
+    TimePickerPage,
+} from '../pages/components/DatePages'
 import {
     ButtonGroupPage,
     KbdPage,
@@ -50,8 +56,6 @@ import {
     StatPage,
 } from '../pages/components/MiscPage'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
-import { FileUploadPage } from '../pages/components/FileUploadPage'
-import { TimePickerPage } from '../pages/components/TimePickerPage'
 import { RatingPage } from '../pages/components/RatingPage'
 import { StepperPage } from '../pages/components/StepperPage'
 import { OTPInputPage } from '../pages/components/OTPInputPage'
@@ -60,10 +64,8 @@ import { HoverCardPage } from '../pages/components/HoverCardPage'
 import {
     ImagePage,
     ScrollAreaPage,
-    FormFieldPage,
     PiePage,
     GaugePage,
-    CalendarPage,
     TreePage,
     CommandPalettePage,
     NavigationMenuPage,

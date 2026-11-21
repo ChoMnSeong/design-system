@@ -10,7 +10,7 @@ import {
 import type { FieldSize } from './types.js'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
-import { FieldBox } from './Field.js'
+import { FieldBox, useFormSize } from './Field.js'
 
 export type TextareaProps = {
     size?: FieldSize
@@ -30,7 +30,7 @@ export type TextareaProps = {
 } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>
 
 export const Textarea = ({
-    size = 'md',
+    size: sizeProp,
     variant: variantProp,
     invalid = false,
     fullWidth,
@@ -48,6 +48,7 @@ export const Textarea = ({
     ...rest
 }: TextareaProps) => {
     const variant = useBorderVariant(variantProp)
+    const size = useFormSize(sizeProp)
     const node = useRef<HTMLTextAreaElement | null>(null)
     const setRefs = useCallback(
         (el: HTMLTextAreaElement | null) => {

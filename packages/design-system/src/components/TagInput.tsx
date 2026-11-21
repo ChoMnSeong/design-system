@@ -3,7 +3,7 @@ import { IconClose } from './icons.js'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
 import type { FieldSize } from './types.js'
-import { FieldBox } from './Field.js'
+import { FieldBox, useFormSize } from './Field.js'
 
 export type TagInputProps = {
     value?: string[]
@@ -41,7 +41,7 @@ export const TagInput = ({
     unique = true,
     maxTags,
     placeholder = '입력 후 Enter',
-    size = 'md',
+    size: sizeProp,
     variant: variantProp,
     invalid,
     readOnly,
@@ -53,6 +53,7 @@ export const TagInput = ({
     'aria-label': ariaLabel,
 }: TagInputProps) => {
     const variant = useBorderVariant(variantProp)
+    const size = useFormSize(sizeProp)
     const [inner, setInner] = useState<string[]>(defaultValue)
     const tags = valueProp ?? inner
     const [draft, setDraft] = useState('')
