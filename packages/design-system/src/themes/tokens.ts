@@ -205,6 +205,24 @@ export const themeTokens = {
             wide: cssVar('typography.letterSpacing.wide'),
         },
         role: {
+            'hero-lg': {
+                fontSize: cssVar('typography.role.hero-lg.fontSize'),
+                fontWeight: cssVar('typography.role.hero-lg.fontWeight'),
+                lineHeight: cssVar('typography.role.hero-lg.lineHeight'),
+                letterSpacing: cssVar('typography.role.hero-lg.letterSpacing'),
+            },
+            'hero-md': {
+                fontSize: cssVar('typography.role.hero-md.fontSize'),
+                fontWeight: cssVar('typography.role.hero-md.fontWeight'),
+                lineHeight: cssVar('typography.role.hero-md.lineHeight'),
+                letterSpacing: cssVar('typography.role.hero-md.letterSpacing'),
+            },
+            'hero-sm': {
+                fontSize: cssVar('typography.role.hero-sm.fontSize'),
+                fontWeight: cssVar('typography.role.hero-sm.fontWeight'),
+                lineHeight: cssVar('typography.role.hero-sm.lineHeight'),
+                letterSpacing: cssVar('typography.role.hero-sm.letterSpacing'),
+            },
             'display-lg': {
                 fontSize: cssVar('typography.role.display-lg.fontSize'),
                 fontWeight: cssVar('typography.role.display-lg.fontWeight'),

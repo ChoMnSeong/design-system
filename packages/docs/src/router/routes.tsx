@@ -75,6 +75,7 @@ import {
 } from '../pages/components/ChartsExtraPage'
 import { DataTablePage } from '../pages/components/DataTablePage'
 import { DataGridPage } from '../pages/components/DataGridPages'
+import { B2CLayoutPage, B2CSitePage, B2CHeroPage, B2CCommercePage, B2CShoppingPage, B2CMobilePage } from '../pages/components/B2CPages'
 
 export type RouteId =
     | 'introduction'
@@ -158,6 +159,12 @@ export type RouteId =
     | 'c-radialchart'
     | 'c-datatable'
     | 'c-datagrid'
+    | 'c-b2c-layout'
+    | 'c-b2c-site'
+    | 'c-b2c-hero'
+    | 'c-b2c-commerce'
+    | 'c-b2c-shopping'
+    | 'c-b2c-mobile'
 
 export type RouteGroup =
     | 'foundation'
@@ -262,6 +269,12 @@ export const routes: RouteMeta[] = [
     { id: 'c-radialchart', label: 'RadialChart', group: 'data', page: RadialChartPage },
     { id: 'c-datatable', label: 'DataTable', group: 'data', page: DataTablePage },
     { id: 'c-datagrid', label: 'DataGrid', group: 'data', page: DataGridPage },
+    { id: 'c-b2c-layout', label: '12-01 큰 제목 · 폭 · 여백', group: 'layout', page: B2CLayoutPage },
+    { id: 'c-b2c-site', label: '12-02 머리말 · 꼬리말', group: 'layout', page: B2CSitePage },
+    { id: 'c-b2c-hero', label: '12-03 배너 · 슬라이드 · 줄', group: 'layout', page: B2CHeroPage },
+    { id: 'c-b2c-commerce', label: '12-04 이미지 · 가격 · 별점', group: 'layout', page: B2CCommercePage },
+    { id: 'c-b2c-shopping', label: '12-05 수량 · 옵션 · 검색', group: 'layout', page: B2CShoppingPage },
+    { id: 'c-b2c-mobile', label: '12-06 영상 · 시트 · 탭', group: 'layout', page: B2CMobilePage },
 ]
 
 export const routeMap: Record<RouteId, RouteMeta> = routes.reduce(

@@ -52,6 +52,9 @@ export type SpacingTokens = {
 }
 
 export type TypographyRole =
+    | 'hero-lg'
+    | 'hero-md'
+    | 'hero-sm'
     | 'display-lg'
     | 'display-md'
     | 'display-sm'
