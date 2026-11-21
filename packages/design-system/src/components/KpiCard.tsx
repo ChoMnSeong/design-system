@@ -67,7 +67,7 @@ export const KpiCard = ({ label, value, unit, target, targetLabel, delta, trend 
 
 export type StatusDef = { label: ReactNode; tone: Tone; pulse?: boolean }
 
-export type StatusCardProps = Omit<CardProps, 'children' | 'title'> & {
+export type StatusCardProps = Omit<CardProps, 'children' | 'title' | 'status'> & {
     title: ReactNode
     status: string
     /** 상태 값 → 라벨 · 톤. 업무마다 다르므로 직접 정한다 */

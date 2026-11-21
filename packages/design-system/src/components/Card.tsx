@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type HTMLAttributes, type KeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode, type Ref } from 'react'
+import { createContext, useContext, useState, type CSSProperties, type HTMLAttributes, type KeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode, type Ref } from 'react'
 import type { BorderVariant } from './borderVariant.js'
 import { useBorderVariant } from '../provider/useDesignSystem.js'
 import { IconChevronDown } from './icons.js'
@@ -9,8 +9,17 @@ const CardContext = createContext<CardCtx | null>(null)
 
 let cardSeq = 0
 
+export type CardSurface = 'card' | 'panel' | 'overlay' | 'inverse' | 'tinted' | 'nested' | 'media' | 'glass'
+
 export type CardProps = {
-    surface?: 'card' | 'panel' | 'overlay'
+    /** card · panel · overlay · inverse(강조 1장) · tinted(tone 배경) · nested(회색 껍데기) · media(사진 배경) · glass */
+    surface?: CardSurface
+    /** surface="media": 사진과 아래쪽 어둡게 */
+    media?: { src: string; alt?: string; position?: string; scrim?: number }
+    /** surface="glass": 흐림 정도와 뒤에 깔 배경 */
+    glass?: { blur?: number; backdrop?: ReactNode }
+    /** 목표 밖일 때만 톤을 깐다 (tinted 를 조건부로) */
+    status?: Tone
     variant?: BorderVariant
     /** 안쪽 여백. false 면 없음 (Card.Media 를 끝까지) */
     padding?: SpaceToken | false
@@ -20,7 +29,8 @@ export type CardProps = {
     tone?: Tone
     /** 톤 색 띠 위치 */
     accent?: 'none' | 'top' | 'left'
-    density?: Density
+    /** touch: 현장 태블릿용 (액션 44px) */
+    density?: Density | 'touch'
     /** hover · 포커스 링 · 클릭. onClick 이 있으면 자동으로 켜진다 */
     interactive?: boolean
     selectable?: boolean
@@ -37,10 +47,18 @@ export type CardProps = {
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
-const PAD: Record<Density, SpaceToken> = { compact: 3, default: 5, comfortable: 6 }
+const PAD: Record<Density | 'touch', SpaceToken> = { compact: 3, default: 5, comfortable: 6, touch: 5 }
 
-export const Card = ({
+type CardComponent = ((props: CardProps) => ReactNode) & {
+    Eyebrow: typeof CardEyebrow; Actions: typeof CardActions; Metric: typeof CardMetric; Delta: typeof CardDelta; Visual: typeof CardVisual; Note: typeof CardNote
+    Header: typeof CardHeader; Title: typeof CardTitle; Description: typeof CardDescription; Body: typeof CardBody; Footer: typeof CardFooter; Media: typeof CardMedia; Section: typeof CardSection
+}
+
+export const Card: CardComponent = (({
     surface = 'card',
+    media,
+    glass,
+    status,
     variant: variantProp,
     padding,
     padded,
@@ -92,9 +110,9 @@ export const Card = ({
             <div
                 ref={ref}
                 data-ds-card=""
-                data-surface={surface}
+                data-surface={status ? 'tinted' : surface}
                 data-variant={variant}
-                data-tone={tone}
+                data-tone={status ?? tone}
                 data-accent={accent !== 'none' ? accent : undefined}
                 data-density={density}
                 data-flush={pad === false ? '' : undefined}
@@ -115,9 +133,17 @@ export const Card = ({
                         activate(e)
                     }
                 }}
-                style={{ ...(pad === false ? { padding: 0 } : { padding: space(pad) }), ...style }}
+                style={{
+                    ...(pad === false ? { padding: 0 } : { padding: space(pad) }),
+                    ...(pad !== false ? ({ '--_pad': space(pad) } as CSSProperties) : null),
+                    ...(surface === 'media' && media ? ({ '--_img': `url("${media.src}")`, '--_pos': media.position ?? 'center', '--_scrim': media.scrim ?? 0.8 } as CSSProperties) : null),
+                    ...(surface === 'glass' && glass?.blur !== undefined ? ({ '--_blur': `${glass.blur}px` } as CSSProperties) : null),
+                    ...style,
+                }}
                 {...rest}
             >
+                {surface === 'media' && media?.alt && <span data-ds-sr-only="">{media.alt}</span>}
+                {surface === 'glass' && glass?.backdrop && <div data-slot="glass-backdrop" aria-hidden>{glass.backdrop}</div>}
                 {loading ? (
                     <div data-slot="loading">
                         <span data-ds-skeleton="" style={{ height: 12, width: '50%' }} />
@@ -130,7 +156,7 @@ export const Card = ({
             </div>
         </CardContext.Provider>
     )
-}
+}) as CardComponent
 
 export type CardHeaderProps = {
     /** 오른쪽 버튼 영역 */
@@ -188,3 +214,82 @@ export const CardSection = (props: HTMLAttributes<HTMLDivElement>) => {
     const { hidden } = useHidden()
     return <div data-ds-card-section="" hidden={hidden} {...props} />
 }
+
+/* ── 대시보드 카드 슬롯 (보드 9-02) ── */
+
+/** 아이콘 + 짧은 라벨 */
+export const CardEyebrow = ({ icon, children, ...rest }: { icon?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
+    <div data-ds-card-eyebrow="" {...rest}>
+        {icon && <span aria-hidden>{icon}</span>}
+        {children}
+    </div>
+)
+
+/** 오른쪽 위 아이콘 버튼 묶음 */
+export const CardActions = (props: HTMLAttributes<HTMLDivElement>) => <div data-ds-card-actions="" {...props} />
+
+export type CardMetricProps = {
+    value: number | string
+    unit?: ReactNode
+    /** sm 24 · md 32 · lg 40 */
+    size?: 'sm' | 'md' | 'lg'
+    format?: Intl.NumberFormatOptions
+} & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
+
+/** 큰 숫자 + 작은 단위 */
+export const CardMetric = ({ value, unit, size = 'md', format, ...rest }: CardMetricProps) => (
+    <div data-ds-card-metric="" data-size={size} {...rest}>
+        <b>{typeof value === 'number' ? value.toLocaleString('ko-KR', format) : value}</b>
+        {unit && <span>{unit}</span>}
+    </div>
+)
+
+export type CardDeltaProps = {
+    value: number
+    /** 비교 기준 (예: 계획 대비) */
+    comparison?: ReactNode
+    /** 감소가 좋은 지표(불량 · 정지시간)는 down */
+    goodWhen?: 'up' | 'down'
+    format?: (n: number) => string
+} & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
+
+/** 증감 + 비교 기준 */
+export const CardDelta = ({ value, comparison, goodWhen = 'up', format = (n) => `${n > 0 ? '+' : ''}${n}%`, ...rest }: CardDeltaProps) => {
+    const good = value === 0 ? null : (value > 0) === (goodWhen === 'up')
+    return (
+        <div data-ds-card-delta="" {...rest}>
+            <span data-ds-badge="" data-appearance="soft" data-size="sm" data-tone={good === null ? 'neutral' : good ? 'success' : 'danger'}>
+                {value > 0 ? '▲' : value < 0 ? '▼' : '–'} {format(value)}
+            </span>
+            {comparison && <span data-slot="cmp">{comparison}</span>}
+        </div>
+    )
+}
+
+/** 그래프 자리. bleed 면 카드 가장자리까지 */
+export const CardVisual = ({ bleed, height, style, ...rest }: { bleed?: boolean | 'x' | 'bottom'; height?: number } & HTMLAttributes<HTMLDivElement>) => (
+    <div data-ds-card-visual="" data-bleed={bleed === true ? 'all' : bleed || undefined} style={{ height, ...style }} {...rest} />
+)
+
+/** 한 줄 설명 + 링크 (위 구분선) */
+export const CardNote = ({ icon, action, children, ...rest }: { icon?: ReactNode; action?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
+    <div data-ds-card-note="" {...rest}>
+        {icon && <span aria-hidden>{icon}</span>}
+        <span data-slot="text">{children}</span>
+        {action}
+    </div>
+)
+
+Card.Eyebrow = CardEyebrow
+Card.Actions = CardActions
+Card.Metric = CardMetric
+Card.Delta = CardDelta
+Card.Visual = CardVisual
+Card.Note = CardNote
+Card.Header = CardHeader
+Card.Title = CardTitle
+Card.Description = CardDescription
+Card.Body = CardBody
+Card.Footer = CardFooter
+Card.Media = CardMedia
+Card.Section = CardSection

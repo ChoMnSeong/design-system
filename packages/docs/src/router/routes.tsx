@@ -15,6 +15,7 @@ import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import { DashboardGridPage } from '../pages/components/DashboardPages'
 import { GanttPage, ParetoPage, StatusTimelinePage } from '../pages/components/IndustrialPages'
 import { AreaChartPage, BarChartPage, CartesianChartPage, GaugePage, LineChartPage, PiePage } from '../pages/components/ChartPages'
 import { BreadcrumbPage, NavigationMenuPage, PaginationPage, StepperPage } from '../pages/components/NavPages'
@@ -101,6 +102,7 @@ export type RouteId =
     | 'c-stack'
     | 'c-appshell'
     | 'c-kpicard'
+    | 'c-dashboard'
     | 'c-tabs'
     | 'c-table'
     | 'c-accordion'
@@ -205,6 +207,7 @@ export const routes: RouteMeta[] = [
     { id: 'c-toolbar', label: 'Toolbar', group: 'layout', page: ToolbarPage },
 
     { id: 'c-card', label: 'Card', group: 'container', page: CardPage },
+    { id: 'c-dashboard', label: 'DashboardGrid · Card 슬롯', group: 'container', page: DashboardGridPage },
     { id: 'c-kpicard', label: 'KpiCard · StatusCard', group: 'container', page: KpiCardPage },
     { id: 'c-box', label: 'Box · Stack · Grid · Divider', group: 'container', page: BoxPage },
     { id: 'c-tabs', label: 'Tabs', group: 'container', page: TabsPage },
