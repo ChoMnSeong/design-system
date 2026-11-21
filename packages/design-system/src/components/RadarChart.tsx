@@ -1,9 +1,13 @@
+import { chartColor } from './CartesianChart.js'
 import { useId, type CSSProperties, type ReactNode } from 'react'
 
 export type RadarSeries = {
-    label: string
+    label?: string
+    /** label 별칭 (비교 모드) */
+    name?: string
     values: number[]
     color?: string
+    tone?: import('./types.js').Tone
 }
 
 export type RadarChartProps = {
@@ -30,6 +34,10 @@ export type RadarChartProps = {
     /** 축 라벨 커스텀 렌더 (값 등 추가 표시 가능). */
     axisLabelRender?: (axis: string, idx: number) => ReactNode
     fillOpacity?: number
+    /** 꼭짓점 사이를 부드럽게 */
+    curve?: 'linear' | 'smooth'
+    /** 오른쪽 요약 칸 (비교 수치 표) */
+    aside?: ReactNode
     style?: CSSProperties
 }
 
@@ -43,6 +51,18 @@ const DEFAULT_COLORS = [
 const polar = (cx: number, cy: number, r: number, deg: number) => {
     const rad = ((deg - 90) * Math.PI) / 180
     return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)] as const
+}
+
+/** 닫힌 곡선 (Catmull-Rom) */
+const smoothClosed = (pts: ReadonlyArray<readonly number[]>) => {
+    const n = pts.length
+    const P = (i: number) => pts[(i + n) % n]!
+    let d = `M ${P(0)[0]} ${P(0)[1]}`
+    for (let i = 0; i < n; i++) {
+        const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2)
+        d += ` C ${p1[0]! + (p2[0]! - p0[0]!) / 6} ${p1[1]! + (p2[1]! - p0[1]!) / 6}, ${p2[0]! - (p3[0]! - p1[0]!) / 6} ${p2[1]! - (p3[1]! - p1[1]!) / 6}, ${p2[0]} ${p2[1]}`
+    }
+    return d + ' Z'
 }
 
 export const RadarChart = ({
@@ -59,7 +79,9 @@ export const RadarChart = ({
     gridShape = 'polygon',
     gridFilled = false,
     axisLabelRender,
-    fillOpacity = 0.22,
+    fillOpacity = 0.18,
+    curve = 'linear',
+    aside,
     style,
 }: RadarChartProps) => {
     const id = useId().replace(/:/g, '')
@@ -94,7 +116,8 @@ export const RadarChart = ({
             .join(' ') + ' Z'
 
     return (
-        <div style={{ display: 'inline-block', ...style }}>
+        <div style={{ display: aside ? 'inline-flex' : 'inline-block', gap: 20, alignItems: 'center', ...style }}>
+            <div>
             <svg
                 width={size}
                 height={size}
@@ -214,12 +237,11 @@ export const RadarChart = ({
                 })}
 
                 {series.map((s, idx) => {
-                    const color =
-                        s.color ?? DEFAULT_COLORS[idx % DEFAULT_COLORS.length]!
+                    const color = s.color ?? (s.tone ? chartColor(s.tone) : DEFAULT_COLORS[idx % DEFAULT_COLORS.length]!)
                     return (
                         <g key={`s-${id}-${idx}`}>
                             <path
-                                d={seriesPath(s.values)}
+                                d={curve === 'smooth' ? smoothClosed(s.values.map((v, i) => axisPoint(i, v / maxOf(i)))) : seriesPath(s.values)}
                                 fill={fill ? color : 'none'}
                                 fillOpacity={fill ? fillOpacity : 0}
                                 stroke={color}
@@ -242,7 +264,7 @@ export const RadarChart = ({
                                             stroke={color}
                                             strokeWidth="2"
                                         >
-                                            {tooltip && <title>{`${s.label} · ${axes[i]}: ${v}`}</title>}
+                                            {tooltip && <title>{`${s.label ?? s.name} · ${axes[i]}: ${v}`}</title>}
                                         </circle>
                                     )
                                 })}
@@ -263,7 +285,7 @@ export const RadarChart = ({
                     {series.map((s, idx) => {
                         const color =
                             s.color ??
-                            DEFAULT_COLORS[idx % DEFAULT_COLORS.length]!
+                            (s.tone ? chartColor(s.tone) : DEFAULT_COLORS[idx % DEFAULT_COLORS.length]!)
                         return (
                             <span
                                 key={idx}
@@ -283,12 +305,14 @@ export const RadarChart = ({
                                         borderRadius: '50%',
                                     }}
                                 />
-                                {s.label}
+                                {s.label ?? s.name}
                             </span>
                         )
                     })}
                 </div>
             )}
+            </div>
+            {aside && <div data-slot="aside" style={{ minWidth: 160 }}>{aside}</div>}
         </div>
     )
 }

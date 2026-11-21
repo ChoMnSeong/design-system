@@ -18,6 +18,7 @@ import { Pagination } from './Pagination.js'
 import { Empty } from './Empty.js'
 import { Popover } from './Popover.js'
 import { Button } from './Button.js'
+import { InlineBar } from './MiniCharts.js'
 import { Menu, MenuCheckboxItem, MenuLabel } from './Menu.js'
 import { useOutsideClick } from './useOutsideClick.js'
 import { IconArrowDown, IconArrowUp, IconChevronDown, IconChevronRight, IconSearch } from './icons.js'
@@ -58,6 +59,10 @@ export type DataTableColumn<T> = {
     format?: (value: unknown, row: T) => ReactNode
     /** 다단 헤더: 하위 열 */
     columns?: DataTableColumn<T>[]
+    /** 'bar' 면 값을 InlineBar 로 그린다 (barMax · barTone) */
+    type?: 'bar'
+    barMax?: number
+    barTone?: (value: number, row: T) => Tone | undefined
 }
 
 export type DataTableSort = { columnId: string; direction: 'asc' | 'desc' } | null
@@ -525,6 +530,7 @@ export const DataTable = <T,>({
             return <Input {...common} defaultValue={String(v ?? '')} onBlur={(e) => commitEdit(row, c, e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(row, c, (e.target as HTMLInputElement).value); if (e.key === 'Escape') setEditing(null) }} fullWidth />
         }
         if (c.cell) return c.cell(row, { value: v, rowIndex })
+        if (c.type === 'bar') return <InlineBar value={Number(v)} max={c.barMax ?? 100} tone={c.barTone?.(Number(v), row)} format={(n) => (c.format ? String(c.format(n, row)) : fmtNum(n))} />
         if (c.format) return c.format(v, row)
         return typeof v === 'number' ? fmtNum(v) : (v as ReactNode)
     }
