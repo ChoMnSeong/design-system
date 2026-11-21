@@ -1,9 +1,6 @@
 import {
-    DonutChart,
-    Gauge,
     HStack,
     Image,
-    PieChart,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -48,75 +45,6 @@ export const ImagePage = () => (
                 radius="var(--ds-radius-lg)"
                 style={{ maxWidth: '480px', display: 'block' }}
             />
-        </ComponentPreview>
-    </>
-)
-
-const PIE_DATA = [
-    { label: '액션', value: 38 },
-    { label: '로맨스', value: 24 },
-    { label: '판타지', value: 18 },
-    { label: 'SF', value: 12 },
-    { label: '기타', value: 8 },
-]
-
-export const PiePage = () => (
-    <>
-        <PageHeader
-            title="PieChart / DonutChart"
-            description="SVG 기반 원형 차트. legend 자동, custom color 지원."
-        />
-        <ComponentPreview
-            title="PieChart"
-            code={`<PieChart data={data} size={180} />`}
-        >
-            <PieChart data={PIE_DATA} size={180} />
-        </ComponentPreview>
-        <ComponentPreview
-            title="DonutChart with center"
-            code={`<DonutChart
-    data={data}
-    size={200}
-    thickness={32}
-    centerValue="100%"
-    centerLabel="시청 비중"
-/>`}
-        >
-            <DonutChart
-                data={PIE_DATA}
-                size={200}
-                thickness={32}
-                centerValue="100%"
-                centerLabel="시청 비중"
-            />
-        </ComponentPreview>
-    </>
-)
-
-export const GaugePage = () => (
-    <>
-        <PageHeader
-            title="Gauge"
-            description="원형 진행률. value/max, 사이즈, 두께, 색상."
-        />
-        <ComponentPreview
-            title="기본"
-            code={`<Gauge value={62} label="달성" />
-<Gauge value={84} label="완료" color="var(--ds-color-state-success)" />`}
-        >
-            <HStack gap={20}>
-                <Gauge value={62} label="달성" />
-                <Gauge
-                    value={84}
-                    label="완료"
-                    color="var(--ds-color-state-success)"
-                />
-                <Gauge
-                    value={28}
-                    label="남음"
-                    color="var(--ds-color-state-warning)"
-                />
-            </HStack>
         </ComponentPreview>
     </>
 )

@@ -13,6 +13,9 @@ export type RadialChartProps = {
     thickness?: number
     gap?: number
     showLegend?: boolean
+    /** 링에 마우스를 올리면 값 표시 */
+    tooltip?: boolean
+    onBarClick?: (datum: RadialDatum, index: number) => void
     /** 각 링의 호를 따라 카테고리 라벨 표시. */
     showInlineLabels?: boolean
     /** 옅은 동심원 그리드 + 방사형 라인 표시. */
@@ -104,6 +107,8 @@ export const RadialChart = ({
     thickness = 14,
     gap = 8,
     showLegend = true,
+    tooltip = true,
+    onBarClick,
     showInlineLabels = false,
     showGrid = false,
     showTrack,
@@ -244,7 +249,10 @@ export const RadialChart = ({
                                             cursor: 'pointer',
                                         }}
                                         onMouseEnter={() => setHover(i)}
-                                    />
+                                        onClick={() => onBarClick?.(d, i)}
+                                    >
+                                        {tooltip && <title>{`${d.label}: ${d.value}`}</title>}
+                                    </path>
                                 )}
                                 {showInlineLabels && pct > 0.12 && (
                                     <InlineRingLabel

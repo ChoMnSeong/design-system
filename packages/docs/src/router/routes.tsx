@@ -14,9 +14,8 @@ import { TogglePage } from '../pages/components/TogglePage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
-import { LineChartPage } from '../pages/components/LineChartPage'
-import { BarChartPage } from '../pages/components/BarChartPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import { AreaChartPage, BarChartPage, CartesianChartPage, GaugePage, LineChartPage, PiePage } from '../pages/components/ChartPages'
 import { BreadcrumbPage, NavigationMenuPage, PaginationPage, StepperPage } from '../pages/components/NavPages'
 import {
     AccordionPage,
@@ -66,12 +65,9 @@ import { OTPInputPage } from '../pages/components/OTPInputPage'
 import { CodeBlockPage } from '../pages/components/CodeBlockPage'
 import {
     ImagePage,
-    PiePage,
-    GaugePage,
 } from '../pages/components/MorePages'
 import { MarqueePage } from '../pages/components/MarqueePage'
 import {
-    AreaChartPage,
     RadarChartPage,
     RadialChartPage,
 } from '../pages/components/ChartsExtraPage'
@@ -128,6 +124,7 @@ export type RouteId =
     | 'c-pagination'
     | 'c-linechart'
     | 'c-barchart'
+    | 'c-cartesian'
     | 'c-colorpicker'
     | 'c-fileupload'
     | 'c-timepicker'
@@ -240,6 +237,7 @@ export const routes: RouteMeta[] = [
 
     { id: 'c-linechart', label: 'LineChart', group: 'data', page: LineChartPage },
     { id: 'c-barchart', label: 'BarChart', group: 'data', page: BarChartPage },
+    { id: 'c-cartesian', label: 'CartesianChart', group: 'data', page: CartesianChartPage },
     { id: 'c-pie', label: 'Pie/Donut', group: 'data', page: PiePage },
     { id: 'c-gauge', label: 'Gauge', group: 'data', page: GaugePage },
     { id: 'c-calendar', label: 'Calendar', group: 'data', page: CalendarPage },

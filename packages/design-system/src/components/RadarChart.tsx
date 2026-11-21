@@ -10,8 +10,14 @@ export type RadarChartProps = {
     axes: string[]
     series: RadarSeries[]
     size?: number
-    max?: number
+    /** 하나면 모든 축 공통, 배열이면 축별 최댓값 (단위가 다른 지표 비교) */
+    max?: number | number[]
+    /** top · bottom · none */
+    legend?: 'top' | 'bottom' | 'none'
+    /** 점에 마우스를 올리면 값 표시 (title) */
+    tooltip?: boolean
     levels?: number
+    /** @deprecated legend 를 쓴다 */
     showLegend?: boolean
     /** 폴리곤 영역 채움 (기본 true). false면 라인만. */
     fill?: boolean
@@ -45,7 +51,9 @@ export const RadarChart = ({
     size = 280,
     max,
     levels = 4,
-    showLegend = true,
+    showLegend,
+    legend,
+    tooltip = true,
     fill = true,
     showDots = true,
     gridShape = 'polygon',
@@ -60,7 +68,8 @@ export const RadarChart = ({
     const padding = 48
     const radius = size / 2 - padding
     const allValues = series.flatMap((s) => s.values)
-    const computedMax = max ?? Math.max(...allValues, 1)
+    const commonMax = typeof max === 'number' ? max : Math.max(...allValues, 1)
+    const maxOf = (i: number) => (Array.isArray(max) ? (max[i] ?? commonMax) : commonMax)
     const angleStep = 360 / Math.max(axes.length, 1)
 
     const axisPoint = (axisIdx: number, frac: number) => {
@@ -79,7 +88,7 @@ export const RadarChart = ({
     const seriesPath = (values: number[]): string =>
         values
             .map((v, i) => {
-                const [x, y] = axisPoint(i, v / computedMax)
+                const [x, y] = axisPoint(i, v / maxOf(i))
                 return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`
             })
             .join(' ') + ' Z'
@@ -221,7 +230,7 @@ export const RadarChart = ({
                                 s.values.map((v, i) => {
                                     const [px, py] = axisPoint(
                                         i,
-                                        v / computedMax,
+                                        v / maxOf(i),
                                     )
                                     return (
                                         <circle
@@ -232,14 +241,16 @@ export const RadarChart = ({
                                             fill="var(--ds-color-background-page)"
                                             stroke={color}
                                             strokeWidth="2"
-                                        />
+                                        >
+                                            {tooltip && <title>{`${s.label} · ${axes[i]}: ${v}`}</title>}
+                                        </circle>
                                     )
                                 })}
                         </g>
                     )
                 })}
             </svg>
-            {showLegend && (
+            {(legend ?? (showLegend === false ? 'none' : 'bottom')) !== 'none' && (
                 <div
                     style={{
                         display: 'flex',

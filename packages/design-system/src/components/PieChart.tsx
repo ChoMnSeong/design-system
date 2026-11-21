@@ -1,254 +1,139 @@
-import { useId, useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { chartColor } from './CartesianChart.js'
+import type { Tone } from './types.js'
 
-export type PieDatum = { label: string; value: number; color?: string }
+export type PieDatum = { label: string; value: number; color?: string; tone?: Tone }
 
 export type PieChartProps = {
     data: PieDatum[]
     size?: number
     donut?: boolean
     thickness?: number
+    /** right · bottom · none */
+    legend?: 'right' | 'bottom' | 'none'
+    /** @deprecated legend 를 쓴다 */
     showLegend?: boolean
-    /** 슬라이스 사이 각도 갭(도). 기본 0. */
     padAngle?: number
-    /** 시작 각도(도). 기본 0 = 12시. */
     startAngle?: number
-    /** 슬라이스 위에 % 표시. */
+    /** 조각 위 글자: value · percent · none */
+    labelType?: 'value' | 'percent' | 'none'
+    /** @deprecated labelType="percent" */
     showValueOnSlice?: boolean
     formatValue?: (n: number, total: number) => string
+    /** 이 비율(%) 미만 조각은 '기타' 로 묶는다 */
+    minSlice?: number
+    onSliceClick?: (datum: PieDatum, index: number) => void
+    tooltip?: boolean
+    /** 강조할 조각 (제어형) */
+    activeIndex?: number
+    'aria-label'?: string
     style?: CSSProperties
+    className?: string
 }
 
-const DEFAULT_COLORS = [
-    'var(--ds-palette-primary-700)',
-    'var(--ds-palette-primary-600)',
-    'var(--ds-palette-primary-500)',
-    'var(--ds-palette-primary-400)',
-    'var(--ds-palette-primary-300)',
-    'var(--ds-palette-primary-200)',
-    'var(--ds-palette-primary-100)',
-]
-
-const polar = (cx: number, cy: number, r: number, deg: number) => {
-    const rad = ((deg - 90) * Math.PI) / 180
-    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)]
-}
-
-const arcPath = (
-    cx: number,
-    cy: number,
-    r: number,
-    startDeg: number,
-    endDeg: number,
-): string => {
-    const [sx, sy] = polar(cx, cy, r, endDeg)
-    const [ex, ey] = polar(cx, cy, r, startDeg)
-    const large = endDeg - startDeg <= 180 ? 0 : 1
-    return `M ${cx} ${cy} L ${sx} ${sy} A ${r} ${r} 0 ${large} 0 ${ex} ${ey} Z`
-}
-
-const donutPath = (
-    cx: number,
-    cy: number,
-    rOuter: number,
-    rInner: number,
-    startDeg: number,
-    endDeg: number,
-): string => {
-    const [osx, osy] = polar(cx, cy, rOuter, endDeg)
-    const [oex, oey] = polar(cx, cy, rOuter, startDeg)
-    const [isx, isy] = polar(cx, cy, rInner, startDeg)
-    const [iex, iey] = polar(cx, cy, rInner, endDeg)
-    const large = endDeg - startDeg <= 180 ? 0 : 1
-    return `M ${osx} ${osy} A ${rOuter} ${rOuter} 0 ${large} 0 ${oex} ${oey} L ${isx} ${isy} A ${rInner} ${rInner} 0 ${large} 1 ${iex} ${iey} Z`
+const arc = (cx: number, cy: number, r: number, ri: number, a0: number, a1: number) => {
+    const p = (rad: number, a: number) => [cx + rad * Math.sin(a), cy - rad * Math.cos(a)]
+    const large = a1 - a0 > Math.PI ? 1 : 0
+    const [x0, y0] = p(r, a0)
+    const [x1, y1] = p(r, a1)
+    if (ri <= 0) return `M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`
+    const [x2, y2] = p(ri, a1)
+    const [x3, y3] = p(ri, a0)
+    return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} L ${x2} ${y2} A ${ri} ${ri} 0 ${large} 0 ${x3} ${y3} Z`
 }
 
 export const PieChart = ({
-    data,
-    size = 180,
+    data: dataProp,
+    size = 200,
     donut,
     thickness = 28,
-    showLegend = true,
+    legend,
+    showLegend,
     padAngle = 0,
     startAngle = 0,
-    showValueOnSlice = false,
+    labelType,
+    showValueOnSlice,
     formatValue,
+    minSlice,
+    onSliceClick,
+    tooltip = true,
+    activeIndex,
+    'aria-label': ariaLabel,
     style,
-}: PieChartProps) => {
-    const id = useId().replace(/:/g, '')
-    const total = data.reduce((sum, d) => sum + d.value, 0) || 1
+    className,
+    children,
+}: PieChartProps & { children?: ReactNode }) => {
     const [hover, setHover] = useState<number | null>(null)
-    const margin = 6
+    const data = useMemo(() => {
+        const total = dataProp.reduce((a, d) => a + d.value, 0) || 1
+        if (!minSlice) return dataProp
+        const keep = dataProp.filter((d) => (d.value / total) * 100 >= minSlice)
+        const rest = dataProp.filter((d) => (d.value / total) * 100 < minSlice)
+        return rest.length > 1 ? [...keep, { label: `기타 ${rest.length}`, value: rest.reduce((a, d) => a + d.value, 0), tone: 'neutral' as Tone }] : dataProp
+    }, [dataProp, minSlice])
+    const total = data.reduce((a, d) => a + d.value, 0) || 1
+    const lt = labelType ?? (showValueOnSlice ? 'percent' : 'none')
+    const lg = legend ?? (showLegend === false ? 'none' : 'right')
+    const r = size / 2 - 4
+    const ri = donut ? r - thickness : 0
     const cx = size / 2
-    const cy = size / 2
-    const rOuter = size / 2 - margin
-    const rInner = donut ? rOuter - thickness : 0
-
-    let cursor = 0
-    const slices = data.map((d, i) => {
-        const rawStart = (cursor / total) * 360
-        cursor += d.value
-        const rawEnd = (cursor / total) * 360
-        const start = rawStart + startAngle + padAngle / 2
-        const end = rawEnd + startAngle - padAngle / 2
-        const safeEnd = end - start >= 360 ? start + 359.999 : end
-        const path = donut
-            ? donutPath(cx, cy, rOuter, rInner, start, safeEnd)
-            : arcPath(cx, cy, rOuter, start, safeEnd)
-        return {
-            path,
-            color: d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]!,
-            datum: d,
-            start,
-            end: safeEnd,
-            mid: (start + safeEnd) / 2,
-            pct: (d.value / total) * 100,
-        }
-    })
-
+    const pad = (padAngle * Math.PI) / 180
+    let a = (startAngle * Math.PI) / 180
+    const active = activeIndex ?? hover
+    const fmt = (v: number) => (formatValue ? formatValue(v, total) : lt === 'value' ? v.toLocaleString('ko-KR') : `${((v / total) * 100).toFixed(1)}%`)
+    const colorOf = (d: PieDatum, i: number) => d.color ?? chartColor(d.tone, i)
     return (
-        <div
-            style={{
-                display: 'inline-flex',
-                gap: '20px',
-                alignItems: 'center',
-                ...style,
-            }}
-        >
-            <svg
-                width={size}
-                height={size}
-                viewBox={`0 0 ${size} ${size}`}
-                style={{ display: 'block', overflow: 'visible' }}
-            >
-                {slices.map((s, i) => {
-                    const isHover = hover === i
-                    const rad = ((s.mid - 90) * Math.PI) / 180
-                    const tx = isHover ? Math.cos(rad) * 5 : 0
-                    const ty = isHover ? Math.sin(rad) * 5 : 0
-                    return (
-                        <path
-                            key={`${id}-${i}`}
-                            d={s.path}
-                            fill={s.color}
-                            stroke="var(--ds-color-background-page)"
-                            strokeWidth="2"
-                            strokeLinejoin="round"
-                            opacity={
-                                hover === null || isHover ? 1 : 0.55
-                            }
-                            transform={`translate(${tx}, ${ty})`}
-                            onMouseEnter={() => setHover(i)}
-                            onMouseLeave={() => setHover(null)}
-                            style={{
-                                transition:
-                                    'transform 200ms ease, opacity 160ms ease',
-                                cursor: 'pointer',
-                                filter: isHover
-                                    ? 'drop-shadow(0 4px 12px var(--ds-color-shadow-strong))'
-                                    : 'none',
-                            }}
-                        />
-                    )
-                })}
-                {showValueOnSlice &&
-                    slices.map((s, i) => {
-                        if (s.pct < 5) return null
-                        const labelR = donut
-                            ? (rOuter + rInner) / 2
-                            : rOuter * 0.65
-                        const rad = ((s.mid - 90) * Math.PI) / 180
-                        const lx = cx + Math.cos(rad) * labelR
-                        const ly = cy + Math.sin(rad) * labelR
+        <div data-ds-pie="" data-legend={lg} className={className} style={style}>
+            <div data-slot="plot" style={{ width: size, height: size }}>
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={ariaLabel ?? data.map((d) => `${d.label} ${((d.value / total) * 100).toFixed(1)}%`).join(', ')}>
+                    {data.map((d, i) => {
+                        const span = (d.value / total) * Math.PI * 2
+                        const a0 = a + pad / 2
+                        const a1 = a + span - pad / 2
+                        a += span
+                        const mid = (a0 + a1) / 2
+                        const grow = active === i ? 4 : 0
+                        const lr = ri ? (r + ri) / 2 : r * 0.62
                         return (
-                            <text
-                                key={`v-${id}-${i}`}
-                                x={lx}
-                                y={ly}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                                fontSize="11"
-                                fontWeight="700"
-                                fill="#ffffff"
-                                fontFamily="var(--ds-typography-font-family-mono)"
-                                style={{
-                                    pointerEvents: 'none',
-                                    paintOrder: 'stroke',
-                                    stroke: 'rgba(0,0,0,0.25)',
-                                    strokeWidth: 2,
-                                    strokeLinejoin: 'round',
-                                }}
-                            >
-                                {Math.round(s.pct)}%
-                            </text>
-                        )
-                    })}
-            </svg>
-            {showLegend && (
-                <ul
-                    style={{
-                        listStyle: 'none',
-                        margin: 0,
-                        padding: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                    }}
-                >
-                    {slices.map((s, i) => {
-                        const isHover = hover === i
-                        return (
-                            <li
-                                key={`${id}-l-${i}`}
-                                onMouseEnter={() => setHover(i)}
-                                onMouseLeave={() => setHover(null)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    fontSize: '12px',
-                                    padding: '4px 8px',
-                                    borderRadius: 'var(--ds-radius-sm)',
-                                    background: isHover
-                                        ? 'var(--ds-color-background-inset)'
-                                        : 'transparent',
-                                    cursor: 'pointer',
-                                    transition: 'background 120ms ease',
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        width: '10px',
-                                        height: '10px',
-                                        borderRadius: '2px',
-                                        background: s.color,
-                                        flexShrink: 0,
-                                    }}
+                            <g key={i}>
+                                <path
+                                    d={arc(cx, cx, r + grow, ri, a0, Math.max(a0 + 0.0001, a1))}
+                                    fill={colorOf(d, i)}
+                                    opacity={active !== null && active !== i ? 0.55 : 1}
+                                    data-slot="slice"
+                                    style={onSliceClick ? { cursor: 'pointer' } : undefined}
+                                    onMouseEnter={() => setHover(i)}
+                                    onMouseLeave={() => setHover(null)}
+                                    onClick={() => onSliceClick?.(dataProp[i] ?? d, i)}
                                 />
-                                <span
-                                    style={{
-                                        color: 'var(--ds-color-foreground-secondary)',
-                                        fontWeight: isHover ? 600 : 500,
-                                    }}
-                                >
-                                    {s.datum.label}
-                                </span>
-                                <span
-                                    style={{
-                                        color: 'var(--ds-color-foreground-primary)',
-                                        fontFamily:
-                                            'var(--ds-typography-font-family-mono)',
-                                        fontSize: '11px',
-                                        fontWeight: 600,
-                                        marginLeft: 'auto',
-                                    }}
-                                >
-                                    {formatValue
-                                        ? formatValue(s.datum.value, total)
-                                        : `${s.pct.toFixed(0)}%`}
-                                </span>
-                            </li>
+                                {lt !== 'none' && span > 0.35 && (
+                                    <text x={cx + lr * Math.sin(mid)} y={cx - lr * Math.cos(mid) + 4} textAnchor="middle" data-slot="slice-label">
+                                        {fmt(d.value)}
+                                    </text>
+                                )}
+                            </g>
                         )
                     })}
+                </svg>
+                {children}
+                {tooltip && hover !== null && data[hover] && (
+                    <div data-slot="tooltip" role="status">
+                        <b>{data[hover]!.label}</b>
+                        <span>
+                            {data[hover]!.value.toLocaleString('ko-KR')} · {((data[hover]!.value / total) * 100).toFixed(1)}%
+                        </span>
+                    </div>
+                )}
+            </div>
+            {lg !== 'none' && (
+                <ul data-slot="legend">
+                    {data.map((d, i) => (
+                        <li key={i} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)} data-active={active === i ? '' : undefined}>
+                            <i style={{ background: colorOf(d, i) }} />
+                            <span>{d.label}</span>
+                            <em>{((d.value / total) * 100).toFixed(1)}%</em>
+                        </li>
+                    ))}
                 </ul>
             )}
         </div>
@@ -256,61 +141,17 @@ export const PieChart = ({
 }
 
 export type DonutChartProps = Omit<PieChartProps, 'donut'> & {
-    centerLabel?: string
-    centerValue?: string
+    centerLabel?: ReactNode
+    centerValue?: ReactNode
 }
 
-export const DonutChart = ({
-    centerLabel,
-    centerValue,
-    size = 200,
-    thickness = 28,
-    ...rest
-}: DonutChartProps) => (
-    <div style={{ position: 'relative', display: 'inline-flex' }}>
-        <PieChart {...rest} donut size={size} thickness={thickness} />
+export const DonutChart = ({ centerLabel, centerValue, size = 200, thickness = 28, ...rest }: DonutChartProps) => (
+    <PieChart {...rest} donut size={size} thickness={thickness}>
         {(centerLabel || centerValue) && (
-            <div
-                aria-hidden
-                style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pointerEvents: 'none',
-                }}
-            >
-                {centerValue && (
-                    <span
-                        style={{
-                            fontSize: '20px',
-                            fontWeight: 700,
-                            color: 'var(--ds-color-foreground-primary)',
-                            letterSpacing: '-0.02em',
-                        }}
-                    >
-                        {centerValue}
-                    </span>
-                )}
-                {centerLabel && (
-                    <span
-                        style={{
-                            fontSize: '11px',
-                            color: 'var(--ds-color-foreground-tertiary)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.06em',
-                            marginTop: '2px',
-                        }}
-                    >
-                        {centerLabel}
-                    </span>
-                )}
+            <div data-slot="center" aria-hidden>
+                {centerValue && <b>{centerValue}</b>}
+                {centerLabel && <span>{centerLabel}</span>}
             </div>
         )}
-    </div>
+    </PieChart>
 )

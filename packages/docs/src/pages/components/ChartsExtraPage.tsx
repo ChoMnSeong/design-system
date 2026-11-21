@@ -1,64 +1,10 @@
 import {
-    AreaChart,
     Card,
-    HStack,
     RadarChart,
     RadialChart,
-    Stack,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
-
-const WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-export const AreaChartPage = () => (
-    <>
-        <PageHeader
-            title="AreaChart"
-            description="다중 시리즈 + 영역 채움. hover 시 모든 시리즈 값을 한 줄에 표시."
-        />
-        <ComponentPreview
-            title="다중 시리즈"
-            code={`<AreaChart
-    labels={WEEK}
-    formatValue={(n) => \`\${n}h\`}
-    series={[
-        { label: '이번 주', values: [12, 18, 14, 22, 28, 36, 32] },
-        { label: '지난 주', values: [8, 14, 12, 18, 22, 28, 24] },
-    ]}
-/>`}
-        >
-            <Card style={{ width: '100%', maxWidth: '640px' }}>
-                <h4
-                    style={{
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        margin: '0 0 14px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        color: 'var(--ds-color-foreground-tertiary)',
-                    }}
-                >
-                    이번 주 시청 비교
-                </h4>
-                <AreaChart
-                    labels={WEEK}
-                    formatValue={(n) => `${n}h`}
-                    series={[
-                        {
-                            label: '이번 주',
-                            values: [12, 18, 14, 22, 28, 36, 32],
-                        },
-                        {
-                            label: '지난 주',
-                            values: [8, 14, 12, 18, 22, 28, 24],
-                        },
-                    ]}
-                />
-            </Card>
-        </ComponentPreview>
-    </>
-)
 
 const RADAR_AXES = ['속도', '강도', '기술', '체력', '회복', '집중']
 const RADAR_A = { label: 'A 캐릭터', values: [82, 65, 90, 72, 60, 88] }
