@@ -19,7 +19,6 @@ import {
     PieChart,
     ScrollArea,
     Stack,
-    Tree,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -175,69 +174,6 @@ export const GaugePage = () => (
         </ComponentPreview>
     </>
 )
-
-const TREE_DATA = [
-    {
-        id: 'src',
-        label: 'src',
-        children: [
-            {
-                id: 'components',
-                label: 'components',
-                children: [
-                    { id: 'Button.tsx', label: 'Button.tsx' },
-                    { id: 'Input.tsx', label: 'Input.tsx' },
-                    { id: 'Card.tsx', label: 'Card.tsx' },
-                ],
-            },
-            {
-                id: 'pages',
-                label: 'pages',
-                children: [
-                    { id: 'Home.tsx', label: 'Home.tsx' },
-                    { id: 'About.tsx', label: 'About.tsx' },
-                ],
-            },
-            { id: 'index.ts', label: 'index.ts' },
-        ],
-    },
-    { id: 'package.json', label: 'package.json' },
-]
-
-export const TreePage = () => {
-    const [selected, setSelected] = useState<string>('Input.tsx')
-    return (
-        <>
-            <PageHeader
-                title="Tree"
-                description="계층 트리뷰. 폴더/파일 같은 중첩 구조 표시."
-            />
-            <ComponentPreview
-                title="파일 트리"
-                code={`<Tree
-    data={treeData}
-    defaultExpanded={['src', 'components']}
-    selectedId={selected}
-    onSelect={setSelected}
-/>`}
-            >
-                <Tree
-                    data={TREE_DATA}
-                    defaultExpanded={['src', 'components']}
-                    selectedId={selected}
-                    onSelect={setSelected}
-                    style={{
-                        width: '280px',
-                        padding: '8px',
-                        background: 'var(--ds-color-background-card)',
-                        border: '1px solid var(--ds-color-border-subtle)',
-                        borderRadius: 'var(--ds-radius-md)',
-                    }}
-                />
-            </ComponentPreview>
-        </>
-    )
-}
 
 export const CommandPalettePage = () => {
     const [open, setOpen] = useState(false)

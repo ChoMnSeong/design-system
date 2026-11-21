@@ -1,7 +1,21 @@
-import { useState, type CSSProperties, type HTMLAttributes, type Ref } from 'react'
-import { mergeStyles } from './types.js'
+import { Children, createContext, isValidElement, useContext, useState, type HTMLAttributes, type ReactNode, type Ref } from 'react'
+import type { Tone } from './types.js'
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+export type PresenceStatus = 'online' | 'away' | 'busy' | 'offline'
+
+const initialsOf = (name?: string): string => {
+    if (!name) return ''
+    const trimmed = name.trim()
+    // 한글 이름은 성 한 글자, 영문은 단어 첫 글자 둘
+    if (/^[가-힣]/.test(trimmed)) return trimmed.slice(0, 1)
+    const parts = trimmed.split(/\s+/)
+    return parts.length > 1 ? `${parts[0]![0]}${parts[1]![0]}`.toUpperCase() : trimmed.slice(0, 2).toUpperCase()
+}
+
+const STATUS_LABEL: Record<PresenceStatus, string> = { online: '온라인', away: '자리 비움', busy: '다른 용무 중', offline: '오프라인' }
+
+const GroupSize = createContext<AvatarSize | null>(null)
 
 export type AvatarProps = {
     src?: string
@@ -9,141 +23,85 @@ export type AvatarProps = {
     name?: string
     size?: AvatarSize
     shape?: 'circle' | 'rounded'
-    fallback?: React.ReactNode
+    /** 이니셜 배경 톤 */
+    tone?: Tone
+    /** 오른쪽 아래 접속 상태 점 */
+    status?: PresenceStatus
+    fallback?: ReactNode
     ref?: Ref<HTMLSpanElement>
 } & Omit<HTMLAttributes<HTMLSpanElement>, 'children'>
-
-const sizes: Record<AvatarSize, { box: number; font: number }> = {
-    xs: { box: 20, font: 10 },
-    sm: { box: 28, font: 11 },
-    md: { box: 36, font: 13 },
-    lg: { box: 48, font: 16 },
-    xl: { box: 64, font: 22 },
-}
-
-const initialsOf = (name?: string): string => {
-    if (!name) return ''
-    const trimmed = name.trim()
-    if (!trimmed) return ''
-    const parts = trimmed.split(/\s+/)
-    if (parts.length === 1) return trimmed.slice(0, 2).toUpperCase()
-    return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase()
-}
 
 export const Avatar = ({
     src,
     alt,
     name,
-    size = 'md',
+    size: sizeProp,
     shape = 'circle',
+    tone = 'accent',
+    status,
     fallback,
-    style,
     ref,
     ...rest
 }: AvatarProps) => {
-    const [errored, setErrored] = useState(false)
-    const showImage = src && !errored
-    const { box, font } = sizes[size]
+    const group = useContext(GroupSize)
+    const size = sizeProp ?? group ?? 'md'
+    const [broken, setBroken] = useState(false)
+    const label = alt ?? name
     return (
         <span
             ref={ref}
-            style={mergeStyles(
-                {
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: `${box}px`,
-                    height: `${box}px`,
-                    borderRadius:
-                        shape === 'circle' ? '50%' : 'var(--ds-radius-md)',
-                    background: 'var(--ds-color-accent-background)',
-                    color: 'var(--ds-color-accent-color)',
-                    fontSize: `${font}px`,
-                    fontWeight: 700,
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    fontFamily: 'inherit',
-                    userSelect: 'none',
-                },
-                style,
-            )}
+            data-ds-avatar=""
+            data-size={size}
+            data-shape={shape}
+            data-tone={tone}
+            role="img"
+            aria-label={[label, status && STATUS_LABEL[status]].filter(Boolean).join(', ') || undefined}
             {...rest}
         >
-            {showImage ? (
-                <img
-                    src={src}
-                    alt={alt ?? name ?? ''}
-                    width={box}
-                    height={box}
-                    loading="lazy"
-                    decoding="async"
-                    onError={() => setErrored(true)}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                    }}
-                />
+            {src && !broken ? (
+                <img src={src} alt="" onError={() => setBroken(true)} />
             ) : (
-                fallback ?? initialsOf(name)
+                <span aria-hidden>{fallback ?? initialsOf(name)}</span>
             )}
+            {status && <span data-slot="status" data-status={status} aria-hidden />}
         </span>
     )
 }
 
 export type AvatarGroupProps = {
     max?: number
+    /** 겹침 간격(px, 음수) */
     spacing?: number
+    /** 자식 Avatar 에 전달 */
+    size?: AvatarSize
 } & HTMLAttributes<HTMLDivElement>
 
-export const AvatarGroup = ({
-    max,
-    spacing = -8,
-    children,
-    style,
-    ...rest
-}: AvatarGroupProps) => {
-    const childArray = Array.isArray(children)
-        ? children
-        : children
-          ? [children]
-          : []
-    const visible = max ? childArray.slice(0, max) : childArray
-    const overflow = max ? childArray.length - max : 0
-
+export const AvatarGroup = ({ max, spacing = -8, size, children, style, ...rest }: AvatarGroupProps) => {
+    const list = Children.toArray(children).filter(isValidElement)
+    const visible = max ? list.slice(0, max) : list
+    const overflow = max ? list.length - max : 0
     return (
-        <div
-            style={mergeStyles(
-                { display: 'inline-flex', alignItems: 'center' },
-                style,
-            )}
-            {...rest}
-        >
-            {visible.map((child, idx) => (
-                <span
-                    key={idx}
-                    style={{
-                        marginLeft: idx === 0 ? 0 : `${spacing}px`,
-                        boxShadow: '0 0 0 2px var(--ds-color-background-card)',
-                        borderRadius: '50%',
-                        display: 'inline-flex',
-                    }}
-                >
-                    {child}
-                </span>
-            ))}
-            {overflow > 0 && (
-                <Avatar
-                    name={`+${overflow}`}
-                    fallback={`+${overflow}`}
-                    style={{
-                        marginLeft: `${spacing}px`,
-                        background: 'var(--ds-color-background-inset)',
-                        color: 'var(--ds-color-foreground-secondary)',
-                        boxShadow: '0 0 0 2px var(--ds-color-background-card)',
-                    }}
-                />
-            )}
-        </div>
+        <GroupSize.Provider value={size ?? null}>
+            <div role="group" data-ds-avatar-group="" style={{ ['--_gap' as string]: `${spacing}px`, ...style }} {...rest}>
+                {visible}
+                {overflow > 0 && <Avatar tone="neutral" fallback={`+${overflow}`} aria-label={`외 ${overflow}명`} />}
+            </div>
+        </GroupSize.Provider>
     )
 }
+
+export type StatusIndicatorProps = {
+    tone?: Tone
+    label?: ReactNode
+    /** 퍼지는 링 (가동·정지처럼 살아 있는 상태) */
+    pulse?: boolean
+    size?: 'sm' | 'md'
+} & HTMLAttributes<HTMLSpanElement>
+
+/** 점 + 라벨 상태 표시 (가동 · 대기 · 정지 · 점검) */
+export const StatusIndicator = ({ tone = 'neutral', label, pulse, size = 'md', ...rest }: StatusIndicatorProps) => (
+    <span data-ds-status="" data-tone={tone} data-size={size} data-pulse={pulse ? '' : undefined} {...rest}>
+        <i aria-hidden />
+        {label}
+    </span>
+)

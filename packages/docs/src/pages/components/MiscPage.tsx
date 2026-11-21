@@ -6,7 +6,6 @@ import {
     Spacer,
     Spinner,
     Stack,
-    Stat,
     VStack,
     Tag,
     IconArrowDown,
@@ -223,45 +222,6 @@ export const EmptyPage = () => (
                 title="시청 기록 없음"
                 description="아직 시청한 작품이 없습니다. 둘러보기에서 새 작품을 찾아보세요."
             />
-        </ComponentPreview>
-    </>
-)
-
-export const StatPage = () => (
-    <>
-        <PageHeader
-            title="Stat"
-            description="KPI 표시 카드. label / value / delta / helper."
-        />
-
-        <ComponentPreview
-            title="기본"
-            code={`<Stat
-    label="이번 주 시청"
-    value="24h 12m"
-    delta={{ value: '+18%', tone: 'success' }}
-    helper="지난 주 대비"
-/>`}
-        >
-            <HStack gap={12} wrap style={{ width: '100%' }}>
-                <Stat
-                    label="이번 주 시청"
-                    value="24h 12m"
-                    delta={{ value: '+18%', tone: 'success' }}
-                    helper="지난 주 대비"
-                />
-                <Stat
-                    label="구독자"
-                    value="1,284"
-                    delta={{ value: '-3%', tone: 'danger' }}
-                    helper="이번 달"
-                />
-                <Stat
-                    label="활성 사용자"
-                    value="528"
-                    helper="현재 시청 중"
-                />
-            </HStack>
         </ComponentPreview>
     </>
 )

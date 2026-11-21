@@ -9,15 +9,12 @@ import { InputPage } from '../pages/components/InputPage'
 import { TextareaPage } from '../pages/components/TextareaPage'
 import { CardPage } from '../pages/components/CardPage'
 import { BoxPage } from '../pages/components/BoxPage'
-import { BadgePage } from '../pages/components/BadgePage'
-import { TagPage } from '../pages/components/TagPage'
 import { AlertPage } from '../pages/components/AlertPage'
 import { CheckboxPage } from '../pages/components/CheckboxPage'
 import { RadioPage } from '../pages/components/RadioPage'
 import { SwitchPage } from '../pages/components/SwitchPage'
 import { TogglePage } from '../pages/components/TogglePage'
 import { TabsPage } from '../pages/components/TabsPage'
-import { TablePage } from '../pages/components/TablePage'
 import { DialogPage } from '../pages/components/DialogPage'
 import { DrawerPage } from '../pages/components/DrawerPage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
@@ -25,14 +22,23 @@ import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { LineChartPage } from '../pages/components/LineChartPage'
 import { BarChartPage } from '../pages/components/BarChartPage'
-import { AvatarPage } from '../pages/components/AvatarPage'
-import { ProgressPage } from '../pages/components/ProgressPage'
 import { TooltipPage } from '../pages/components/TooltipPage'
 import { ToastPage } from '../pages/components/ToastPage'
 import { BreadcrumbPage } from '../pages/components/BreadcrumbPage'
 import { PaginationPage } from '../pages/components/PaginationPage'
 import { AccordionPage } from '../pages/components/AccordionPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import {
+    AvatarPage,
+    BadgePage,
+    DescriptionsPage,
+    ProgressPage,
+    StatPage,
+    TablePage,
+    TagPage,
+    TimelinePage,
+    TreePage,
+} from '../pages/components/DisplayPages'
 import {
     CalendarPage,
     DatePickerPage,
@@ -53,7 +59,6 @@ import {
     SpinnerPage,
     SkeletonPage,
     EmptyPage,
-    StatPage,
 } from '../pages/components/MiscPage'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
 import { RatingPage } from '../pages/components/RatingPage'
@@ -66,7 +71,6 @@ import {
     ScrollAreaPage,
     PiePage,
     GaugePage,
-    TreePage,
     CommandPalettePage,
     NavigationMenuPage,
 } from '../pages/components/MorePages'
@@ -111,6 +115,8 @@ export type RouteId =
     | 'c-alert'
     | 'c-avatar'
     | 'c-stat'
+    | 'c-descriptions'
+    | 'c-timeline'
     | 'c-empty'
     | 'c-kbd'
     | 'c-spinner'
@@ -213,6 +219,8 @@ export const routes: RouteMeta[] = [
     { id: 'c-alert', label: 'Alert', group: 'display', page: AlertPage },
     { id: 'c-avatar', label: 'Avatar', group: 'display', page: AvatarPage },
     { id: 'c-stat', label: 'Stat', group: 'display', page: StatPage },
+    { id: 'c-descriptions', label: 'Descriptions', group: 'display', page: DescriptionsPage },
+    { id: 'c-timeline', label: 'Timeline', group: 'display', page: TimelinePage },
     { id: 'c-empty', label: 'Empty', group: 'display', page: EmptyPage },
     { id: 'c-kbd', label: 'Kbd', group: 'display', page: KbdPage },
     { id: 'c-codeblock', label: 'CodeBlock', group: 'display', page: CodeBlockPage },

@@ -1,138 +1,63 @@
-import type { CSSProperties, HTMLAttributes, Ref } from 'react'
-import { mergeStyles, onToneColor, toneColor, type Tone } from './types.js'
+import type { HTMLAttributes, ReactNode, Ref } from 'react'
 import type { BorderVariant } from './borderVariant.js'
-import { useBorderVariant } from '../provider/useDesignSystem.js'
+import type { Tone } from './types.js'
+
+export type BadgeAppearance = 'solid' | 'soft' | 'outline'
 
 export type BadgeProps = {
+    /** 'default' 는 'neutral' 과 같다 */
     tone?: Tone | 'default'
-    size?: 'sm' | 'md'
+    appearance?: BadgeAppearance
+    /** xs 18 · sm 20 · md 22 */
+    size?: 'xs' | 'sm' | 'md'
+    /** 앞에 상태 점 */
     dot?: boolean
+    /** 숫자 children 이 max 를 넘으면 "max+" */
+    max?: number
+    /** 주의를 끄는 맥동 링 */
+    pulse?: boolean
+    icon?: ReactNode
+    /** @deprecated appearance="solid" */
     solid?: boolean
+    /** @deprecated appearance 로 통합 (outlined → outline) */
     variant?: BorderVariant
     ref?: Ref<HTMLSpanElement>
 } & HTMLAttributes<HTMLSpanElement>
 
-const baseStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    fontWeight: 600,
-    fontFamily: 'inherit',
-    letterSpacing: '0.01em',
-    whiteSpace: 'nowrap',
-    lineHeight: 1.2,
-}
-
-const sizeStyles = {
-    sm: { padding: '2px 8px', fontSize: '10px' },
-    md: { padding: '3px 10px', fontSize: '11px' },
-}
-
-const computeAppearance = (
-    tone: Tone | 'default',
-    solid: boolean,
-    variant: BorderVariant,
-): CSSProperties => {
-    const isDefault = tone === 'default'
-    const accentColor = isDefault
-        ? 'var(--ds-color-foreground-tertiary)'
-        : toneColor(tone as Tone)
-
-    if (solid) {
-        return {
-            background: isDefault
-                ? 'var(--ds-color-background-inset)'
-                : toneColor(tone as Tone),
-            color: isDefault
-                ? 'var(--ds-color-foreground-primary)'
-                : onToneColor(tone as Tone),
-            border: 'none',
-            borderRadius: 'var(--ds-radius-full)',
-        }
-    }
-
-    const fg = isDefault
-        ? 'var(--ds-color-foreground-secondary)'
-        : toneColor(tone as Tone)
-
-    switch (variant) {
-        case 'underline':
-            return {
-                background: 'transparent',
-                color: fg,
-                border: 'none',
-                borderBottom: `1.5px solid ${accentColor}`,
-                borderRadius: 0,
-            }
-        case 'filled':
-            return {
-                background: isDefault
-                    ? 'var(--ds-color-background-inset)'
-                    : `color-mix(in srgb, ${accentColor} 18%, transparent)`,
-                color: fg,
-                border: 'none',
-                borderRadius: 'var(--ds-radius-full)',
-            }
-        case 'ghost':
-            return {
-                background: 'transparent',
-                color: fg,
-                border: 'none',
-                borderRadius: 'var(--ds-radius-full)',
-            }
-        case 'outlined':
-        default:
-            return {
-                background: isDefault
-                    ? 'var(--ds-color-background-inset)'
-                    : 'transparent',
-                color: fg,
-                border: `1px solid ${
-                    isDefault ? 'var(--ds-color-border-subtle)' : accentColor
-                }`,
-                borderRadius: 'var(--ds-radius-full)',
-            }
-    }
-}
-
 export const Badge = ({
-    tone = 'default',
+    tone = 'neutral',
+    appearance,
     size = 'md',
     dot,
-    solid = false,
-    variant: variantProp,
+    max,
+    pulse,
+    icon,
+    solid,
+    variant,
     children,
-    style,
     ref,
     ...rest
 }: BadgeProps) => {
-    const variant = useBorderVariant(variantProp)
-    const appearance = computeAppearance(tone, solid, variant)
-    const isDefault = tone === 'default'
-
+    const app: BadgeAppearance = appearance ?? (solid ? 'solid' : variant === 'outlined' ? 'outline' : 'soft')
+    const content =
+        typeof children === 'number' && max !== undefined && children > max ? `${max}+` : children
     return (
         <span
             ref={ref}
-            style={mergeStyles(baseStyle, sizeStyles[size], appearance, style)}
+            data-ds-badge=""
+            data-tone={tone === 'default' ? 'neutral' : tone}
+            data-appearance={app}
+            data-size={size}
+            data-pulse={pulse ? '' : undefined}
             {...rest}
         >
-            {dot && (
-                <span
-                    aria-hidden
-                    style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        background: solid
-                            ? 'currentColor'
-                            : isDefault
-                              ? 'var(--ds-color-foreground-tertiary)'
-                              : toneColor(tone as Tone),
-                        marginRight: '6px',
-                        flexShrink: 0,
-                    }}
-                />
+            {dot && <span data-slot="dot" aria-hidden />}
+            {icon && (
+                <span data-slot="icon" aria-hidden>
+                    {icon}
+                </span>
             )}
-            {children}
+            {content}
         </span>
     )
 }

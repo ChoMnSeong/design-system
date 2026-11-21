@@ -9,6 +9,10 @@ export type CodeBlockProps = {
     showLineNumbers?: boolean
     showCopy?: boolean
     maxHeight?: number | string
+    /** 강조할 줄 번호 (1부터) */
+    highlightLines?: number[]
+    /** 긴 줄을 줄바꿈한다 (기본은 가로 스크롤) */
+    wrap?: boolean
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
@@ -19,6 +23,8 @@ export const CodeBlock = ({
     showLineNumbers,
     showCopy = true,
     maxHeight,
+    highlightLines,
+    wrap,
     style,
     ref,
     ...rest
@@ -134,11 +140,25 @@ export const CodeBlock = ({
                             : maxHeight,
                 }}
             >
-                {showLineNumbers ? (
+                {showLineNumbers || highlightLines?.length || wrap ? (
                     <code>
                         {lines.map((line, i) => (
-                            <div key={i} style={{ display: 'flex' }}>
-                                <span
+                            <div
+                                key={i}
+                                data-highlight={highlightLines?.includes(i + 1) ? '' : undefined}
+                                style={{
+                                    display: 'flex',
+                                    margin: '0 -16px',
+                                    padding: '0 16px',
+                                    ...(highlightLines?.includes(i + 1)
+                                        ? {
+                                              background: 'color-mix(in oklab, var(--ds-palette-primary-500) 12%, transparent)',
+                                              boxShadow: 'inset 3px 0 0 var(--ds-palette-primary-500)',
+                                          }
+                                        : null),
+                                }}
+                            >
+                                {showLineNumbers && <span
                                     aria-hidden
                                     style={{
                                         flex: '0 0 auto',
@@ -150,8 +170,8 @@ export const CodeBlock = ({
                                     }}
                                 >
                                     {i + 1}
-                                </span>
-                                <span style={{ flex: 1, whiteSpace: 'pre' }}>
+                                </span>}
+                                <span style={{ flex: 1, whiteSpace: wrap ? 'pre-wrap' : 'pre', overflowWrap: wrap ? 'anywhere' : undefined }}>
                                     {line || ' '}
                                 </span>
                             </div>
