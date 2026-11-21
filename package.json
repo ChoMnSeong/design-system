@@ -1,0 +1,16 @@
+{
+    "name": "ensnif-design-system",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "pnpm --filter design-system-docs dev",
+        "build": "pnpm --filter @ensnif/design-system build",
+        "build:docs": "pnpm --filter design-system-docs build",
+        "publish:ds": "pnpm --filter @ensnif/design-system publish"
+    },
+    "devDependencies": {
+        "prettier": "^3.5.3",
+        "typescript": "^5.8.2"
+    },
+    "packageManager": "pnpm@9.1.0"
+}
