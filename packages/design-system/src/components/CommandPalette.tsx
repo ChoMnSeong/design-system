@@ -1,13 +1,8 @@
-import {
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type KeyboardEvent,
-    type ReactNode,
-} from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { IconSearch } from './icons.js'
+import { Kbd } from './Kbd.js'
+import { useModalBehavior, useOverlayState } from './Dialog.js'
 
 export type CommandItem = {
     id: string
@@ -17,328 +12,254 @@ export type CommandItem = {
     group?: string
     keywords?: string[]
     shortcut?: string
+    disabled?: boolean
     onSelect: () => void
 }
 
 export type CommandPaletteProps = {
-    open: boolean
-    onClose: () => void
-    items: CommandItem[]
+    open?: boolean
+    defaultOpen?: boolean
+    onOpenChange?: (open: boolean) => void
+    /** @deprecated onOpenChange(false) */
+    onClose?: () => void
+    items?: CommandItem[]
+    /** 서버 검색. 입력이 바뀔 때(200ms 뒤) 불린다. 결과는 items 뒤에 붙는다 */
+    loadItems?: (query: string) => Promise<CommandItem[]>
     placeholder?: string
     emptyMessage?: ReactNode
+    /** 전역 단축키. 'mod' 는 macOS 에서 ⌘, 그 밖에서 Ctrl. false 면 끈다 */
+    hotkey?: string | false
+    /** 최근 실행한 항목을 맨 위 '최근' 그룹에 보인다. 문자열이면 localStorage 키 */
+    recent?: boolean | string
+    footer?: ReactNode
+    /** 점수(0 이면 제외). 기본은 라벨 앞부분 일치 > 포함 > 키워드 */
+    filter?: (item: CommandItem, query: string) => number
+    size?: 'md' | 'lg'
+}
+
+const defaultScore = (it: CommandItem, q: string) => {
+    const l = it.label.toLowerCase()
+    if (l.startsWith(q)) return 3
+    if (l.includes(q)) return 2
+    const hay = [it.description ?? '', it.group ?? '', ...(it.keywords ?? [])].join(' ').toLowerCase()
+    return hay.includes(q) ? 1 : 0
+}
+
+const isMac = () => typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+
+const matchesHotkey = (e: globalThis.KeyboardEvent, hk: string) => {
+    const parts = hk.toLowerCase().split('+')
+    const key = parts.pop()
+    const mod = parts.includes('mod')
+    const need = {
+        meta: parts.includes('meta') || (mod && isMac()),
+        ctrl: parts.includes('ctrl') || (mod && !isMac()),
+        shift: parts.includes('shift'),
+        alt: parts.includes('alt'),
+    }
+    return e.key.toLowerCase() === key && e.metaKey === need.meta && e.ctrlKey === need.ctrl && e.shiftKey === need.shift && e.altKey === need.alt
 }
 
 export const CommandPalette = ({
-    open,
+    open: openProp,
+    defaultOpen,
+    onOpenChange,
     onClose,
-    items,
+    items = [],
+    loadItems,
     placeholder = '명령어 또는 검색어 입력…',
     emptyMessage = '결과 없음',
+    hotkey = 'mod+k',
+    recent,
+    footer,
+    filter = defaultScore,
+    size = 'md',
 }: CommandPaletteProps) => {
+    const { open, setOpen } = useOverlayState({ open: openProp, defaultOpen, onOpenChange, onClose })
     const [query, setQuery] = useState('')
-    const [highlight, setHighlight] = useState(0)
-    const inputRef = useRef<HTMLInputElement | null>(null)
+    const [active, setActive] = useState(0)
+    const [remote, setRemote] = useState<CommandItem[]>([])
+    const [loading, setLoading] = useState(false)
+    const panelRef = useRef<HTMLDivElement | null>(null)
+    const listId = useId()
+    const storeKey = typeof recent === 'string' ? recent : 'ds-command-recent'
+    const [recentIds, setRecentIds] = useState<string[]>(() => {
+        if (!recent) return []
+        try {
+            return JSON.parse(localStorage.getItem(storeKey) ?? '[]')
+        } catch {
+            return []
+        }
+    })
+
+    useModalBehavior(open, panelRef, () => setOpen(false))
+
+    // 전역 단축키
+    useEffect(() => {
+        if (!hotkey) return
+        const onKey = (e: globalThis.KeyboardEvent) => {
+            if (matchesHotkey(e, hotkey)) {
+                e.preventDefault()
+                setOpen(!open)
+            }
+        }
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hotkey, open])
 
     useEffect(() => {
         if (!open) {
             setQuery('')
-            setHighlight(0)
-            return
+            setActive(0)
+            setRemote([])
         }
-        const t = setTimeout(() => inputRef.current?.focus(), 30)
-        return () => clearTimeout(t)
     }, [open])
 
     useEffect(() => {
-        if (!open) return
-        const onKey = (e: globalThis.KeyboardEvent) => {
-            if (e.key === 'Escape') onClose()
-        }
-        window.addEventListener('keydown', onKey)
-        const overflow = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
+        if (!loadItems || !open) return
+        let alive = true
+        setLoading(true)
+        const t = setTimeout(() => {
+            loadItems(query)
+                .then((r) => alive && setRemote(r))
+                .finally(() => alive && setLoading(false))
+        }, 200)
         return () => {
-            window.removeEventListener('keydown', onKey)
-            document.body.style.overflow = overflow
+            alive = false
+            clearTimeout(t)
         }
-    }, [open, onClose])
+    }, [loadItems, query, open])
 
-    const filtered = useMemo(() => {
+    const all = useMemo(() => [...items, ...remote.filter((r) => !items.some((i) => i.id === r.id))], [items, remote])
+    const visible = useMemo(() => {
         const q = query.trim().toLowerCase()
-        if (!q) return items
-        return items.filter((it) => {
-            const hay = [
-                it.label,
-                it.description ?? '',
-                it.group ?? '',
-                ...(it.keywords ?? []),
-            ]
-                .join(' ')
-                .toLowerCase()
-            return hay.includes(q)
-        })
-    }, [items, query])
-
-    useEffect(() => {
-        setHighlight(0)
-    }, [query])
-
-    const grouped = useMemo(() => {
-        const map = new Map<string, CommandItem[]>()
-        for (const it of filtered) {
-            const g = it.group ?? ''
-            if (!map.has(g)) map.set(g, [])
-            map.get(g)!.push(it)
+        if (!q) {
+            const rec = recent ? recentIds.map((id) => all.find((i) => i.id === id)).filter(Boolean).map((i) => ({ ...i!, group: '최근' })) : []
+            return [...rec, ...all.filter((i) => !rec.some((r) => r.id === i.id))]
         }
-        return Array.from(map.entries())
-    }, [filtered])
+        return all
+            .map((it) => ({ it, s: filter(it, q) }))
+            .filter((x) => x.s > 0)
+            .sort((a, b) => b.s - a.s)
+            .map((x) => x.it)
+    }, [all, query, recent, recentIds, filter])
+
+    const groups = useMemo(() => {
+        const m = new Map<string, CommandItem[]>()
+        for (const it of visible) {
+            const g = it.group ?? ''
+            if (!m.has(g)) m.set(g, [])
+            m.get(g)!.push(it)
+        }
+        return [...m.entries()]
+    }, [visible])
+    const flat = groups.flatMap(([, list]) => list)
+
+    const run = (it: CommandItem) => {
+        if (it.disabled) return
+        if (recent) {
+            const next = [it.id, ...recentIds.filter((x) => x !== it.id)].slice(0, 5)
+            setRecentIds(next)
+            try {
+                localStorage.setItem(storeKey, JSON.stringify(next))
+            } catch {
+                /* 저장 불가 */
+            }
+        }
+        setOpen(false)
+        it.onSelect()
+    }
 
     const onKey = (e: KeyboardEvent) => {
         if (e.key === 'ArrowDown') {
             e.preventDefault()
-            setHighlight((h) =>
-                Math.min(h + 1, Math.max(filtered.length - 1, 0)),
-            )
+            setActive((a) => Math.min(a + 1, flat.length - 1))
         } else if (e.key === 'ArrowUp') {
             e.preventDefault()
-            setHighlight((h) => Math.max(h - 1, 0))
+            setActive((a) => Math.max(a - 1, 0))
         } else if (e.key === 'Enter') {
             e.preventDefault()
-            const it = filtered[highlight]
-            if (it) {
-                it.onSelect()
-                onClose()
-            }
+            const it = flat[active]
+            if (it) run(it)
         }
     }
 
-    if (!open || typeof document === 'undefined') return null
+    useEffect(() => {
+        panelRef.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: 'nearest' })
+    }, [active])
 
-    let runningIndex = 0
-    const node = (
-        <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                zIndex: 'var(--ds-z-index-modal)',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                padding: '80px 16px 16px',
-            }}
-        >
-            <div
-                onClick={onClose}
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'var(--ds-color-background-scrim)',
-                    backdropFilter: 'blur(2px)',
-                    animation: 'ds-fade-in 160ms ease',
-                }}
-            />
-            <div
-                role="dialog"
-                aria-modal="true"
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    maxWidth: '560px',
-                    background: 'var(--ds-surface-overlay-background)',
-                    backdropFilter: 'var(--ds-surface-overlay-backdrop-filter)',
-                    border: 'var(--ds-surface-overlay-border)',
-                    borderRadius: 'var(--ds-surface-overlay-radius)',
-                    boxShadow: 'var(--ds-surface-overlay-shadow)',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    maxHeight: '70vh',
-                }}
-            >
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '12px 14px',
-                        borderBottom: '1px solid var(--ds-color-border-subtle)',
-                    }}
-                >
-                    <IconSearch
-                        size={16}
-                        style={{
-                            color: 'var(--ds-color-foreground-tertiary)',
-                            flexShrink: 0,
-                        }}
-                    />
+    if (!open || typeof document === 'undefined') return null
+    let idx = -1
+    return createPortal(
+        <div data-ds-modal-root="" data-command="" onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}>
+            <div ref={panelRef} role="dialog" aria-modal="true" aria-label="명령 팔레트" data-ds-command="" data-size={size} tabIndex={-1}>
+                <label data-slot="search">
+                    <IconSearch size={18} aria-hidden />
                     <input
-                        ref={inputRef}
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={onKey}
-                        placeholder={placeholder}
+                        data-autofocus=""
+                        role="combobox"
+                        aria-expanded="true"
+                        aria-controls={listId}
+                        aria-activedescendant={flat[active] ? `${listId}-${active}` : undefined}
                         aria-label={placeholder}
-                        autoComplete="off"
-                        spellCheck={false}
-                        data-ds-focusable=""
-                        style={{
-                            flex: 1,
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            color: 'var(--ds-color-foreground-primary)',
-                            fontSize: '14px',
-                            fontFamily: 'inherit',
-                            padding: 0,
+                        placeholder={placeholder}
+                        value={query}
+                        onChange={(e) => {
+                            setQuery(e.target.value)
+                            setActive(0)
                         }}
+                        onKeyDown={onKey}
                     />
-                </div>
-                <div
-                    data-ds-scrollbar=""
-                    style={{
-                        flex: 1,
-                        overscrollBehavior: 'contain',
-                        overflowY: 'auto',
-                        padding: '6px',
-                    }}
-                >
-                    {filtered.length === 0 ? (
-                        <div
-                            style={{
-                                padding: '32px 16px',
-                                textAlign: 'center',
-                                color: 'var(--ds-color-foreground-tertiary)',
-                                fontSize: '13px',
-                            }}
-                        >
-                            {emptyMessage}
-                        </div>
+                    {loading && <span data-ds-spinner-ring="" style={{ width: 14, height: 14, borderWidth: 2 }} aria-hidden />}
+                    <Kbd size="xs">Esc</Kbd>
+                </label>
+                <div id={listId} role="listbox" data-slot="list">
+                    {flat.length === 0 ? (
+                        <div data-slot="empty">{loading ? '검색 중…' : emptyMessage}</div>
                     ) : (
-                        grouped.map(([group, list]) => (
-                            <div key={group}>
-                                {group && (
-                                    <div
-                                        style={{
-                                            padding: '8px 10px 4px',
-                                            fontSize: '10px',
-                                            fontWeight: 700,
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.08em',
-                                            color: 'var(--ds-color-foreground-tertiary)',
-                                        }}
-                                    >
-                                        {group}
-                                    </div>
-                                )}
+                        groups.map(([g, list]) => (
+                            <div key={g || '_'} role="group" aria-label={g || undefined}>
+                                {g && <div data-slot="group">{g}</div>}
                                 {list.map((it) => {
-                                    const idx = runningIndex++
-                                    const isActive = idx === highlight
+                                    idx += 1
+                                    const i = idx
                                     return (
-                                        <button
-                                            data-ds-interactive="subtle"
-                                            data-ds-list-item={
-                                                filtered.length > 50
-                                                    ? ''
-                                                    : undefined
-                                            }
-                                            key={it.id}
-                                            type="button"
-                                            onClick={() => {
-                                                it.onSelect()
-                                                onClose()
-                                            }}
-                                            onMouseEnter={() => setHighlight(idx)}
-                                            style={{
-                                                width: '100%',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '10px',
-                                                padding: '8px 10px',
-                                                background: isActive
-                                                    ? 'var(--ds-color-background-inset)'
-                                                    : 'transparent',
-                                                color: 'var(--ds-color-foreground-primary)',
-                                                border: 'none',
-                                                borderRadius: 'var(--ds-radius-sm)',
-                                                cursor: 'pointer',
-                                                fontFamily: 'inherit',
-                                                textAlign: 'left',
-                                                fontSize: '13px',
-                                            }}
+                                        <div
+                                            key={`${g}-${it.id}`}
+                                            id={`${listId}-${i}`}
+                                            role="option"
+                                            aria-selected={i === active}
+                                            aria-disabled={it.disabled || undefined}
+                                            data-index={i}
+                                            data-slot="item"
+                                            data-active={i === active ? '' : undefined}
+                                            onMouseMove={() => setActive(i)}
+                                            onClick={() => run(it)}
                                         >
-                                            {it.icon && (
-                                                <span
-                                                    style={{
-                                                        display: 'inline-flex',
-                                                        alignItems: 'center',
-                                                        color: 'var(--ds-color-foreground-tertiary)',
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    {it.icon}
-                                                </span>
-                                            )}
-                                            <div
-                                                style={{
-                                                    flex: 1,
-                                                    minWidth: 0,
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    gap: '2px',
-                                                }}
-                                            >
-                                                <span style={{ fontWeight: 600 }}>
-                                                    {it.label}
-                                                </span>
-                                                {it.description && (
-                                                    <span
-                                                        style={{
-                                                            fontSize: '11px',
-                                                            color: 'var(--ds-color-foreground-tertiary)',
-                                                        }}
-                                                    >
-                                                        {it.description}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {it.shortcut && (
-                                                <span
-                                                    style={{
-                                                        fontSize: '11px',
-                                                        color: 'var(--ds-color-foreground-tertiary)',
-                                                        fontFamily:
-                                                            'var(--ds-typography-font-family-mono)',
-                                                    }}
-                                                >
-                                                    {it.shortcut}
-                                                </span>
-                                            )}
-                                        </button>
+                                            {it.icon && <span data-slot="icon" aria-hidden>{it.icon}</span>}
+                                            <span data-slot="label">
+                                                {it.label}
+                                                {it.description && <small>{it.description}</small>}
+                                            </span>
+                                            {it.shortcut && <Kbd keys={it.shortcut.split(/\s+/)} size="xs" />}
+                                        </div>
                                     )
                                 })}
                             </div>
                         ))
                     )}
                 </div>
-                <div
-                    style={{
-                        padding: '8px 14px',
-                        borderTop: '1px solid var(--ds-color-border-subtle)',
-                        display: 'flex',
-                        gap: '14px',
-                        fontSize: '11px',
-                        color: 'var(--ds-color-foreground-tertiary)',
-                        fontFamily: 'var(--ds-typography-font-family-mono)',
-                    }}
-                >
-                    <span>↑↓ 이동</span>
-                    <span>↵ 선택</span>
-                    <span>esc 닫기</span>
+                <div data-slot="footer">
+                    {footer ?? (
+                        <>
+                            <span><Kbd size="xs">↑</Kbd><Kbd size="xs">↓</Kbd> 이동</span>
+                            <span><Kbd size="xs">Enter</Kbd> 실행</span>
+                        </>
+                    )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body,
     )
-
-    return createPortal(node, document.body)
 }

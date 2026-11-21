@@ -1,118 +1,78 @@
-import {
-    cloneElement,
-    isValidElement,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-    type ReactElement,
-    type ReactNode,
-} from 'react'
-import { Popover } from './Popover.js'
+import { cloneElement, isValidElement, useEffect, useId, useRef, useState, type ReactElement, type ReactNode } from 'react'
+import { PopoverPositioner } from './Popover.js'
 
 export type TooltipProps = {
     content: ReactNode
     children: ReactElement<any>
     delay?: number
-    side?: 'top' | 'bottom'
+    side?: 'top' | 'bottom' | 'left' | 'right'
     align?: 'start' | 'center' | 'end'
+    arrow?: boolean
+    maxWidth?: number
+    disabled?: boolean
+    tone?: 'neutral' | 'accent' | 'danger'
 }
 
+/** 짧은 설명 말풍선. 마우스 오버와 키보드 포커스 모두에서 열리고 Esc 로 닫힌다. */
 export const Tooltip = ({
     content,
     children,
     delay = 200,
     side = 'top',
     align = 'center',
+    arrow = true,
+    maxWidth = 240,
+    disabled,
+    tone = 'neutral',
 }: TooltipProps) => {
     const [open, setOpen] = useState(false)
     const triggerRef = useRef<HTMLElement | null>(null)
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-    const show = useCallback(() => {
-        timer.current && clearTimeout(timer.current)
-        timer.current = setTimeout(() => setOpen(true), delay)
-    }, [delay])
-
-    const hide = useCallback(() => {
-        timer.current && clearTimeout(timer.current)
-        setOpen(false)
-    }, [])
-
-    useEffect(() => () => {
+    const id = useId()
+    const clear = () => {
         if (timer.current) clearTimeout(timer.current)
-    }, [])
+    }
+    const show = () => {
+        clear()
+        timer.current = setTimeout(() => setOpen(true), delay)
+    }
+    const hide = () => {
+        clear()
+        setOpen(false)
+    }
+    useEffect(() => {
+        if (!open) return
+        const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+    }, [open])
+    useEffect(() => () => clear(), [])
 
-    if (!isValidElement(children)) return <>{children}</>
-
-    const childProps = (children.props ?? {}) as Record<string, unknown>
+    if (!isValidElement(children) || disabled || content == null || content === '') return children
+    const p = (children.props ?? {}) as Record<string, ((e: unknown) => void) | string | undefined>
+    const call = (k: string, e: unknown) => (typeof p[k] === 'function' ? (p[k] as (e: unknown) => void)(e) : undefined)
     const enhanced = cloneElement(children, {
         ref: (node: HTMLElement | null) => {
             triggerRef.current = node
-            const original = (children as { ref?: unknown }).ref
-            if (typeof original === 'function') original(node)
-            else if (
-                original &&
-                typeof original === 'object' &&
-                'current' in original
-            ) {
-                ;(original as { current: HTMLElement | null }).current = node
-            }
+            const r = (children as { ref?: unknown }).ref
+            if (typeof r === 'function') r(node)
+            else if (r && typeof r === 'object' && 'current' in r) (r as { current: HTMLElement | null }).current = node
         },
-        onMouseEnter: (e: unknown) => {
-            const fn = childProps.onMouseEnter as
-                | ((e: unknown) => void)
-                | undefined
-            fn?.(e)
-            show()
-        },
-        onMouseLeave: (e: unknown) => {
-            const fn = childProps.onMouseLeave as
-                | ((e: unknown) => void)
-                | undefined
-            fn?.(e)
-            hide()
-        },
-        onFocus: (e: unknown) => {
-            const fn = childProps.onFocus as ((e: unknown) => void) | undefined
-            fn?.(e)
-            show()
-        },
-        onBlur: (e: unknown) => {
-            const fn = childProps.onBlur as ((e: unknown) => void) | undefined
-            fn?.(e)
-            hide()
-        },
+        'aria-describedby': [p['aria-describedby'], open ? id : undefined].filter(Boolean).join(' ') || undefined,
+        onMouseEnter: (e: unknown) => { call('onMouseEnter', e); show() },
+        onMouseLeave: (e: unknown) => { call('onMouseLeave', e); hide() },
+        onFocus: (e: unknown) => { call('onFocus', e); show() },
+        onBlur: (e: unknown) => { call('onBlur', e); hide() },
     } as never)
 
     return (
         <>
             {enhanced}
-            <Popover
-                open={open}
-                triggerRef={triggerRef}
-                offset={6}
-                align={align}
-                placement={side}
-                zIndex="var(--ds-z-index-tooltip)"
-            >
-                <div
-                    role="tooltip"
-                    style={{
-                        background: 'var(--ds-color-foreground-primary)',
-                        color: 'var(--ds-color-background-page)',
-                        fontSize: '11px',
-                        fontWeight: 500,
-                        padding: '5px 9px',
-                        borderRadius: 'var(--ds-radius-sm)',
-                        boxShadow: 'var(--ds-shadow-lg)',
-                        whiteSpace: 'nowrap',
-                        pointerEvents: 'none',
-                    }}
-                >
+            <PopoverPositioner open={open} triggerRef={triggerRef} offset={6} align={align} placement={side} zIndex="var(--ds-z-index-tooltip)" arrow={arrow}>
+                <div id={id} role="tooltip" data-ds-tooltip="" data-tone={tone === 'neutral' ? undefined : tone} style={{ maxWidth }}>
                     {content}
                 </div>
-            </Popover>
+            </PopoverPositioner>
         </>
     )
 }

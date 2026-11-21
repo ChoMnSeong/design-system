@@ -1,24 +1,14 @@
-import { useState } from 'react'
 import {
-    Button,
-    CodeBlock,
-    CommandPalette,
     DonutChart,
     Gauge,
     HStack,
     IconArrowRight,
-    IconCheck,
-    IconClose,
     IconError,
-    IconInfo,
     IconSearch,
-    IconSun,
     Image,
-    Kbd,
     NavigationMenu,
     PieChart,
     ScrollArea,
-    Stack,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -174,73 +164,6 @@ export const GaugePage = () => (
         </ComponentPreview>
     </>
 )
-
-export const CommandPalettePage = () => {
-    const [open, setOpen] = useState(false)
-    return (
-        <>
-            <PageHeader
-                title="CommandPalette"
-                description="⌘K 검색 메뉴. group 묶음, 키워드, 단축키 표시 지원."
-            />
-            <ComponentPreview
-                title="기본"
-                code={`<CommandPalette open={open} onClose={...} items={items} />`}
-            >
-                <Stack gap={8} align="center">
-                    <Button onClick={() => setOpen(true)}>
-                        명령 열기 <Kbd size="sm">⌘</Kbd>
-                        <Kbd size="sm">K</Kbd>
-                    </Button>
-                </Stack>
-                <CommandPalette
-                    open={open}
-                    onClose={() => setOpen(false)}
-                    items={[
-                        {
-                            id: 'new',
-                            label: '새 컬렉션',
-                            description: '내 라이브러리 추가',
-                            group: '액션',
-                            shortcut: '⌘N',
-                            icon: <IconArrowRight size={14} />,
-                            onSelect: () => alert('새 컬렉션'),
-                        },
-                        {
-                            id: 'search',
-                            label: '검색',
-                            group: '액션',
-                            shortcut: '⌘F',
-                            icon: <IconSearch size={14} />,
-                            onSelect: () => alert('검색'),
-                        },
-                        {
-                            id: 'theme',
-                            label: '다크 모드 전환',
-                            group: '설정',
-                            icon: <IconSun size={14} />,
-                            onSelect: () => alert('테마'),
-                        },
-                        {
-                            id: 'help',
-                            label: '도움말',
-                            group: '설정',
-                            icon: <IconInfo size={14} />,
-                            onSelect: () => alert('help'),
-                        },
-                        {
-                            id: 'logout',
-                            label: '로그아웃',
-                            group: '계정',
-                            icon: <IconClose size={14} />,
-                            onSelect: () => alert('logout'),
-                        },
-                    ]}
-                />
-            </ComponentPreview>
-        </>
-    )
-}
 
 export const NavigationMenuPage = () => (
     <>

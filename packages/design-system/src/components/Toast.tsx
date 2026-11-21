@@ -1,111 +1,164 @@
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useRef,
-    useState,
-    type ReactNode,
-} from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import {
-    IconClose,
-    IconError,
-    IconInfo,
-    IconSuccess,
-    IconWarning,
-    type IconType,
-} from './icons.js'
-import { toneColor, type Tone } from './types.js'
+import { IconClose, IconError, IconInfo, IconSuccess, IconWarning } from './icons.js'
+import type { Tone } from './types.js'
 
-export type ToastTone = Exclude<Tone, 'accent' | 'neutral'> | 'info'
+export type ToastTone = Tone
 
 export type ToastOptions = {
+    /** 같은 id 로 다시 부르면 새로 쌓지 않고 바꾼다 (중복 방지) */
+    id?: string
     title?: ReactNode
     description?: ReactNode
-    tone?: ToastTone
+    tone?: Tone
+    /** ms. 0 이면 닫을 때까지 남는다. 기본 4000 */
     duration?: number
     action?: { label: string; onClick: () => void }
+    /** duration 과 무관하게 남긴다 (오류 · 확인 필요) */
+    persistent?: boolean
+    /** 남은 시간 막대 */
+    progress?: boolean
+    /** 진행 중 표시 (promise 의 loading 단계) */
+    loading?: boolean
 }
 
-export type ToastItem = ToastOptions & { id: string }
+export type ToastItem = ToastOptions & { id: string; createdAt: number }
+
+type Shorthand = (opts: Omit<ToastOptions, 'tone'>) => string
+type PromiseMessages<R> = {
+    loading: ToastOptions | ReactNode
+    success: ToastOptions | ReactNode | ((r: R) => ToastOptions | ReactNode)
+    error: ToastOptions | ReactNode | ((e: unknown) => ToastOptions | ReactNode)
+}
+
+export type ToastApi = ((opts: ToastOptions) => string) & {
+    success: Shorthand
+    error: Shorthand
+    warning: Shorthand
+    info: Shorthand
+    update: (id: string, opts: Partial<ToastOptions>) => void
+    dismiss: (id?: string) => void
+    promise: <R>(p: Promise<R>, msgs: PromiseMessages<R>) => Promise<R>
+}
 
 type ToastContextValue = {
-    toast: (opts: ToastOptions) => string
-    success: (opts: Omit<ToastOptions, 'tone'>) => string
-    error: (opts: Omit<ToastOptions, 'tone'>) => string
-    warning: (opts: Omit<ToastOptions, 'tone'>) => string
-    info: (opts: Omit<ToastOptions, 'tone'>) => string
-    dismiss: (id: string) => void
+    toast: ToastApi
+    success: Shorthand
+    error: Shorthand
+    warning: Shorthand
+    info: Shorthand
+    update: ToastApi['update']
+    dismiss: ToastApi['dismiss']
+    promise: ToastApi['promise']
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
-const iconByTone: Record<ToastTone, IconType> = {
-    info: IconInfo,
-    success: IconSuccess,
-    warning: IconWarning,
-    danger: IconError,
-}
+export type ToastPlacement = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
 
 export type ToastProviderProps = {
     children: ReactNode
-    placement?: 'top-right' | 'bottom-right' | 'top-center' | 'bottom-center'
+    placement?: ToastPlacement
+    /** 한 번에 보일 최대 개수. 넘치면 오래된 것부터 닫는다 */
+    max?: number
 }
 
-export const ToastProvider = ({
-    children,
-    placement = 'bottom-right',
-}: ToastProviderProps) => {
-    const [items, setItems] = useState<ToastItem[]>([])
-    const idRef = useRef(0)
+const toOpts = (v: ToastOptions | ReactNode): ToastOptions =>
+    v && typeof v === 'object' && !('$$typeof' in (v as object)) && ('title' in (v as object) || 'description' in (v as object)) ? (v as ToastOptions) : { title: v as ReactNode }
 
-    const dismiss = useCallback((id: string) => {
-        setItems((prev) => prev.filter((t) => t.id !== id))
+export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }: ToastProviderProps) => {
+    const [items, setItems] = useState<ToastItem[]>([])
+    const seq = useRef(0)
+    const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+
+    const dismiss = useCallback((id?: string) => {
+        if (id === undefined) {
+            timers.current.forEach(clearTimeout)
+            timers.current.clear()
+            setItems([])
+            return
+        }
+        const t = timers.current.get(id)
+        if (t) clearTimeout(t)
+        timers.current.delete(id)
+        setItems((prev) => prev.filter((x) => x.id !== id))
     }, [])
 
-    const toast = useCallback(
-        (opts: ToastOptions): string => {
-            const id = `t-${++idRef.current}`
-            const item: ToastItem = { ...opts, id }
-            setItems((prev) => [...prev, item])
-            const duration = opts.duration ?? 4000
-            if (duration > 0) {
-                setTimeout(() => dismiss(id), duration)
-            }
-            return id
+    const schedule = useCallback(
+        (item: ToastItem) => {
+            const old = timers.current.get(item.id)
+            if (old) clearTimeout(old)
+            const d = item.duration ?? 4000
+            if (!item.persistent && !item.loading && d > 0) timers.current.set(item.id, setTimeout(() => dismiss(item.id), d))
         },
         [dismiss],
     )
 
-    const success = useCallback(
-        (opts: Omit<ToastOptions, 'tone'>) => toast({ ...opts, tone: 'success' }),
-        [toast],
-    )
-    const error = useCallback(
-        (opts: Omit<ToastOptions, 'tone'>) => toast({ ...opts, tone: 'danger' }),
-        [toast],
-    )
-    const warning = useCallback(
-        (opts: Omit<ToastOptions, 'tone'>) => toast({ ...opts, tone: 'warning' }),
-        [toast],
-    )
-    const info = useCallback(
-        (opts: Omit<ToastOptions, 'tone'>) => toast({ ...opts, tone: 'info' }),
-        [toast],
+    const toast = useCallback(
+        (opts: ToastOptions): string => {
+            const id = opts.id ?? `t-${++seq.current}`
+            const item: ToastItem = { ...opts, id, createdAt: Date.now() }
+            setItems((prev) => {
+                const without = prev.filter((x) => x.id !== id)
+                const next = [...without, item]
+                return next.length > max ? next.slice(next.length - max) : next
+            })
+            schedule(item)
+            return id
+        },
+        [max, schedule],
     )
 
+    const update = useCallback(
+        (id: string, opts: Partial<ToastOptions>) => {
+            setItems((prev) =>
+                prev.map((x) => {
+                    if (x.id !== id) return x
+                    const next = { ...x, ...opts, createdAt: Date.now() }
+                    schedule(next)
+                    return next
+                }),
+            )
+        },
+        [schedule],
+    )
+
+    const api = useMemo(() => {
+        const fn = ((o: ToastOptions) => toast(o)) as ToastApi
+        fn.success = (o) => toast({ ...o, tone: 'success' })
+        fn.error = (o) => toast({ ...o, tone: 'danger' })
+        fn.warning = (o) => toast({ ...o, tone: 'warning' })
+        fn.info = (o) => toast({ ...o, tone: 'info' })
+        fn.update = update
+        fn.dismiss = dismiss
+        fn.promise = async <R,>(p: Promise<R>, msgs: PromiseMessages<R>) => {
+            const id = toast({ ...toOpts(msgs.loading), tone: 'info', loading: true })
+            try {
+                const r = await p
+                const m = typeof msgs.success === 'function' ? (msgs.success as (r: R) => ToastOptions | ReactNode)(r) : msgs.success
+                update(id, { tone: 'success', loading: false, duration: 4000, ...toOpts(m) })
+                return r
+            } catch (e) {
+                const m = typeof msgs.error === 'function' ? (msgs.error as (e: unknown) => ToastOptions | ReactNode)(e) : msgs.error
+                update(id, { tone: 'danger', loading: false, persistent: true, ...toOpts(m) })
+                throw e
+            }
+        }
+        return fn
+    }, [toast, update, dismiss])
+
+    useEffect(() => () => timers.current.forEach(clearTimeout), [])
+
     return (
-        <ToastContext.Provider
-            value={{ toast, success, error, warning, info, dismiss }}
-        >
+        <ToastContext.Provider value={{ toast: api, success: api.success, error: api.error, warning: api.warning, info: api.info, update, dismiss, promise: api.promise }}>
             {children}
             {typeof document !== 'undefined' &&
                 createPortal(
-                    <ToastViewport
-                        items={items}
-                        placement={placement}
-                        onDismiss={dismiss}
-                    />,
+                    <ol data-ds-toaster="" data-placement={placement} aria-label="알림">
+                        {(placement.startsWith('top') ? [...items].reverse() : items).map((t) => (
+                            <ToastView key={t.id} item={t} onDismiss={() => dismiss(t.id)} />
+                        ))}
+                    </ol>,
                     document.body,
                 )}
         </ToastContext.Provider>
@@ -114,237 +167,50 @@ export const ToastProvider = ({
 
 export const useToast = () => {
     const ctx = useContext(ToastContext)
-    if (!ctx) throw new Error('useToast must be used inside <ToastProvider>')
+    if (!ctx) throw new Error('useToast 는 ToastProvider 안에서 써야 합니다.')
     return ctx
 }
 
-const placementStyles: Record<
-    NonNullable<ToastProviderProps['placement']>,
-    React.CSSProperties
-> = {
-    'top-right': { top: '16px', right: '16px', alignItems: 'flex-end' },
-    'bottom-right': { bottom: '16px', right: '16px', alignItems: 'flex-end' },
-    'top-center': {
-        top: '16px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        alignItems: 'center',
-    },
-    'bottom-center': {
-        bottom: '16px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        alignItems: 'center',
-    },
+const ICON: Record<Tone, ReactNode> = {
+    accent: <IconInfo size={18} />,
+    neutral: <IconInfo size={18} />,
+    info: <IconInfo size={18} />,
+    success: <IconSuccess size={18} />,
+    warning: <IconWarning size={18} />,
+    danger: <IconError size={18} />,
 }
 
-const MAX_VISIBLE_TOASTS = 4
-const STACK_OFFSET = 12
-const STACK_SCALE_STEP = 0.04
-
-const ToastViewport = ({
-    items,
-    placement,
-    onDismiss,
-}: {
-    items: ToastItem[]
-    placement: NonNullable<ToastProviderProps['placement']>
-    onDismiss: (id: string) => void
-}) => {
-    const isBottom = placement.startsWith('bottom')
-    const isCenter = placement.endsWith('center')
-    const [expanded, setExpanded] = useState(false)
-    const visible = items.slice(-MAX_VISIBLE_TOASTS)
-
-    const transformOrigin = `${isBottom ? 'bottom' : 'top'} ${
-        isCenter ? 'center' : 'right'
-    }`
-
+const ToastView = ({ item, onDismiss }: { item: ToastItem; onDismiss: () => void }) => {
+    const tone = item.tone ?? 'neutral'
+    const urgent = tone === 'danger' || tone === 'warning'
+    const d = item.duration ?? 4000
     return (
-        <div
-            onMouseEnter={() => setExpanded(true)}
-            onMouseLeave={() => setExpanded(false)}
-            style={{
-                position: 'fixed',
-                zIndex: 'var(--ds-z-index-toast)',
-                width: '380px',
-                maxWidth: 'calc(100vw - 32px)',
-                pointerEvents: 'none',
-                ...placementStyles[placement],
-            }}
-        >
-            <style>{KEYFRAMES}</style>
-            <div
-                style={{
-                    position: 'relative',
-                    height:
-                        expanded
-                            ? `${visible.length * 72}px`
-                            : '92px',
-                    transition: 'height 240ms ease',
-                }}
-            >
-                {visible.map((t, idx) => {
-                    const fromNewest = visible.length - 1 - idx
-                    const yShift = fromNewest * STACK_OFFSET
-                    const scale = 1 - fromNewest * STACK_SCALE_STEP
-                    const expandedShift = isBottom
-                        ? -(visible.length - 1 - idx) * 72
-                        : idx * 72
-
-                    const transform = expanded
-                        ? `translateY(${expandedShift}px)`
-                        : `translateY(${isBottom ? -yShift : yShift}px) scale(${scale})`
-
-                    return (
-                        <div
-                            key={t.id}
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                ...(isBottom ? { bottom: 0 } : { top: 0 }),
-                                transform,
-                                transformOrigin,
-                                opacity: expanded
-                                    ? 1
-                                    : 1 - fromNewest * 0.15,
-                                zIndex: visible.length - fromNewest,
-                                transition:
-                                    'transform 280ms cubic-bezier(0.32, 0.72, 0, 1), opacity 220ms ease',
-                                pointerEvents:
-                                    expanded || fromNewest === 0
-                                        ? 'auto'
-                                        : 'none',
-                            }}
-                        >
-                            <ToastItemView item={t} onDismiss={onDismiss} />
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-    )
-}
-
-const KEYFRAMES = `@keyframes ds-toast-in {
-    from { opacity: 0; transform: translateY(8px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}`
-
-const ToastItemView = ({
-    item,
-    onDismiss,
-}: {
-    item: ToastItem
-    onDismiss: (id: string) => void
-}) => {
-    const tone = item.tone ?? 'info'
-    const color = toneColor(tone as Tone)
-    const Icon = iconByTone[tone]
-
-    return (
-        <div
-            role="status"
-            style={{
-                pointerEvents: 'auto',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '10px',
-                minWidth: '280px',
-                maxWidth: '420px',
-                padding: '12px 14px',
-                background: 'var(--ds-surface-overlay-background)',
-                backdropFilter: 'var(--ds-surface-overlay-backdrop-filter)',
-                border: 'var(--ds-surface-overlay-border)',
-                borderLeft: `3px solid ${color}`,
-                borderRadius: 'var(--ds-radius-md)',
-                boxShadow: 'var(--ds-shadow-xl)',
-                color: 'var(--ds-color-foreground-primary)',
-                animation: 'ds-toast-in 200ms cubic-bezier(0.16, 1, 0.3, 1)',
-            }}
-        >
-            <span
-                style={{
-                    color,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                    marginTop: '1px',
-                }}
-            >
-                <Icon size={18} />
+        <li data-ds-toast="" data-tone={tone} role={urgent ? 'alert' : 'status'} aria-live={urgent ? 'assertive' : 'polite'}>
+            <span data-slot="icon" aria-hidden>
+                {item.loading ? <span data-ds-spinner-ring="" style={{ width: 16, height: 16, borderWidth: 2 }} /> : ICON[tone]}
             </span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-                {item.title && (
-                    <div
-                        style={{
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            marginBottom: item.description ? '2px' : 0,
-                        }}
-                    >
-                        {item.title}
-                    </div>
-                )}
-                {item.description && (
-                    <div
-                        style={{
-                            fontSize: '12px',
-                            color: 'var(--ds-color-foreground-secondary)',
-                            lineHeight: 1.5,
-                        }}
-                    >
-                        {item.description}
-                    </div>
-                )}
-                {item.action && (
-                    <button
-                        data-ds-interactive="subtle"
-                        type="button"
-                        onClick={() => {
-                            item.action?.onClick()
-                            onDismiss(item.id)
-                        }}
-                        style={{
-                            marginTop: '6px',
-                            padding: '4px 10px',
-                            background: 'transparent',
-                            color,
-                            border: `1px solid ${color}`,
-                            borderRadius: 'var(--ds-radius-sm)',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            fontFamily: 'inherit',
-                        }}
-                    >
-                        {item.action.label}
-                    </button>
-                )}
+            <div data-slot="body">
+                {item.title && <b>{item.title}</b>}
+                {item.description && <span>{item.description}</span>}
             </div>
-            <button
-                data-ds-interactive="subtle"
-                type="button"
-                aria-label="Close"
-                onClick={() => onDismiss(item.id)}
-                style={{
-                    flexShrink: 0,
-                    width: '20px',
-                    height: '20px',
-                    background: 'transparent',
-                    color: 'var(--ds-color-foreground-tertiary)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 'var(--ds-radius-sm)',
-                }}
-            >
+            {item.action && (
+                <button
+                    type="button"
+                    data-slot="action"
+                    onClick={() => {
+                        item.action!.onClick()
+                        onDismiss()
+                    }}
+                >
+                    {item.action.label}
+                </button>
+            )}
+            <button type="button" data-slot="close" aria-label="알림 닫기" onClick={onDismiss}>
                 <IconClose size={14} />
             </button>
-        </div>
+            {item.progress && !item.persistent && !item.loading && d > 0 && (
+                <span key={item.createdAt} data-slot="progress" style={{ animationDuration: `${d}ms` }} aria-hidden />
+            )}
+        </li>
     )
 }

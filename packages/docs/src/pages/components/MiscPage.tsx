@@ -1,14 +1,10 @@
 import {
     Divider,
-    Empty,
     HStack,
-    Skeleton,
     Spacer,
-    Spinner,
     Stack,
     VStack,
     Tag,
-    IconArrowDown,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -118,110 +114,6 @@ export const StackPage = () => (
                 <Spacer />
                 <Tag tone="accent">Right</Tag>
             </HStack>
-        </ComponentPreview>
-    </>
-)
-
-export const SpinnerPage = () => (
-    <>
-        <PageHeader
-            title="Spinner"
-            description="로딩 인디케이터. size, thickness, label 지원."
-        />
-
-        <ComponentPreview
-            title="Sizes"
-            code={`<Spinner size={12} />
-<Spinner size={16} />
-<Spinner size={24} />
-<Spinner size={32} />`}
-        >
-            <Spinner size={12} />
-            <Spinner size={16} />
-            <Spinner size={24} />
-            <Spinner size={32} />
-        </ComponentPreview>
-
-        <ComponentPreview
-            title="With label"
-            code={`<Spinner label="불러오는 중..." />`}
-        >
-            <Spinner label="불러오는 중..." />
-        </ComponentPreview>
-    </>
-)
-
-export const SkeletonPage = () => (
-    <>
-        <PageHeader
-            title="Skeleton"
-            description="콘텐츠 로딩 플레이스홀더. width/height/circle/lines."
-        />
-
-        <ComponentPreview
-            title="기본"
-            code={`<Skeleton height={20} width="60%" />
-<Skeleton lines={3} />`}
-        >
-            <Stack gap={8} style={{ width: '100%', maxWidth: '320px' }}>
-                <Skeleton height={20} width="60%" />
-                <Skeleton lines={3} />
-            </Stack>
-        </ComponentPreview>
-
-        <ComponentPreview
-            title="Card placeholder"
-            code={`<HStack>
-    <Skeleton circle width={40} height={40} />
-    <Stack>
-        <Skeleton height={12} width="60%" />
-        <Skeleton height={10} width="40%" />
-    </Stack>
-</HStack>
-<Skeleton lines={2} height={10} />`}
-        >
-            <div
-                style={{
-                    width: '300px',
-                    padding: '16px',
-                    background: 'var(--ds-color-background-card)',
-                    border: '1px solid var(--ds-color-border-subtle)',
-                    borderRadius: 'var(--ds-radius-lg)',
-                }}
-            >
-                <HStack gap={12} align="center" style={{ marginBottom: '14px' }}>
-                    <Skeleton circle width={40} height={40} />
-                    <Stack gap={4} style={{ flex: 1 }}>
-                        <Skeleton height={12} width="60%" />
-                        <Skeleton height={10} width="40%" />
-                    </Stack>
-                </HStack>
-                <Skeleton lines={2} height={10} />
-            </div>
-        </ComponentPreview>
-    </>
-)
-
-export const EmptyPage = () => (
-    <>
-        <PageHeader
-            title="Empty"
-            description="비어있는 상태 표시. icon / title / description / action."
-        />
-
-        <ComponentPreview
-            title="기본"
-            code={`<Empty
-    icon={<IconArrowDown size={32} />}
-    title="시청 기록 없음"
-    description="아직 시청한 작품이 없습니다."
-/>`}
-        >
-            <Empty
-                icon={<IconArrowDown size={32} />}
-                title="시청 기록 없음"
-                description="아직 시청한 작품이 없습니다. 둘러보기에서 새 작품을 찾아보세요."
-            />
         </ComponentPreview>
     </>
 )

@@ -1,153 +1,87 @@
-import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react'
-import { mergeStyles, toneColor, type Tone } from './types.js'
-import {
-    IconClose,
-    IconError,
-    IconInfo,
-    IconSuccess,
-    IconWarning,
-    type IconType,
-} from './icons.js'
+import { useState, type HTMLAttributes, type ReactNode, type Ref } from 'react'
 import type { BorderVariant } from './borderVariant.js'
-import { useBorderVariant } from '../provider/useDesignSystem.js'
+import type { Tone } from './types.js'
+import { IconClose, IconError, IconInfo, IconSuccess, IconWarning } from './icons.js'
 
 export type AlertProps = {
-    tone?: Exclude<Tone, 'accent' | 'neutral'> | 'info'
+    tone?: Tone
     title?: ReactNode
+    /** 기본 아이콘을 바꾼다. null 이면 아이콘 없음 */
     icon?: ReactNode
+    /** soft(기본) · solid · outline · accent-left(왼쪽 색 띠) */
+    appearance?: 'soft' | 'solid' | 'outline' | 'accent-left'
+    /** @deprecated appearance 로 통합 */
     variant?: BorderVariant
+    /** 본문 아래 버튼 */
+    actions?: ReactNode
+    /** 화면 맨 위 공지처럼 전체 폭, 모서리 없음 */
+    banner?: boolean
+    size?: 'sm' | 'md'
+    /** onClose 없이도 닫기 버튼으로 스스로 숨는다 */
+    closable?: boolean
     onClose?: () => void
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 
-const baseStyle: CSSProperties = {
-    display: 'flex',
-    gap: '12px',
-    padding: '14px 16px',
-    alignItems: 'flex-start',
-}
-
-const defaultIcon: Record<string, IconType> = {
-    info: IconInfo,
-    success: IconSuccess,
-    warning: IconWarning,
-    danger: IconError,
-}
-
-const containerStyle = (
-    variant: BorderVariant,
-    color: string,
-): CSSProperties => {
-    switch (variant) {
-        case 'underline':
-            return {
-                background: 'transparent',
-                border: 'none',
-                borderBottom: `2px solid ${color}`,
-                borderRadius: 0,
-            }
-        case 'filled':
-            return {
-                background: `color-mix(in srgb, ${color} 12%, transparent)`,
-                border: 'none',
-                borderLeft: `3px solid ${color}`,
-                borderRadius: 'var(--ds-radius-md)',
-            }
-        case 'ghost':
-            return {
-                background: 'transparent',
-                border: 'none',
-                borderLeft: `3px solid ${color}`,
-                borderRadius: 'var(--ds-radius-md)',
-            }
-        case 'outlined':
-        default:
-            return {
-                background: 'var(--ds-color-background-card)',
-                border: '1px solid var(--ds-color-border-subtle)',
-                borderLeft: `3px solid ${color}`,
-                borderRadius: 'var(--ds-radius-md)',
-            }
-    }
+const ICON: Record<Tone, (s: number) => ReactNode> = {
+    accent: (s) => <IconInfo size={s} />,
+    neutral: (s) => <IconInfo size={s} />,
+    info: (s) => <IconInfo size={s} />,
+    success: (s) => <IconSuccess size={s} />,
+    warning: (s) => <IconWarning size={s} />,
+    danger: (s) => <IconError size={s} />,
 }
 
 export const Alert = ({
     tone = 'info',
     title,
     icon,
-    variant: variantProp,
+    appearance,
+    variant,
+    actions,
+    banner,
+    size = 'md',
+    closable,
     onClose,
     children,
-    style,
+    role,
     ref,
     ...rest
 }: AlertProps) => {
-    const variant = useBorderVariant(variantProp)
-    const color = toneColor(tone)
-    const Icon = defaultIcon[tone]
+    const [hidden, setHidden] = useState(false)
+    if (hidden) return null
+    const app = appearance ?? (variant === 'outlined' ? 'outline' : 'soft')
+    const urgent = tone === 'danger' || tone === 'warning'
     return (
         <div
             ref={ref}
-            role="alert"
-            style={mergeStyles(baseStyle, containerStyle(variant, color), style)}
+            role={role ?? (urgent ? 'alert' : 'status')}
+            data-ds-alert=""
+            data-tone={tone}
+            data-appearance={app}
+            data-banner={banner ? '' : undefined}
+            data-size={size}
             {...rest}
         >
-            <span
-                aria-hidden
-                style={{
-                    color,
-                    marginTop: '1px',
-                    flexShrink: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                {icon ?? (Icon && <Icon size={18} />)}
-            </span>
-            <div style={{ flex: 1 }}>
-                {title && (
-                    <div
-                        style={{
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            marginBottom: children ? '2px' : 0,
-                            color: 'var(--ds-color-foreground-primary)',
-                        }}
-                    >
-                        {title}
-                    </div>
-                )}
-                {children && (
-                    <div
-                        style={{
-                            fontSize: '12px',
-                            color: 'var(--ds-color-foreground-secondary)',
-                            lineHeight: 1.5,
-                        }}
-                    >
-                        {children}
-                    </div>
-                )}
+            {icon !== null && (
+                <span data-slot="icon" aria-hidden>
+                    {icon ?? ICON[tone](size === 'sm' ? 16 : 18)}
+                </span>
+            )}
+            <div data-slot="body">
+                {title && <b data-slot="title">{title}</b>}
+                {children && <div data-slot="text">{children}</div>}
+                {actions && !banner && <div data-slot="actions">{actions}</div>}
             </div>
-            {onClose && (
+            {actions && banner && <div data-slot="actions">{actions}</div>}
+            {(closable || onClose) && (
                 <button
-                    data-ds-interactive="subtle"
-                    onClick={onClose}
-                    aria-label="Close"
-                    style={{
-                        flexShrink: 0,
-                        width: '22px',
-                        height: '22px',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--ds-color-foreground-tertiary)',
-                        cursor: 'pointer',
-                        padding: 0,
-                        borderRadius: 'var(--ds-radius-sm)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                    type="button"
+                    data-slot="close"
+                    aria-label="닫기"
+                    onClick={() => {
+                        onClose?.()
+                        if (closable) setHidden(true)
                     }}
                 >
                     <IconClose size={16} />

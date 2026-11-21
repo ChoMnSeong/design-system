@@ -9,25 +9,29 @@ import { InputPage } from '../pages/components/InputPage'
 import { TextareaPage } from '../pages/components/TextareaPage'
 import { CardPage } from '../pages/components/CardPage'
 import { BoxPage } from '../pages/components/BoxPage'
-import { AlertPage } from '../pages/components/AlertPage'
 import { CheckboxPage } from '../pages/components/CheckboxPage'
 import { RadioPage } from '../pages/components/RadioPage'
 import { SwitchPage } from '../pages/components/SwitchPage'
 import { TogglePage } from '../pages/components/TogglePage'
 import { TabsPage } from '../pages/components/TabsPage'
-import { DialogPage } from '../pages/components/DialogPage'
-import { DrawerPage } from '../pages/components/DrawerPage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { LineChartPage } from '../pages/components/LineChartPage'
 import { BarChartPage } from '../pages/components/BarChartPage'
-import { TooltipPage } from '../pages/components/TooltipPage'
-import { ToastPage } from '../pages/components/ToastPage'
 import { BreadcrumbPage } from '../pages/components/BreadcrumbPage'
 import { PaginationPage } from '../pages/components/PaginationPage'
 import { AccordionPage } from '../pages/components/AccordionPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import {
+    AlertPage,
+    CommandPalettePage,
+    DialogPage,
+    DrawerPage,
+    SkeletonPage,
+    ToastPage,
+    TooltipPage,
+} from '../pages/components/FeedbackPages'
 import {
     AvatarPage,
     BadgePage,
@@ -56,22 +60,17 @@ import {
 import {
     DividerPage,
     StackPage,
-    SpinnerPage,
-    SkeletonPage,
-    EmptyPage,
 } from '../pages/components/MiscPage'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
 import { RatingPage } from '../pages/components/RatingPage'
 import { StepperPage } from '../pages/components/StepperPage'
 import { OTPInputPage } from '../pages/components/OTPInputPage'
 import { CodeBlockPage } from '../pages/components/CodeBlockPage'
-import { HoverCardPage } from '../pages/components/HoverCardPage'
 import {
     ImagePage,
     ScrollAreaPage,
     PiePage,
     GaugePage,
-    CommandPalettePage,
     NavigationMenuPage,
 } from '../pages/components/MorePages'
 import { MarqueePage } from '../pages/components/MarqueePage'
@@ -221,18 +220,15 @@ export const routes: RouteMeta[] = [
     { id: 'c-stat', label: 'Stat', group: 'display', page: StatPage },
     { id: 'c-descriptions', label: 'Descriptions', group: 'display', page: DescriptionsPage },
     { id: 'c-timeline', label: 'Timeline', group: 'display', page: TimelinePage },
-    { id: 'c-empty', label: 'Empty', group: 'display', page: EmptyPage },
     { id: 'c-kbd', label: 'Kbd', group: 'display', page: KbdPage },
     { id: 'c-codeblock', label: 'CodeBlock', group: 'display', page: CodeBlockPage },
     { id: 'c-image', label: 'Image', group: 'display', page: ImagePage },
     { id: 'c-marquee', label: 'Marquee', group: 'display', page: MarqueePage },
 
-    { id: 'c-spinner', label: 'Spinner', group: 'feedback', page: SpinnerPage },
-    { id: 'c-skeleton', label: 'Skeleton', group: 'feedback', page: SkeletonPage },
+    { id: 'c-skeleton', label: 'Skeleton · Spinner · Empty', group: 'feedback', page: SkeletonPage },
     { id: 'c-progress', label: 'Progress', group: 'feedback', page: ProgressPage },
-    { id: 'c-tooltip', label: 'Tooltip', group: 'feedback', page: TooltipPage },
+    { id: 'c-tooltip', label: 'Popover · Tooltip · HoverCard', group: 'feedback', page: TooltipPage },
     { id: 'c-toast', label: 'Toast', group: 'feedback', page: ToastPage },
-    { id: 'c-hovercard', label: 'HoverCard', group: 'feedback', page: HoverCardPage },
 
     { id: 'c-dialog', label: 'Dialog', group: 'overlay', page: DialogPage },
     { id: 'c-drawer', label: 'Drawer', group: 'overlay', page: DrawerPage },
