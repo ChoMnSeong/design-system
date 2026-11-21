@@ -100,21 +100,16 @@ export const glassmorphism: VariantSpec = {
         return {
             // 그라디언트 폭이 넓으면 흰 글자도 어두운 글자도 한쪽 끝에서 무너진다.
             // 다른 variant 와 같은 600/700/800 계열로 좁혀 흰 글자를 성립시킨다.
-            background: isLight
-                ? `linear-gradient(135deg, ${c.primary600} 0%, ${c.primary700} 100%)`
-                : `linear-gradient(135deg, ${c.primary600}e6 0%, ${c.primary800}e6 100%)`,
+            // 보드 9-12: 그라디언트 → primary600 단색 (유리 위에서 대비를 계산할 수 있게)
+            background: c.primary600,
             // 그라디언트는 대비 계산이 안 되니 가장 밝은 지점(글자에 가장 불리한 곳)으로 판단한다.
             color: c.readable(c.primary600, c.primary700, c.primary800),
             border: `1px solid ${isLight ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.2)'}`,
             shadow: isLight
                 ? `0 6px 20px ${c.primary300}99`
                 : `0 6px 20px ${c.primary700}99`,
-            hoverBackground: isLight
-                ? `linear-gradient(135deg, ${c.primary700} 0%, ${c.primary800} 100%)`
-                : `linear-gradient(135deg, ${c.primary700}f2 0%, ${c.primary800}f2 100%)`,
-            activeBackground: isLight
-                ? `linear-gradient(135deg, ${c.primary800} 0%, ${c.primary900} 100%)`
-                : `linear-gradient(135deg, ${c.primary800} 0%, ${c.primary900} 100%)`,
+            hoverBackground: c.primary700,
+            activeBackground: c.primary800,
         }
     },
 }

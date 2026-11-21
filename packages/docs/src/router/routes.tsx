@@ -15,7 +15,7 @@ import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { MenuPage } from '../pages/components/MenuPage'
-import { DashboardGridPage, MiniChartsPage } from '../pages/components/DashboardPages'
+import { DashboardGridPage, MiniChartsPage, ThemePresetPage } from '../pages/components/DashboardPages'
 import { GanttPage, ParetoPage, StatusTimelinePage } from '../pages/components/IndustrialPages'
 import { AreaChartPage, BarChartPage, CartesianChartPage, GaugePage, LineChartPage, PiePage } from '../pages/components/ChartPages'
 import { BreadcrumbPage, NavigationMenuPage, PaginationPage, StepperPage } from '../pages/components/NavPages'
@@ -130,6 +130,7 @@ export type RouteId =
     | 'c-cartesian'
     | 'c-pareto'
     | 'c-minicharts'
+    | 'presets'
     | 'c-statustimeline'
     | 'c-gantt'
     | 'c-colorpicker'
@@ -178,6 +179,7 @@ export type RouteMeta = {
 export const routes: RouteMeta[] = [
     { id: 'introduction', label: 'Introduction', group: 'foundation', page: IntroductionPage },
     { id: 'palettes', label: 'Palettes', group: 'foundation', page: PalettesPage },
+    { id: 'presets', label: '테마 프리셋 · 유리', group: 'foundation', page: ThemePresetPage },
     { id: 'surfaces', label: 'Surfaces', group: 'foundation', page: SurfacesPage },
     { id: 'typography', label: 'Typography', group: 'foundation', page: TypographyPage },
     { id: 'tokens', label: 'Tokens', group: 'foundation', page: TokensPage },

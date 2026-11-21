@@ -22,6 +22,7 @@ import type { BaseTokens } from '../tokens/types.js'
 import type { BorderVariant } from '../components/borderVariant.js'
 import { DesignSystemContext } from './context.js'
 import { DEFAULT_LOCALE, LocaleContext } from './locale.js'
+import { getPreset, glassPageBackground, presetVars, type GlassOptions, type ThemePreset } from '../presets/index.js'
 import { FocusStyles } from './FocusStyles.js'
 import { InteractionStyles } from './InteractionStyles.js'
 import { ComponentStyles } from './ComponentStyles.js'
@@ -48,6 +49,10 @@ export type DesignSystemProviderProps = {
     locale?: string
     /** 주 시작 요일 (0 일요일 · 1 월요일) */
     weekStartsOn?: 0 | 1
+    /** 브랜드 프리셋: 'default' · 'editorial' · 'neon' · 'photo' · definePreset() 결과 */
+    preset?: string | ThemePreset
+    /** glassmorphism 배경 · 재질 */
+    glass?: GlassOptions
     className?: string
     style?: CSSProperties
     children: ReactNode
@@ -109,6 +114,8 @@ export const DesignSystemProvider = ({
     applyTo = 'root',
     locale = DEFAULT_LOCALE.locale,
     weekStartsOn = DEFAULT_LOCALE.weekStartsOn,
+    preset,
+    glass,
     className,
     style,
     children,
@@ -168,7 +175,22 @@ export const DesignSystemProvider = ({
         return buildTheme(input)
     }, [palette, variant, mode, paletteOverrides, mergedTokenOverrides])
 
-    const cssVars = useMemo(() => themeToCssVars(theme), [theme])
+    const cssVars = useMemo(
+        () => ({
+            ...themeToCssVars(theme),
+            ...presetVars(getPreset(preset), theme.mode),
+            ...(theme.variantName === 'glassmorphism'
+                ? { '--ds-surface-page-background': glassPageBackground(glass, theme.mode) }
+                : null),
+        }),
+        [theme, preset, glass?.backdrop, glass?.backdropImage],
+    )
+    const presetName = typeof preset === 'object' ? preset.name : preset
+    const glassAttrs = {
+        'data-ds-preset': presetName,
+        'data-ds-glass-backdrop': glass?.backdrop ?? 'pattern',
+        'data-ds-glass-material': glass?.material ?? 'glass',
+    }
     const scopeRef = useRef<HTMLDivElement | null>(null)
     const previousKeysRef = useRef<Set<string>>(new Set())
 
@@ -183,13 +205,17 @@ export const DesignSystemProvider = ({
         document.documentElement.dataset.dsPalette = theme.paletteName
         document.documentElement.dataset.dsVariant = theme.variantName
         document.documentElement.dataset.dsMode = theme.mode
+        if (presetName) document.documentElement.dataset.dsPreset = presetName
+        else delete document.documentElement.dataset.dsPreset
+        document.documentElement.dataset.dsGlassBackdrop = glass?.backdrop ?? 'pattern'
+        document.documentElement.dataset.dsGlassMaterial = glass?.material ?? 'glass'
         // 네이티브 위젯(스크롤바, select, date 피커)이 모드를 따라오게 한다.
         document.documentElement.style.colorScheme = theme.mode
         const ssrStyle = document.querySelector('style[data-ds-init="true"]')
         if (ssrStyle && ssrStyle.parentNode) {
             ssrStyle.parentNode.removeChild(ssrStyle)
         }
-    }, [applyTo, cssVars, theme.paletteName, theme.variantName, theme.mode])
+    }, [applyTo, cssVars, theme.paletteName, theme.variantName, theme.mode, presetName, glass?.backdrop, glass?.material])
 
     const scopeStyle = useMemo<CSSProperties | undefined>(() => {
         if (applyTo !== 'scope') return style
@@ -264,6 +290,7 @@ export const DesignSystemProvider = ({
                     data-ds-palette={theme.paletteName}
                     data-ds-variant={theme.variantName}
                     data-ds-mode={theme.mode}
+                    {...glassAttrs}
                 >
                     {children}
                 </div>

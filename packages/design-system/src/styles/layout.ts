@@ -445,3 +445,38 @@ export const DASH_CSS = `
 [data-ds-dashboard-grid] [data-slot="resize"] { position: absolute; right: 2px; bottom: 2px; width: 14px; height: 14px; cursor: nwse-resize; border-right: 3px solid var(--ds-palette-primary-500); border-bottom: 3px solid var(--ds-palette-primary-500); border-radius: 0 0 4px 0; z-index: 2; }
 [data-ds-dashboard-grid] [data-slot="resize"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 2px; }
 `.trim()
+
+/** 테마 프리셋 · Liquid Glass (보드 9-11, 9-16) */
+export const PRESET_CSS = `
+[data-ds-preset] [data-ds-card-metric] b, [data-ds-preset] [data-ds-kpi] [data-slot="value"] b, [data-ds-preset] [data-ds-page-header] h1 { font-family: var(--ds-font-display, inherit); }
+[data-ds-preset="editorial"] [data-ds-card-eyebrow] { text-transform: uppercase; letter-spacing: 0.08em; }
+[data-ds-preset="neon"] [data-ds-card-metric] b { color: var(--ds-tone-accent-text); }
+
+[data-ds-liquid] {
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--_r);
+    overflow: hidden;
+    color: var(--ds-color-foreground-primary);
+    -webkit-backdrop-filter: blur(12px) saturate(170%);
+    backdrop-filter: blur(12px) saturate(170%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.08), 0 10px 30px rgba(20,20,40,.18);
+    border: 1px solid rgba(255,255,255,.45);
+    background: rgba(255,255,255,.14);
+}
+@supports (backdrop-filter: url(#a)) {
+    [data-ds-liquid] { -webkit-backdrop-filter: var(--_filter) saturate(170%); backdrop-filter: var(--_filter) saturate(170%); }
+}
+[data-ds-liquid]::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 40%); }
+[data-ds-liquid][data-legibility="auto"] { background: rgba(20,20,30,.16); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+[data-ds-liquid][data-legibility="dark"] { background: rgba(10,10,20,.38); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+[data-ds-liquid][data-legibility="light"] { background: rgba(255,255,255,.55); }
+[data-ds-liquid] [data-slot="content"] { position: relative; z-index: 1; padding: 16px 18px; }
+@media (prefers-reduced-transparency: reduce) {
+    [data-ds-liquid] { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--ds-surface-card-background); color: var(--ds-color-foreground-primary); text-shadow: none; }
+}
+/* A · 바쁜 배경 위 컨트롤 판 (흰 42% + 흐림 10px), 글이 많은 메뉴는 72% */
+[data-ds-variant="glassmorphism"][data-ds-glass-backdrop="image"] [data-ds-toolbar],
+[data-ds-variant="glassmorphism"][data-ds-glass-backdrop="image"] [data-ds-segmented] { background: rgba(255,255,255,.42); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+[data-ds-variant="glassmorphism"][data-ds-glass-backdrop="image"] [data-ds-menu] { background: rgba(255,255,255,.72); }
+`.trim()
