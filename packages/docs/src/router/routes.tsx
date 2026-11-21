@@ -74,6 +74,7 @@ import {
     RadialChartPage,
 } from '../pages/components/ChartsExtraPage'
 import { DataTablePage } from '../pages/components/DataTablePage'
+import { DataGridPage } from '../pages/components/DataGridPages'
 
 export type RouteId =
     | 'introduction'
@@ -156,6 +157,7 @@ export type RouteId =
     | 'c-radarchart'
     | 'c-radialchart'
     | 'c-datatable'
+    | 'c-datagrid'
 
 export type RouteGroup =
     | 'foundation'
@@ -259,6 +261,7 @@ export const routes: RouteMeta[] = [
     { id: 'c-radarchart', label: 'RadarChart', group: 'data', page: RadarChartPage },
     { id: 'c-radialchart', label: 'RadialChart', group: 'data', page: RadialChartPage },
     { id: 'c-datatable', label: 'DataTable', group: 'data', page: DataTablePage },
+    { id: 'c-datagrid', label: 'DataGrid', group: 'data', page: DataGridPage },
 ]
 
 export const routeMap: Record<RouteId, RouteMeta> = routes.reduce(
