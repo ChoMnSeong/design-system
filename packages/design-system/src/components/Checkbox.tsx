@@ -1,156 +1,171 @@
 import {
     useCallback,
     useEffect,
+    useId,
     useRef,
+    useState,
     type CSSProperties,
     type InputHTMLAttributes,
     type ReactNode,
     type Ref,
 } from 'react'
-import { mergeStyles } from './types.js'
+import type { FieldSize, Option, Tone } from './types.js'
 
 export type CheckboxProps = {
     label?: ReactNode
+    /** 라벨 아래 보조 설명 */
+    description?: ReactNode
     indeterminate?: boolean
-    size?: 'sm' | 'md'
+    /** xs 12 · sm 14 · md 16 · lg 20 */
+    size?: FieldSize
+    /** 체크됐을 때 색. 기본 accent */
+    tone?: Tone
+    onCheckedChange?: (checked: boolean) => void
     ref?: Ref<HTMLInputElement>
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'>
 
-const sizes = {
-    sm: { box: 14, font: 13 },
-    md: { box: 16, font: 14 },
-}
-
 export const Checkbox = ({
     label,
+    description,
     indeterminate,
     size = 'md',
-    checked,
-    disabled,
+    tone,
+    onCheckedChange,
+    onChange,
+    className,
     style,
     ref,
     ...rest
 }: CheckboxProps) => {
-    const innerRef = useRef<HTMLInputElement | null>(null)
-
+    const inner = useRef<HTMLInputElement | null>(null)
     useEffect(() => {
-        if (innerRef.current) {
-            innerRef.current.indeterminate = !!indeterminate
-        }
+        if (inner.current) inner.current.indeterminate = !!indeterminate
     }, [indeterminate])
-
     const setRef = useCallback(
         (node: HTMLInputElement | null) => {
-            innerRef.current = node
+            inner.current = node
             if (typeof ref === 'function') ref(node)
-            else if (ref && 'current' in ref) {
-                ;(ref as { current: HTMLInputElement | null }).current = node
-            }
+            else if (ref) (ref as { current: HTMLInputElement | null }).current = node
         },
         [ref],
     )
-
-    const dim = sizes[size].box
-    const wrapperStyle: CSSProperties = {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '8px',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        fontSize: `${sizes[size].font}px`,
-        lineHeight: `${dim}px`,
-        color: disabled
-            ? 'var(--ds-color-foreground-muted)'
-            : 'var(--ds-color-foreground-primary)',
-        userSelect: 'none',
-    }
-
-    const visualStyle: CSSProperties = {
-        position: 'relative',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: `${dim}px`,
-        height: `${dim}px`,
-        flexShrink: 0,
-        background:
-            checked || indeterminate
-                ? 'var(--ds-color-accent-background)'
-                : 'var(--ds-surface-inset-background)',
-        border:
-            checked || indeterminate
-                ? 'var(--ds-color-accent-border)'
-                : '1px solid var(--ds-color-border-default)',
-        borderRadius: 'var(--ds-radius-xs)',
-        transitionProperty: 'background, background-color, border-color, color, box-shadow, opacity',
-        transitionDuration: '120ms',
-        transitionTimingFunction: 'ease',
-        boxShadow: checked ? 'var(--ds-color-accent-shadow)' : 'none',
-        opacity: disabled ? 0.5 : 1,
-    }
-
+    const descId = useId()
+    const input = (
+        <input
+            ref={setRef}
+            type="checkbox"
+            data-ds-checkbox=""
+            data-size={size}
+            data-tone={tone}
+            data-indeterminate={indeterminate ? '' : undefined}
+            aria-describedby={description ? descId : undefined}
+            onChange={(e) => {
+                onChange?.(e)
+                onCheckedChange?.(e.target.checked)
+            }}
+            {...rest}
+        />
+    )
+    if (!label && !description) return input
     return (
         <label
-            data-ds-interactive="control"
-            data-ds-disabled={disabled ? '' : undefined}
-            style={mergeStyles(wrapperStyle, style)}
+            data-ds-choice=""
+            data-size={size}
+            data-disabled={rest.disabled ? '' : undefined}
+            className={className}
+            style={style}
         >
-            <input
-                {...rest}
-                ref={setRef}
-                type="checkbox"
-                checked={checked}
-                disabled={disabled}
-                data-ds-focus-input=""
-                style={{
-                    position: 'absolute',
-                    width: 1,
-                    height: 1,
-                    padding: 0,
-                    margin: -1,
-                    overflow: 'hidden',
-                    clip: 'rect(0,0,0,0)',
-                    whiteSpace: 'nowrap',
-                    border: 0,
-                }}
-            />
-            <span aria-hidden data-ds-focus-visual="" style={visualStyle}>
-                {indeterminate ? (
-                    <svg
-                        viewBox="0 0 16 16"
-                        width={dim}
-                        height={dim}
-                        fill="none"
-                        style={{ display: 'block' }}
-                    >
-                        <line
-                            x1="4"
-                            y1="8"
-                            x2="12"
-                            y2="8"
-                            stroke="var(--ds-color-accent-color)"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                ) : checked ? (
-                    <svg
-                        viewBox="0 0 16 16"
-                        width={dim}
-                        height={dim}
-                        fill="none"
-                        style={{ display: 'block' }}
-                    >
-                        <path
-                            d="M3.5 8.2 L6.5 11 L12.5 5"
-                            stroke="var(--ds-color-accent-color)"
-                            strokeWidth="2.4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                ) : null}
+            {input}
+            <span data-slot="text">
+                {label}
+                {description && (
+                    <small id={descId} data-slot="desc">
+                        {description}
+                    </small>
+                )}
             </span>
-            {label && <span style={{ lineHeight: 1.4 }}>{label}</span>}
         </label>
+    )
+}
+
+export type CheckboxGroupProps = {
+    options: Option[]
+    value?: string[]
+    defaultValue?: string[]
+    onValueChange?: (value: string[]) => void
+    direction?: 'row' | 'column'
+    /** 맨 위에 "전체 선택" 체크박스를 둔다. 문자열이면 그 라벨로. */
+    selectAll?: boolean | ReactNode
+    size?: FieldSize
+    tone?: Tone
+    disabled?: boolean
+    style?: CSSProperties
+    'aria-label'?: string
+}
+
+export const CheckboxGroup = ({
+    options,
+    value: valueProp,
+    defaultValue = [],
+    onValueChange,
+    direction = 'column',
+    selectAll,
+    size = 'md',
+    tone,
+    disabled,
+    style,
+    'aria-label': ariaLabel,
+}: CheckboxGroupProps) => {
+    const [inner, setInner] = useState(defaultValue)
+    const value = valueProp ?? inner
+    const set = (next: string[]) => {
+        if (valueProp === undefined) setInner(next)
+        onValueChange?.(next)
+    }
+    const enabled = options.filter((o) => !o.disabled).map((o) => o.value)
+    const allOn = enabled.length > 0 && enabled.every((v) => value.includes(v))
+    const someOn = !allOn && enabled.some((v) => value.includes(v))
+    return (
+        <div
+            role="group"
+            aria-label={ariaLabel}
+            data-ds-choice-group=""
+            data-direction={direction}
+            style={style}
+        >
+            {selectAll && (
+                <Checkbox
+                    size={size}
+                    tone={tone}
+                    disabled={disabled}
+                    label={selectAll === true ? '전체 선택' : selectAll}
+                    checked={allOn}
+                    indeterminate={someOn}
+                    onCheckedChange={(on) =>
+                        set(
+                            on
+                                ? Array.from(new Set([...value, ...enabled]))
+                                : value.filter((v) => !enabled.includes(v)),
+                        )
+                    }
+                />
+            )}
+            <div data-ds-choice-group="" data-direction={direction} data-indent={selectAll ? '' : undefined}>
+                {options.map((o) => (
+                    <Checkbox
+                        key={o.value}
+                        size={size}
+                        tone={tone}
+                        label={o.label}
+                        description={o.description}
+                        disabled={disabled || o.disabled}
+                        checked={value.includes(o.value)}
+                        onCheckedChange={(on) =>
+                            set(on ? [...value, o.value] : value.filter((v) => v !== o.value))
+                        }
+                    />
+                ))}
+            </div>
+        </div>
     )
 }

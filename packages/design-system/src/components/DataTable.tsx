@@ -14,7 +14,7 @@ import {
     TableRow,
 } from './Table.js'
 import { Input } from './Input.js'
-import { ComboBox, type ComboBoxOption } from './ComboBox.js'
+import { ComboBox, type ComboBoxOption } from './Select.js'
 import { Pagination } from './Pagination.js'
 import { Empty } from './Empty.js'
 import { Popover } from './Popover.js'

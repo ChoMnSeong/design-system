@@ -23,7 +23,7 @@ import { DialogPage } from '../pages/components/DialogPage'
 import { DrawerPage } from '../pages/components/DrawerPage'
 import { DatePickerPage } from '../pages/components/DatePickerPage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
-import { SliderPage } from '../pages/components/SliderPage'
+import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
 import { LineChartPage } from '../pages/components/LineChartPage'
 import { BarChartPage } from '../pages/components/BarChartPage'
@@ -93,6 +93,7 @@ export type RouteId =
     | 'c-switch'
     | 'c-toggle'
     | 'c-slider'
+    | 'c-segmented'
     | 'c-numberinput'
     | 'c-datepicker'
     | 'c-combobox'
@@ -183,9 +184,10 @@ export const routes: RouteMeta[] = [
     { id: 'c-switch', label: 'Switch', group: 'form', page: SwitchPage },
     { id: 'c-toggle', label: 'Toggle', group: 'form', page: TogglePage },
     { id: 'c-slider', label: 'Slider', group: 'form', page: SliderPage },
+    { id: 'c-segmented', label: 'SegmentedControl', group: 'form', page: SegmentedControlPage },
     { id: 'c-numberinput', label: 'NumberInput', group: 'form', page: NumberInputPage },
     { id: 'c-datepicker', label: 'DatePicker', group: 'form', page: DatePickerPage },
-    { id: 'c-combobox', label: 'ComboBox', group: 'form', page: ComboBoxPage },
+    { id: 'c-combobox', label: 'Select · ComboBox', group: 'form', page: ComboBoxPage },
     { id: 'c-colorpicker', label: 'ColorPicker', group: 'form', page: ColorPickerPage },
     { id: 'c-timepicker', label: 'TimePicker', group: 'form', page: TimePickerPage },
     { id: 'c-fileupload', label: 'FileUpload', group: 'form', page: FileUploadPage },

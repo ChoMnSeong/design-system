@@ -1,9 +1,11 @@
-import { useId, useState, type CSSProperties, type MouseEvent } from 'react'
-import { mergeStyles } from './types.js'
+import { useId, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { mergeStyles, type Tone } from './types.js'
 
 export type RatingProps = {
     value?: number
     defaultValue?: number
+    onValueChange?: (value: number) => void
+    /** @deprecated onValueChange 를 쓴다. */
     onChange?: (value: number) => void
     max?: number
     size?: 'sm' | 'md' | 'lg'
@@ -11,7 +13,12 @@ export type RatingProps = {
     allowClear?: boolean
     /** Allow 0.5 step ratings via left/right half click. */
     allowHalf?: boolean
+    /** @deprecated tone 을 쓴다. */
     color?: string
+    /** 채움 색. 기본 warning(별점의 관례색) */
+    tone?: Tone
+    /** 별 대신 쓸 모양. 채움은 currentColor 로 그려진다 (예: 하트 svg) */
+    icon?: ReactNode
     style?: CSSProperties
 }
 
@@ -76,9 +83,14 @@ export const Rating = ({
     readOnly,
     allowClear = true,
     allowHalf = false,
-    color = 'var(--ds-palette-primary-500)',
+    color: colorProp,
+    tone = 'warning',
+    icon,
+    onValueChange,
     style,
 }: RatingProps) => {
+    const color =
+        colorProp ?? (tone === 'neutral' ? 'var(--ds-color-foreground-secondary)' : `var(--ds-palette-${tone === 'accent' ? 'primary' : tone}-500)`)
     const id = useId().replace(/:/g, '')
     const [internal, setInternal] = useState(defaultValue)
     const value = controlled ?? internal
@@ -91,6 +103,7 @@ export const Rating = ({
         const next = allowClear && n === value ? 0 : n
         if (controlled === undefined) setInternal(next)
         onChange?.(next)
+        onValueChange?.(next)
     }
 
     const computeStarValue = (
@@ -106,7 +119,7 @@ export const Rating = ({
     return (
         <div
             role="radiogroup"
-            aria-label="Rating"
+            aria-label="평점"
             style={mergeStyles(
                 {
                     display: 'inline-flex',
@@ -141,7 +154,7 @@ export const Rating = ({
                                 setHover(computeStarValue(i, e))
                         }}
                         onMouseLeave={() => !readOnly && setHover(null)}
-                        aria-label={`${i + 1} star${i > 0 ? 's' : ''}`}
+                        aria-label={`${i + 1}점`}
                         style={{
                             background: 'transparent',
                             border: 'none',
@@ -155,12 +168,40 @@ export const Rating = ({
                             transform: isHover ? 'scale(1.1)' : 'none',
                         }}
                     >
-                        <Star
-                            fill={fillState}
-                            size={dim}
-                            color={color}
-                            gradientId={`half-${id}-${i}`}
-                        />
+                        {icon ? (
+                            <span
+                                aria-hidden
+                                style={{
+                                    display: 'inline-flex',
+                                    width: dim,
+                                    height: dim,
+                                    position: 'relative',
+                                    color: 'var(--ds-color-border-default)',
+                                }}
+                            >
+                                {icon}
+                                {fillState !== 'empty' && (
+                                    <span
+                                        style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            overflow: 'hidden',
+                                            width: fillState === 'half' ? '50%' : '100%',
+                                            color,
+                                        }}
+                                    >
+                                        {icon}
+                                    </span>
+                                )}
+                            </span>
+                        ) : (
+                            <Star
+                                fill={fillState}
+                                size={dim}
+                                color={color}
+                                gradientId={`half-${id}-${i}`}
+                            />
+                        )}
                     </button>
                 )
             })}

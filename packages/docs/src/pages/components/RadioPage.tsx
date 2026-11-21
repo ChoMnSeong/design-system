@@ -1,72 +1,45 @@
-import { useState } from 'react'
 import { Radio, RadioGroup } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
 
-export const RadioPage = () => {
-    const [plan, setPlan] = useState('basic')
-
-    return (
-        <>
-            <PageHeader
-                title="Radio"
-                description="RadioGroup으로 묶어서 사용. value/onChange 또는 비제어 모드."
+export const RadioPage = () => (
+    <>
+        <PageHeader title="Radio · RadioGroup" description="appearance default · card · button. options 배열이나 children 으로 그립니다." />
+        <ComponentPreview title="default" code={`<RadioGroup direction="row" defaultValue="day">…</RadioGroup>`}>
+            <RadioGroup direction="row" defaultValue="day" aria-label="근무조">
+                <Radio value="day" label="주간" />
+                <Radio value="night" label="야간" />
+                <Radio value="three" label="3교대 (disabled)" disabled />
+            </RadioGroup>
+        </ComponentPreview>
+        <ComponentPreview
+            title="card"
+            code={`<RadioGroup appearance="card" options={[{ value: 'pm', label: '정기 보전', description: '주기 기반 예방보전' }, …]} />`}
+        >
+            <RadioGroup
+                appearance="card"
+                defaultValue="pm"
+                aria-label="보전 유형"
+                style={{ width: '100%' }}
+                options={[
+                    { value: 'pm', label: '정기 보전', description: '주기 기반 예방보전' },
+                    { value: 'bm', label: '사후 보전', description: '고장 발생 후 수리' },
+                    { value: 'cbm', label: '예지 보전', description: '센서 이상 감지' },
+                ]}
             />
-
-            <ComponentPreview
-                title="기본"
-                code={`<RadioGroup value={plan} onChange={setPlan}>
-    <Radio value="basic" label="Basic" />
-    <Radio value="pro" label="Pro" />
-    <Radio value="enterprise" label="Enterprise" />
-</RadioGroup>`}
-            >
-                <RadioGroup
-                    name="plan"
-                    value={plan}
-                    onChange={setPlan}
-                >
-                    <Radio value="basic" label="Basic - 무료" />
-                    <Radio value="pro" label="Pro - 월 9,900원" />
-                    <Radio
-                        value="enterprise"
-                        label="Enterprise - 문의"
-                    />
-                </RadioGroup>
-            </ComponentPreview>
-
-            <ComponentPreview
-                title="Horizontal"
-                description="direction='row'"
-                code={`<RadioGroup direction="row" defaultValue="md">
-    <Radio value="sm" label="Small" />
-    <Radio value="md" label="Medium" />
-    <Radio value="lg" label="Large" />
-</RadioGroup>`}
-            >
-                <RadioGroup
-                    name="size"
-                    direction="row"
-                    defaultValue="md"
-                >
-                    <Radio value="sm" label="Small" />
-                    <Radio value="md" label="Medium" />
-                    <Radio value="lg" label="Large" />
-                </RadioGroup>
-            </ComponentPreview>
-
-            <ComponentPreview
-                title="Disabled"
-                code={`<RadioGroup defaultValue="a" disabled>
-    <Radio value="a" label="Option A" />
-    <Radio value="b" label="Option B" />
-</RadioGroup>`}
-            >
-                <RadioGroup name="d" defaultValue="a" disabled>
-                    <Radio value="a" label="Option A" />
-                    <Radio value="b" label="Option B" />
-                </RadioGroup>
-            </ComponentPreview>
-        </>
-    )
-}
+        </ComponentPreview>
+        <ComponentPreview title="button" code={`<RadioGroup appearance="button" size="sm" options={…} />`}>
+            <RadioGroup
+                appearance="button"
+                size="sm"
+                defaultValue="week"
+                aria-label="단위"
+                options={[
+                    { value: 'day', label: '일' },
+                    { value: 'week', label: '주' },
+                    { value: 'month', label: '월' },
+                ]}
+            />
+        </ComponentPreview>
+    </>
+)

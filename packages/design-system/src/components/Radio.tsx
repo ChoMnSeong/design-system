@@ -1,56 +1,100 @@
 import {
     createContext,
     useContext,
+    useId,
+    useState,
     type CSSProperties,
     type InputHTMLAttributes,
     type ReactNode,
     type Ref,
 } from 'react'
-import { mergeStyles } from './types.js'
+import type { FieldSize, Option } from './types.js'
 
-type RadioGroupContext = {
-    name?: string
-    value?: string
-    onChange?: (value: string) => void
+type RadioCtxValue = {
+    name: string
+    value: string | undefined
+    select: (v: string) => void
     disabled?: boolean
+    size: FieldSize
+    appearance: RadioAppearance
 }
+const RadioCtx = createContext<RadioCtxValue | null>(null)
 
-const RadioCtx = createContext<RadioGroupContext | null>(null)
+export type RadioAppearance = 'default' | 'card' | 'button'
 
 export type RadioGroupProps = {
     name?: string
     value?: string
     defaultValue?: string
+    onValueChange?: (value: string) => void
+    /** @deprecated onValueChange 를 쓴다. */
     onChange?: (value: string) => void
-    disabled?: boolean
-    children: ReactNode
+    /** children 대신 옵션 배열로 그린다. */
+    options?: Option[]
+    /** default: 동그라미, card: 설명이 있는 카드 선택, button: 붙은 버튼 */
+    appearance?: RadioAppearance
     direction?: 'row' | 'column'
+    size?: FieldSize
+    disabled?: boolean
+    children?: ReactNode
     style?: CSSProperties
+    'aria-label'?: string
+    'aria-labelledby'?: string
 }
 
 export const RadioGroup = ({
     name,
-    value,
+    value: valueProp,
+    defaultValue,
+    onValueChange,
     onChange,
+    options,
+    appearance = 'default',
+    direction,
+    size = 'md',
     disabled,
     children,
-    direction = 'column',
     style,
+    ...aria
 }: RadioGroupProps) => {
+    const autoName = useId()
+    const [inner, setInner] = useState(defaultValue)
+    const value = valueProp ?? inner
+    const dir = direction ?? (appearance === 'default' ? 'column' : 'row')
     return (
-        <RadioCtx.Provider value={{ name, value, onChange, disabled }}>
+        <RadioCtx.Provider
+            value={{
+                name: name ?? autoName,
+                value,
+                select: (v) => {
+                    if (valueProp === undefined) setInner(v)
+                    onValueChange?.(v)
+                    onChange?.(v)
+                },
+                disabled,
+                size,
+                appearance,
+            }}
+        >
             <div
                 role="radiogroup"
-                style={mergeStyles(
-                    {
-                        display: 'flex',
-                        flexDirection: direction,
-                        gap: direction === 'row' ? '16px' : '8px',
-                    },
-                    style,
-                )}
+                data-ds-choice-group=""
+                data-direction={dir}
+                data-appearance={appearance}
+                style={style}
+                {...aria}
             >
-                {children}
+                {options
+                    ? options.map((o) => (
+                          <Radio
+                              key={o.value}
+                              value={o.value}
+                              label={o.label}
+                              description={o.description}
+                              disabled={o.disabled}
+                          />
+                      ))
+                    : children}
             </div>
         </RadioCtx.Provider>
     )
@@ -58,114 +102,67 @@ export const RadioGroup = ({
 
 export type RadioProps = {
     label?: ReactNode
+    description?: ReactNode
     value: string
-    size?: 'sm' | 'md'
+    size?: FieldSize
     ref?: Ref<HTMLInputElement>
-} & Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    'type' | 'size' | 'value' | 'onChange' | 'name'
->
-
-const sizes = {
-    sm: { box: 14, dot: 6, font: 13 },
-    md: { box: 16, dot: 8, font: 14 },
-}
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'value' | 'name'>
 
 export const Radio = ({
     label,
+    description,
     value,
-    size = 'md',
+    size: sizeProp,
     disabled: ownDisabled,
+    checked: checkedProp,
+    onChange,
+    className,
     style,
     ref,
     ...rest
 }: RadioProps) => {
     const ctx = useContext(RadioCtx)
+    const descId = useId()
+    const size = sizeProp ?? ctx?.size ?? 'md'
     const disabled = ownDisabled ?? ctx?.disabled
-    const checked = ctx ? ctx.value === value : (rest as { checked?: boolean }).checked
-    const { box, dot, font } = sizes[size]
-
+    const checked = ctx ? ctx.value === value : checkedProp
+    const appearance = ctx?.appearance ?? 'default'
     return (
         <label
-            data-ds-disabled={disabled ? '' : undefined}
-            data-ds-interactive="control"
-            style={mergeStyles(
-                {
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    fontSize: `${font}px`,
-                    lineHeight: `${box}px`,
-                    color: disabled
-                        ? 'var(--ds-color-foreground-muted)'
-                        : 'var(--ds-color-foreground-primary)',
-                    userSelect: 'none',
-                },
-                style,
-            )}
+            data-ds-choice=""
+            data-size={size}
+            data-appearance={appearance}
+            data-checked={checked ? '' : undefined}
+            data-disabled={disabled ? '' : undefined}
+            className={className}
+            style={style}
         >
             <input
-                {...rest}
                 ref={ref}
                 type="radio"
+                data-ds-radio=""
+                data-size={size}
                 name={ctx?.name}
                 value={value}
                 checked={checked}
                 disabled={disabled}
-                data-ds-focus-input=""
-                onChange={() => {
-                    if (ctx?.onChange) ctx.onChange(value)
+                aria-describedby={description ? descId : undefined}
+                onChange={(e) => {
+                    onChange?.(e)
+                    if (e.target.checked) ctx?.select(value)
                 }}
-                style={{
-                    position: 'absolute',
-                    width: 1,
-                    height: 1,
-                    padding: 0,
-                    margin: -1,
-                    overflow: 'hidden',
-                    clip: 'rect(0,0,0,0)',
-                    whiteSpace: 'nowrap',
-                    border: 0,
-                }}
+                {...rest}
             />
-            <span
-                aria-hidden
-                data-ds-focus-visual=""
-                style={{
-                    position: 'relative',
-                    width: `${box}px`,
-                    height: `${box}px`,
-                    flexShrink: 0,
-                    background: 'var(--ds-surface-inset-background)',
-                    border: checked
-                        ? `2px solid var(--ds-color-accent-background)`
-                        : '1px solid var(--ds-color-border-default)',
-                    borderRadius: '50%',
-                    transitionProperty: 'background, background-color, border-color, color, box-shadow, opacity',
-                    transitionDuration: '120ms',
-                    transitionTimingFunction: 'ease',
-                    opacity: disabled ? 0.5 : 1,
-                    display: 'inline-block',
-                }}
-            >
-                {checked && (
-                    <span
-                        style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: `${dot}px`,
-                            height: `${dot}px`,
-                            borderRadius: '50%',
-                            background:
-                                'var(--ds-color-accent-background)',
-                        }}
-                    />
-                )}
-            </span>
-            {label && <span style={{ lineHeight: 1.4 }}>{label}</span>}
+            {(label || description) && (
+                <span data-slot="text">
+                    {appearance === 'card' ? <b>{label}</b> : label}
+                    {description && (
+                        <small id={descId} data-slot="desc">
+                            {description}
+                        </small>
+                    )}
+                </span>
+            )}
         </label>
     )
 }

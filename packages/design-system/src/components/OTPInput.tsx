@@ -6,7 +6,7 @@ import {
     type ClipboardEvent,
     type KeyboardEvent,
 } from 'react'
-import { mergeStyles } from './types.js'
+import { mergeStyles, type Size } from './types.js'
 import {
     borderVariantContainerStyle,
     type BorderVariant,
@@ -23,6 +23,12 @@ export type OTPInputProps = {
     autoFocus?: boolean
     disabled?: boolean
     variant?: BorderVariant
+    /** 입력한 글자를 ● 로 가린다 */
+    mask?: boolean
+    /** 칸 크기. sm 32 · md 40 · lg 48 */
+    size?: Size
+    invalid?: boolean
+    'aria-label'?: string
     style?: CSSProperties
 }
 
@@ -36,6 +42,10 @@ export const OTPInput = ({
     autoFocus,
     disabled,
     variant: variantProp,
+    mask,
+    size = 'md',
+    invalid,
+    'aria-label': ariaLabel = '인증번호',
     style,
 }: OTPInputProps) => {
     const variant = useBorderVariant(variantProp)
@@ -96,21 +106,23 @@ export const OTPInput = ({
         }
     }
 
-    const cellSize = 40
+    const cellSize = size === 'sm' ? 32 : size === 'lg' ? 48 : 40
     const cellStyle: CSSProperties = {
         width: `${cellSize}px`,
         height: `${cellSize + 6}px`,
         textAlign: 'center',
-        fontSize: '18px',
+        fontSize: size === 'sm' ? '15px' : size === 'lg' ? '22px' : '18px',
         fontWeight: 700,
         fontFamily: 'var(--ds-typography-font-family-mono)',
         color: 'var(--ds-color-foreground-primary)',
         outline: 'none',
-        ...borderVariantContainerStyle(variant, { surfaceToken: 'inset' }),
+        ...borderVariantContainerStyle(variant, { surfaceToken: 'inset', invalid }),
     }
 
     return (
         <div
+            role="group"
+            aria-label={ariaLabel}
             style={mergeStyles(
                 {
                     display: 'inline-flex',
@@ -127,7 +139,9 @@ export const OTPInput = ({
                     ref={(el) => {
                         refs.current[idx] = el
                     }}
-                    type="text"
+                    type={mask ? 'password' : 'text'}
+                    aria-label={`${ariaLabel} ${idx + 1}번째 자리`}
+                    aria-invalid={invalid || undefined}
                     inputMode={type === 'numeric' ? 'numeric' : 'text'}
                     autoComplete={idx === 0 ? 'one-time-code' : 'off'}
                     spellCheck={false}

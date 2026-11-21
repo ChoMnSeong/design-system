@@ -1,93 +1,37 @@
-import { useState } from 'react'
-import { Checkbox } from '@ensnif/design-system'
+import { Checkbox, CheckboxGroup } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
 
-export const CheckboxPage = () => {
-    const [a, setA] = useState(true)
-    const [b, setB] = useState(false)
-
-    const items = [
-        { id: 1, label: '액션', checked: true },
-        { id: 2, label: '로맨스', checked: false },
-        { id: 3, label: '판타지', checked: true },
-    ]
-    const allChecked = items.every((i) => i.checked)
-    const someChecked = items.some((i) => i.checked)
-
-    return (
-        <>
-            <PageHeader
-                title="Checkbox"
-                description="단일 선택 체크박스. controlled / uncontrolled, indeterminate, disabled 지원."
+export const CheckboxPage = () => (
+    <>
+        <PageHeader title="Checkbox · CheckboxGroup" description="size xs~lg, tone, description. CheckboxGroup 은 selectAll 로 전체 선택을 붙입니다." />
+        <ComponentPreview title="size · 상태 · tone" code={`<Checkbox size="lg" defaultChecked /> <Checkbox indeterminate /> <Checkbox tone="danger" defaultChecked />`}>
+            <Checkbox size="xs" aria-label="xs" />
+            <Checkbox size="sm" aria-label="sm" />
+            <Checkbox aria-label="md" />
+            <Checkbox size="lg" aria-label="lg" />
+            <Checkbox defaultChecked aria-label="checked" />
+            <Checkbox indeterminate aria-label="indeterminate" />
+            <Checkbox defaultChecked disabled aria-label="disabled" />
+            <Checkbox tone="success" defaultChecked aria-label="success" />
+            <Checkbox tone="danger" defaultChecked aria-label="danger" />
+        </ComponentPreview>
+        <ComponentPreview
+            title="group · description"
+            code={`<CheckboxGroup selectAll options={[{ value: 'in', label: '수입검사' }, { value: 'proc', label: '공정검사' }]} />
+<Checkbox label="자동 실적 등록" description="설비 카운터 값으로 실적을 등록합니다" />`}
+        >
+            <CheckboxGroup
+                selectAll
+                defaultValue={['in']}
+                aria-label="검사 종류"
+                options={[
+                    { value: 'in', label: '수입검사' },
+                    { value: 'proc', label: '공정검사' },
+                    { value: 'out', label: '출하검사' },
+                ]}
             />
-
-            <ComponentPreview
-                title="기본"
-                code={`<Checkbox label="이용약관 동의" checked={a} onChange={(e) => setA(e.target.checked)} />`}
-            >
-                <Checkbox
-                    label="이용약관 동의"
-                    checked={a}
-                    onChange={(e) => setA(e.target.checked)}
-                />
-                <Checkbox
-                    label="개인정보 수집"
-                    checked={b}
-                    onChange={(e) => setB(e.target.checked)}
-                />
-                <Checkbox label="비활성" disabled />
-                <Checkbox label="비활성 + 체크" disabled defaultChecked />
-            </ComponentPreview>
-
-            <ComponentPreview
-                title="Indeterminate"
-                description="자식 일부만 체크된 그룹 헤더용"
-                code={`<Checkbox
-    label="모두"
-    checked={allChecked}
-    indeterminate={!allChecked && someChecked}
-/>`}
-            >
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                    }}
-                >
-                    <Checkbox
-                        label="모두"
-                        checked={allChecked}
-                        indeterminate={!allChecked && someChecked}
-                    />
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                            paddingLeft: '20px',
-                        }}
-                    >
-                        {items.map((i) => (
-                            <Checkbox
-                                key={i.id}
-                                label={i.label}
-                                defaultChecked={i.checked}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </ComponentPreview>
-
-            <ComponentPreview
-                title="Sizes"
-                code={`<Checkbox size="sm" label="Small" />
-<Checkbox size="md" label="Medium" />`}
-            >
-                <Checkbox size="sm" label="Small" defaultChecked />
-                <Checkbox size="md" label="Medium" defaultChecked />
-            </ComponentPreview>
-        </>
-    )
-}
+            <Checkbox defaultChecked label="자동 실적 등록" description="설비 카운터 값으로 실적을 등록합니다" />
+        </ComponentPreview>
+    </>
+)

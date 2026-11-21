@@ -1,46 +1,21 @@
-import { Label, Stack, Textarea } from '@ensnif/design-system'
+import { Textarea } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
 
 export const TextareaPage = () => (
     <>
-        <PageHeader
-            title="Textarea"
-            description="여러 줄 입력. Input과 같은 4개 variant + autoResize 옵션."
-        />
-
+        <PageHeader title="Textarea" description="minRows · maxRows 로 내용에 맞게 늘어나고, showCount 로 글자 수를 보입니다." />
         <ComponentPreview
-            title="Variants"
-            code={`<Textarea variant="outlined" placeholder="Outlined" />
-<Textarea variant="filled" placeholder="Filled" />
-<Textarea variant="ghost" placeholder="Ghost" />
-<Textarea variant="underline" placeholder="Underline" />`}
+            title="기본"
+            code={`<Textarea maxLength={200} showCount defaultValue="조치 내용: 유압 호스 교체" />
+<Textarea variant="filled" minRows={2} maxRows={6} placeholder="특이사항 입력" />
+<Textarea invalid placeholder="반려 사유" />`}
         >
-            <Stack gap={12} style={{ width: '100%', maxWidth: '420px' }}>
-                <Textarea variant="outlined" placeholder="Outlined" fullWidth />
-                <Textarea variant="filled" placeholder="Filled" fullWidth />
-                <Textarea variant="ghost" placeholder="Ghost" fullWidth />
-                <Textarea
-                    variant="underline"
-                    placeholder="Underline"
-                    fullWidth
-                />
-            </Stack>
-        </ComponentPreview>
-
-        <ComponentPreview
-            title="Auto resize"
-            code={`<Textarea autoResize rows={2} placeholder="작성해주세요..." />`}
-        >
-            <Stack gap={6} style={{ width: '100%', maxWidth: '420px' }}>
-                <Label>코멘트</Label>
-                <Textarea
-                    autoResize
-                    rows={2}
-                    placeholder="작성해주세요..."
-                    fullWidth
-                />
-            </Stack>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, width: '100%' }}>
+                <Textarea maxLength={200} showCount defaultValue="조치 내용: 유압 호스 교체" aria-label="조치 내용" fullWidth />
+                <Textarea variant="filled" minRows={2} maxRows={6} placeholder="특이사항 입력 (늘어남)" aria-label="특이사항" fullWidth />
+                <Textarea invalid placeholder="반려 사유를 입력하세요" aria-label="반려 사유" fullWidth />
+            </div>
         </ComponentPreview>
     </>
 )

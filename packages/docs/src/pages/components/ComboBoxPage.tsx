@@ -1,80 +1,69 @@
 import { useState } from 'react'
-import { ComboBox, Label } from '@ensnif/design-system'
+import { ComboBox, MultiSelect, Select, TagInput, type SelectOption } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
 
-const genres = [
-    { value: 'action', label: '액션', description: '빠른 전개의 전투 중심' },
-    { value: 'romance', label: '로맨스', description: '관계와 감정 중심' },
-    { value: 'fantasy', label: '판타지', description: '이세계, 마법 등' },
-    { value: 'sf', label: 'SF', description: '미래·우주·기술' },
-    { value: 'slice', label: '일상', description: '잔잔한 일상' },
-    { value: 'sports', label: '스포츠' },
-    { value: 'mystery', label: '미스터리' },
-    { value: 'horror', label: '호러', disabled: true },
+const STATUS: SelectOption[] = [
+    { value: 'wait', label: '대기' },
+    { value: 'run', label: '작업중' },
+    { value: 'done', label: '완료' },
+    { value: 'cancel', label: '취소', disabled: true },
 ]
+const ITEMS: SelectOption[] = [
+    { value: 'BR-A01', label: '브래킷 A형', description: 'BR-A01', group: '완제품' },
+    { value: 'BR-B01', label: '브래킷 B형', description: 'BR-B01', group: '완제품' },
+    { value: 'HS-C01', label: '하우징 커버', description: 'HS-C01', group: '완제품' },
+    { value: 'BR-BL', label: '브래킷 블랭크', description: 'BR-BL', group: '반제품' },
+]
+const LINES = ['1', '2', '3', '4', '5'].map((n) => ({ value: n, label: `${n}라인` }))
+const VENDORS = Array.from({ length: 40 }, (_, i) => ({ value: `V${i}`, label: `거래처 ${i + 1}` }))
 
 export const ComboBoxPage = () => {
-    const [value, setValue] = useState<string | undefined>(undefined)
-
+    const [items, setItems] = useState(ITEMS)
     return (
         <>
-            <PageHeader
-                title="ComboBox"
-                description="검색 가능한 드롭다운 셀렉트. 키보드 네비게이션 (↑↓ Enter Esc) 지원."
-            />
-
-            <ComponentPreview
-                title="기본"
-                code={`<ComboBox options={options} value={value} onChange={setValue} placeholder="장르 선택" />`}
-            >
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px',
-                    }}
-                >
-                    <Label>관심 장르</Label>
-                    <ComboBox
-                        options={genres}
-                        value={value}
-                        onChange={setValue}
-                        placeholder="장르 선택..."
-                        width={260}
-                    />
-                    <span
-                        style={{
-                            fontSize: '11px',
-                            color: 'var(--ds-color-foreground-tertiary)',
-                            fontFamily: 'var(--ds-typography-font-family-mono)',
-                        }}
-                    >
-                        선택된 값: {value ?? '(없음)'}
-                    </span>
-                </div>
+            <PageHeader title="Select · ComboBox · MultiSelect · TagInput" description="같은 엔진. searchable · multiple · creatable · loadOptions · groupBy 를 조합합니다." />
+            <ComponentPreview title="Select · 코드값" code={`<Select options={STATUS} defaultValue="run" />`}>
+                <Select options={STATUS} defaultValue="run" aria-label="상태" width={200} />
+                <Select options={STATUS} clearable placeholder="상태" aria-label="상태 2" width={200} />
             </ComponentPreview>
-
             <ComponentPreview
-                title="기본값"
-                code={`<ComboBox options={genres} defaultValue="fantasy" width={260} />`}
+                title="ComboBox · searchable · groupBy · creatable"
+                code={`<ComboBox options={items} creatable onCreate={(t) => setItems([...items, { value: t, label: t, group: '신규' }])} />`}
             >
                 <ComboBox
-                    options={genres}
-                    defaultValue="fantasy"
-                    width={260}
+                    options={items}
+                    creatable
+                    onCreate={(t) => setItems([...items, { value: t, label: t, group: '신규' }])}
+                    aria-label="품목"
+                    width={280}
                 />
             </ComponentPreview>
-
+            <ComponentPreview title="MultiSelect · maxTagCount=2" code={`<MultiSelect options={LINES} defaultValue={['1','2','3','4']} maxTagCount={2} />`}>
+                <MultiSelect options={LINES} defaultValue={['1', '2', '3', '4']} maxTagCount={2} aria-label="라인" width={280} />
+                <MultiSelect options={LINES} searchable placeholder="라인 검색" aria-label="라인 검색" width={280} />
+            </ComponentPreview>
             <ComponentPreview
-                title="Disabled"
-                code={`<ComboBox options={genres} defaultValue="action" disabled width={260} />`}
+                title="TagInput · loadOptions"
+                code={`<TagInput mono defaultValue={['L2611-118']} validate={(t) => /^L\\d{4}-\\d{3}$/.test(t)} />
+<ComboBox loadOptions={(q) => fetchVendors(q)} />`}
             >
+                <TagInput
+                    mono
+                    defaultValue={['L2611-118', 'L2611-121', 'L26-?']}
+                    validate={(t) => /^L\d{4}-\d{3}$/.test(t)}
+                    placeholder="LOT 번호 입력 후 Enter"
+                    aria-label="LOT"
+                    style={{ width: 340 }}
+                />
                 <ComboBox
-                    options={genres}
-                    defaultValue="action"
-                    disabled
-                    width={260}
+                    aria-label="거래처"
+                    width={220}
+                    placeholder="거래처 검색"
+                    loadOptions={(q) =>
+                        new Promise((r) => setTimeout(() => r(VENDORS.filter((v) => v.label.includes(q))), 600))
+                    }
+                    virtualized
                 />
             </ComponentPreview>
         </>

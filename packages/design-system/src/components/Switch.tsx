@@ -1,100 +1,79 @@
-import type { CSSProperties, InputHTMLAttributes, Ref } from 'react'
-import { mergeStyles } from './types.js'
+import { useState, type InputHTMLAttributes, type ReactNode, type Ref } from 'react'
+import type { FieldSize, Tone } from './types.js'
 
 export type SwitchProps = {
-    size?: 'sm' | 'md'
-    label?: string
+    /** xs 24×14 · sm 28×16 · md 36×20 · lg 44×24 */
+    size?: FieldSize
+    label?: ReactNode
+    /** 라벨을 스위치 앞(start)에 둘지 뒤(end)에 둘지. 기본 end */
+    labelPosition?: 'start' | 'end'
+    /** 켜짐·꺼짐에 따라 바뀌는 라벨. label 보다 우선 */
+    onLabel?: ReactNode
+    offLabel?: ReactNode
+    /** 변경을 서버에 반영하는 중. 스위치 대신 스피너를 보이고 입력을 막는다 */
+    loading?: boolean
+    tone?: Tone
+    onCheckedChange?: (checked: boolean) => void
     ref?: Ref<HTMLInputElement>
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'>
-
-const sizes = {
-    sm: { width: 32, height: 18, knob: 12 },
-    md: { width: 42, height: 24, knob: 18 },
-}
 
 export const Switch = ({
     size = 'md',
     label,
-    checked,
+    labelPosition = 'end',
+    onLabel,
+    offLabel,
+    loading,
+    tone,
+    onCheckedChange,
+    onChange,
+    checked: checkedProp,
+    defaultChecked,
     disabled,
+    className,
     style,
     ref,
     ...rest
 }: SwitchProps) => {
-    const s = sizes[size]
-    const trackStyle: CSSProperties = {
-        position: 'relative',
-        display: 'inline-block',
-        width: `${s.width}px`,
-        height: `${s.height}px`,
-        background: checked
-            ? 'var(--ds-color-accent-background)'
-            : 'var(--ds-color-background-inset)',
-        border: checked
-            ? 'var(--ds-color-accent-border)'
-            : '1px solid var(--ds-color-border-default)',
-        borderRadius: 'var(--ds-radius-full)',
-        transition: 'background 160ms ease',
-        opacity: disabled ? 0.5 : 1,
-        flexShrink: 0,
-    }
-    const knobStyle: CSSProperties = {
-        position: 'absolute',
-        top: '50%',
-        left: checked
-            ? `calc(100% - ${s.knob}px - 2px)`
-            : '2px',
-        width: `${s.knob}px`,
-        height: `${s.knob}px`,
-        transform: 'translateY(-50%)',
-        borderRadius: '50%',
-        background: checked
-            ? 'var(--ds-color-accent-color)'
-            : 'var(--ds-color-foreground-tertiary)',
-        boxShadow: 'var(--ds-shadow-xs)',
-        transition: 'left 160ms ease, background 160ms ease',
-    }
+    const [inner, setInner] = useState(!!defaultChecked)
+    const checked = checkedProp ?? inner
+    const text = checked ? (onLabel ?? label) : (offLabel ?? label)
+    const control = loading ? (
+        <span data-ds-switch-loading="" data-size={size} role="status" aria-label="적용 중">
+            <span data-ds-field-spinner="" data-ds-spinner="" />
+        </span>
+    ) : (
+        <input
+            ref={ref}
+            type="checkbox"
+            role="switch"
+            data-ds-switch=""
+            data-size={size}
+            data-tone={tone}
+            checked={checked}
+            aria-checked={checked}
+            disabled={disabled}
+            onChange={(e) => {
+                if (checkedProp === undefined) setInner(e.target.checked)
+                onChange?.(e)
+                onCheckedChange?.(e.target.checked)
+            }}
+            {...rest}
+        />
+    )
+    if (!text) return control
     return (
         <label
-            data-ds-disabled={disabled ? '' : undefined}
-            data-ds-interactive="control"
-            style={mergeStyles(
-                {
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    cursor: disabled ? 'not-allowed' : 'pointer',
-                    color: 'var(--ds-color-foreground-primary)',
-                    fontSize: '14px',
-                    lineHeight: `${s.height}px`,
-                    userSelect: 'none',
-                },
-                style,
-            )}
+            data-ds-choice=""
+            data-switch=""
+            data-size={size}
+            data-disabled={disabled || loading ? '' : undefined}
+            className={className}
+            style={style}
         >
-            <input
-                {...rest}
-                ref={ref}
-                type="checkbox"
-                role="switch"
-                checked={checked}
-                disabled={disabled}
-                data-ds-focus-input=""
-                style={{
-                    position: 'absolute',
-                    width: 1,
-                    height: 1,
-                    overflow: 'hidden',
-                    clip: 'rect(0,0,0,0)',
-                    border: 0,
-                    margin: -1,
-                    padding: 0,
-                }}
-            />
-            <span aria-hidden data-ds-focus-visual="" style={trackStyle}>
-                <span style={knobStyle} />
-            </span>
-            {label && <span style={{ lineHeight: 1.4 }}>{label}</span>}
+            {labelPosition === 'start' && <span data-slot="text">{text}</span>}
+            {control}
+            {labelPosition === 'end' && <span data-slot="text">{text}</span>}
         </label>
     )
 }

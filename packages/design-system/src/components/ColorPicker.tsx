@@ -5,14 +5,71 @@ import {
 } from 'react'
 import { Popover } from './Popover.js'
 import { useOutsideClick } from './useOutsideClick.js'
-import { mergeStyles } from './types.js'
+import { mergeStyles, type FieldSize } from './types.js'
+
+export type ColorFormat = 'hex' | 'rgb' | 'oklch'
+
+const hexToRgb = (hex: string) => {
+    const h = hex.replace('#', '')
+    return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number]
+}
+
+/** sRGB → OKLCH (Björn Ottosson 의 OKLab 변환). */
+const rgbToOklch = ([r, g, b]: [number, number, number]) => {
+    const lin = (c: number) => {
+        const v = c / 255
+        return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+    }
+    const [R, G, B] = [lin(r), lin(g), lin(b)]
+    const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B)
+    const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B)
+    const s = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B)
+    const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s
+    const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s
+    const Bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+    const C = Math.sqrt(A * A + Bb * Bb)
+    let H = (Math.atan2(Bb, A) * 180) / Math.PI
+    if (H < 0) H += 360
+    return [L, C, H] as const
+}
+
+/** 내부 값(#rrggbb + 알파)을 원하는 형식의 문자열로. */
+export const formatColor = (hex: string, alpha: number, format: ColorFormat): string => {
+    const a = Math.round(alpha * 100) / 100
+    if (format === 'rgb') {
+        const [r, g, b] = hexToRgb(hex)
+        return a < 1 ? `rgb(${r} ${g} ${b} / ${a})` : `rgb(${r} ${g} ${b})`
+    }
+    if (format === 'oklch') {
+        const [L, C, H] = rgbToOklch(hexToRgb(hex))
+        const body = `${(L * 100).toFixed(1)}% ${C.toFixed(3)} ${C < 0.0005 ? 0 : H.toFixed(1)}`
+        return a < 1 ? `oklch(${body} / ${a})` : `oklch(${body})`
+    }
+    return a < 1
+        ? `${hex}${Math.round(a * 255).toString(16).padStart(2, '0')}`
+        : hex
+}
+
+/** #rrggbbaa 를 받으면 색과 알파로 나눈다. */
+const splitHexAlpha = (v: string): [string, number] => {
+    const m = /^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})$/.exec(v.trim())
+    if (m) return [`#${m[1]!.toLowerCase()}`, parseInt(m[2]!, 16) / 255]
+    return [v, 1]
+}
 
 export type ColorPickerProps = {
     value?: string
     defaultValue?: string
     onChange?: (value: string) => void
+    /** 바뀐 값을 format 형식 문자열로 받는다 */
+    onValueChange?: (value: string) => void
     swatches?: string[]
     disabled?: boolean
+    /** onChange · onValueChange 로 내보낼 형식. value 는 hex(#rrggbb, #rrggbbaa) 로 받는다 */
+    format?: ColorFormat
+    /** 투명도 슬라이더를 보인다 */
+    alpha?: boolean
+    size?: FieldSize
     style?: CSSProperties
 }
 
@@ -47,12 +104,24 @@ export const ColorPicker = ({
     value: controlled,
     defaultValue = '#a35def',
     onChange,
+    onValueChange,
     swatches = DEFAULT_SWATCHES,
     disabled,
+    format = 'hex',
+    alpha: withAlpha = false,
+    size = 'md',
     style,
 }: ColorPickerProps) => {
-    const [internal, setInternal] = useState(defaultValue)
-    const value = controlled ?? internal
+    const [internal, setInternal] = useState(() => splitHexAlpha(defaultValue)[0])
+    const [internalAlpha, setInternalAlpha] = useState(() => splitHexAlpha(defaultValue)[1])
+    const [ctrlHex, ctrlAlpha] = controlled !== undefined ? splitHexAlpha(controlled) : [undefined, undefined]
+    const value = ctrlHex ?? internal
+    const alphaValue = ctrlAlpha ?? internalAlpha
+    const emit = (hex: string, a: number) => {
+        const out = formatColor(hex, withAlpha ? a : 1, format)
+        onChange?.(out)
+        onValueChange?.(out)
+    }
     const [open, setOpen] = useState(false)
     const [draft, setDraft] = useState(value)
 
@@ -64,7 +133,7 @@ export const ColorPicker = ({
         if (!isValidHex(next)) return
         const norm = normalizeHex(next)
         if (controlled === undefined) setInternal(norm)
-        onChange?.(norm)
+        emit(norm, alphaValue)
     }
 
     return (
@@ -79,9 +148,11 @@ export const ColorPicker = ({
                     setOpen((v) => !v)
                     setDraft(value)
                 }}
+                aria-label="색 선택"
+                aria-expanded={open}
                 style={{
-                    height: '36px',
-                    padding: '0 12px',
+                    height: size === 'xs' ? '24px' : size === 'sm' ? '28px' : size === 'lg' ? '44px' : '36px',
+                    padding: size === 'xs' || size === 'sm' ? '0 8px' : '0 12px',
                     background: 'var(--ds-surface-inset-background)',
                     border: 'var(--ds-surface-inset-border)',
                     borderRadius: 'var(--ds-surface-inset-radius)',
@@ -101,7 +172,7 @@ export const ColorPicker = ({
                         width: '20px',
                         height: '20px',
                         borderRadius: 'var(--ds-radius-sm)',
-                        background: value,
+                        background: `linear-gradient(${formatColor(value, withAlpha ? alphaValue : 1, 'rgb')}, ${formatColor(value, withAlpha ? alphaValue : 1, 'rgb')}), repeating-conic-gradient(#ccc 0 25%, #fff 0 50%) 0 0 / 8px 8px`,
                         border: '1px solid var(--ds-color-border-subtle)',
                         flexShrink: 0,
                     }}
@@ -112,7 +183,7 @@ export const ColorPicker = ({
                         fontSize: '12px',
                     }}
                 >
-                    {value}
+                    {formatColor(value, withAlpha ? alphaValue : 1, format)}
                 </span>
             </button>
 
@@ -217,6 +288,36 @@ export const ColorPicker = ({
                             }}
                         />
                     </div>
+                    {withAlpha && (
+                        <label
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                marginTop: '10px',
+                                fontSize: '12px',
+                                color: 'var(--ds-color-foreground-tertiary)',
+                            }}
+                        >
+                            투명도
+                            <input
+                                type="range"
+                                min={0}
+                                max={100}
+                                value={Math.round(alphaValue * 100)}
+                                aria-label="투명도"
+                                onChange={(e) => {
+                                    const a = Number(e.target.value) / 100
+                                    if (ctrlAlpha === undefined) setInternalAlpha(a)
+                                    emit(value, a)
+                                }}
+                                style={{ flex: 1, accentColor: 'var(--ds-palette-primary-600)' }}
+                            />
+                            <span style={{ fontFamily: 'var(--ds-typography-font-family-mono)', width: '36px', textAlign: 'right' }}>
+                                {Math.round(alphaValue * 100)}%
+                            </span>
+                        </label>
+                    )}
                 </div>
             </Popover>
         </div>

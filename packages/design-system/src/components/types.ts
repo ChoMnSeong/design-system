@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
 export type Size = 'sm' | 'md' | 'lg'
 export type Tone =
@@ -85,3 +85,18 @@ export const space = (t: SpaceToken | string): string =>
 
 /** 정보 밀도. compact 는 업무 화면의 표·툴바, comfortable 은 B2C·터치 화면. */
 export type Density = 'compact' | 'default' | 'comfortable'
+
+/** 입력 컨트롤 공통 크기. xs 24 · sm 28 · md 36 · lg 44 */
+export type FieldSize = 'xs' | 'sm' | 'md' | 'lg'
+/** Size(sm·md·lg) 를 쓰던 컴포넌트가 FieldSize 로 넘어갈 때 아이콘 크기 등에 쓴다. */
+export const fieldIconSize: Record<FieldSize, number> = { xs: 12, sm: 14, md: 16, lg: 18 }
+
+/** 선택형 컨트롤(Select · RadioGroup · SegmentedControl · CheckboxGroup) 공용 옵션. */
+export type Option<V extends string = string> = {
+    value: V
+    label: ReactNode
+    description?: ReactNode
+    icon?: ReactNode
+    disabled?: boolean
+    group?: string
+}
