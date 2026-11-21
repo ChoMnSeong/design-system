@@ -8,7 +8,6 @@ import {
     Image,
     NavigationMenu,
     PieChart,
-    ScrollArea,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -53,45 +52,6 @@ export const ImagePage = () => (
                 radius="var(--ds-radius-lg)"
                 style={{ maxWidth: '480px', display: 'block' }}
             />
-        </ComponentPreview>
-    </>
-)
-
-export const ScrollAreaPage = () => (
-    <>
-        <PageHeader
-            title="ScrollArea"
-            description="얇은 커스텀 스크롤바 적용. maxHeight, direction 옵션."
-        />
-        <ComponentPreview
-            title="기본"
-            code={`<ScrollArea maxHeight={200}>
-    {items.map((item) => <div>{item}</div>)}
-</ScrollArea>`}
-        >
-            <ScrollArea
-                maxHeight={200}
-                style={{
-                    width: '320px',
-                    border: '1px solid var(--ds-color-border-subtle)',
-                    borderRadius: 'var(--ds-radius-md)',
-                    padding: '12px',
-                }}
-            >
-                {Array.from({ length: 30 }, (_, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            padding: '6px 8px',
-                            borderBottom:
-                                '1px solid var(--ds-color-border-subtle)',
-                            fontSize: '13px',
-                        }}
-                    >
-                        목록 항목 {i + 1}
-                    </div>
-                ))}
-            </ScrollArea>
         </ComponentPreview>
     </>
 )

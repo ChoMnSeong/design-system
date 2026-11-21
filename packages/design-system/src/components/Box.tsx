@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, Ref } from 'react'
-import { mergeStyles } from './types.js'
+import { mergeStyles, type Tone } from './types.js'
 import {
     borderVariantContainerStyle,
     type BorderVariant,
@@ -12,8 +12,12 @@ export type BoxSurface = 'page' | 'panel' | 'card' | 'overlay' | 'inset' | 'none
 export type BoxProps = {
     surface?: BoxSurface
     variant?: BorderVariant
-    padding?: string | number
-    radius?: string
+    /** px 숫자 또는 CSS 길이. 토큰은 space(3) */
+    padding?: number | string
+    /** RadiusToken(xs~3xl · full) · CSS 값 */
+    radius?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full' | (string & {})
+    /** 옅은 톤 배경 */
+    tone?: Tone
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
@@ -53,6 +57,7 @@ export const Box = ({
     variant: variantProp,
     padding,
     radius,
+    tone,
     style,
     ref,
     ...rest
@@ -63,11 +68,14 @@ export const Box = ({
             ref={ref}
             style={mergeStyles(
                 surfaceStyles(surface, variant),
-                padding !== undefined && {
-                    padding:
-                        typeof padding === 'number' ? `${padding}px` : padding,
+                padding !== undefined && { padding: typeof padding === 'number' ? `${padding}px` : padding },
+                radius !== undefined && {
+                    borderRadius: /^(none|xs|sm|md|lg|xl|2xl|3xl|full)$/.test(radius) ? `var(--ds-radius-${radius})` : radius,
                 },
-                radius !== undefined && { borderRadius: radius },
+                tone && {
+                    background: `color-mix(in oklab, var(--ds-tone-${tone}-solid) 9%, var(--ds-surface-card-background))`,
+                    border: `1px solid color-mix(in oklab, var(--ds-tone-${tone}-solid) 22%, transparent)`,
+                },
                 style,
             )}
             {...rest}

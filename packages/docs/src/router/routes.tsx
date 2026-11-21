@@ -7,13 +7,10 @@ import { TokensPage } from '../pages/TokensPage'
 import { ButtonPage } from '../pages/components/ButtonPage'
 import { InputPage } from '../pages/components/InputPage'
 import { TextareaPage } from '../pages/components/TextareaPage'
-import { CardPage } from '../pages/components/CardPage'
-import { BoxPage } from '../pages/components/BoxPage'
 import { CheckboxPage } from '../pages/components/CheckboxPage'
 import { RadioPage } from '../pages/components/RadioPage'
 import { SwitchPage } from '../pages/components/SwitchPage'
 import { TogglePage } from '../pages/components/TogglePage'
-import { TabsPage } from '../pages/components/TabsPage'
 import { ComboBoxPage } from '../pages/components/ComboBoxPage'
 import { SegmentedControlPage, SliderPage } from '../pages/components/SliderPage'
 import { NumberInputPage } from '../pages/components/NumberInputPage'
@@ -21,8 +18,15 @@ import { LineChartPage } from '../pages/components/LineChartPage'
 import { BarChartPage } from '../pages/components/BarChartPage'
 import { BreadcrumbPage } from '../pages/components/BreadcrumbPage'
 import { PaginationPage } from '../pages/components/PaginationPage'
-import { AccordionPage } from '../pages/components/AccordionPage'
 import { MenuPage } from '../pages/components/MenuPage'
+import {
+    AccordionPage,
+    AppShellPage,
+    BoxPage,
+    CardPage,
+    KpiCardPage,
+    TabsPage,
+} from '../pages/components/LayoutPages'
 import {
     AlertPage,
     CommandPalettePage,
@@ -57,10 +61,6 @@ import {
     SplitButtonPage,
     ToolbarPage,
 } from '../pages/components/ActionPages'
-import {
-    DividerPage,
-    StackPage,
-} from '../pages/components/MiscPage'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
 import { RatingPage } from '../pages/components/RatingPage'
 import { StepperPage } from '../pages/components/StepperPage'
@@ -68,7 +68,6 @@ import { OTPInputPage } from '../pages/components/OTPInputPage'
 import { CodeBlockPage } from '../pages/components/CodeBlockPage'
 import {
     ImagePage,
-    ScrollAreaPage,
     PiePage,
     GaugePage,
     NavigationMenuPage,
@@ -106,6 +105,8 @@ export type RouteId =
     | 'c-box'
     | 'c-divider'
     | 'c-stack'
+    | 'c-appshell'
+    | 'c-kpicard'
     | 'c-tabs'
     | 'c-table'
     | 'c-accordion'
@@ -202,13 +203,12 @@ export const routes: RouteMeta[] = [
     { id: 'c-otpinput', label: 'OTPInput', group: 'form', page: OTPInputPage },
     { id: 'c-formfield', label: 'FormField', group: 'form', page: FormFieldPage },
 
-    { id: 'c-stack', label: 'Stack', group: 'layout', page: StackPage },
-    { id: 'c-divider', label: 'Divider', group: 'layout', page: DividerPage },
+    { id: 'c-appshell', label: 'AppShell · PageHeader · FilterBar', group: 'layout', page: AppShellPage },
     { id: 'c-toolbar', label: 'Toolbar', group: 'layout', page: ToolbarPage },
-    { id: 'c-scrollarea', label: 'ScrollArea', group: 'layout', page: ScrollAreaPage },
 
     { id: 'c-card', label: 'Card', group: 'container', page: CardPage },
-    { id: 'c-box', label: 'Box', group: 'container', page: BoxPage },
+    { id: 'c-kpicard', label: 'KpiCard · StatusCard', group: 'container', page: KpiCardPage },
+    { id: 'c-box', label: 'Box · Stack · Grid · Divider', group: 'container', page: BoxPage },
     { id: 'c-tabs', label: 'Tabs', group: 'container', page: TabsPage },
     { id: 'c-accordion', label: 'Accordion', group: 'container', page: AccordionPage },
     { id: 'c-table', label: 'Table', group: 'container', page: TablePage },

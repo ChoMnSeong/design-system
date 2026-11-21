@@ -1,67 +1,26 @@
-import {
-    createContext,
-    useContext,
-    useState,
-    type CSSProperties,
-    type HTMLAttributes,
-    type ReactNode,
-} from 'react'
+import { createContext, useContext, useId, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
+import type { BorderVariant } from './borderVariant.js'
+import type { Density } from './types.js'
 import { IconChevronDown } from './icons.js'
-import { mergeStyles } from './types.js'
-import { type BorderVariant } from './borderVariant.js'
-import { useBorderVariant } from '../provider/useDesignSystem.js'
 
-type AccordionContextValue = {
-    type: 'single' | 'multiple'
-    open: string[]
-    toggle: (value: string) => void
-}
-
-const Ctx = createContext<AccordionContextValue | null>(null)
+type Ctx = { type: 'single' | 'multiple'; open: string[]; toggle: (v: string) => void }
+const AccCtx = createContext<Ctx | null>(null)
 
 export type AccordionProps = {
     type?: 'single' | 'multiple'
     value?: string | string[]
     defaultValue?: string | string[]
     onValueChange?: (value: string | string[]) => void
+    /** default: 구분선 · separated: 항목마다 카드 · flush: 선·여백 없이 */
+    appearance?: 'default' | 'separated' | 'flush'
+    /** @deprecated appearance 로 통합 */
     variant?: BorderVariant
+    /** single 에서 열린 항목을 다시 눌러 닫을 수 있는지. 기본 true */
+    collapsible?: boolean
+    density?: Density
     children: ReactNode
     style?: CSSProperties
-}
-
-const wrapperStyle = (variant: BorderVariant): CSSProperties => {
-    switch (variant) {
-        case 'underline':
-            return {
-                background: 'transparent',
-                border: 'none',
-                borderTop: '1px solid var(--ds-color-border-subtle)',
-                borderRadius: 0,
-                overflow: 'visible',
-            }
-        case 'filled':
-            return {
-                background: 'var(--ds-color-background-inset)',
-                border: 'none',
-                borderRadius: 'var(--ds-radius-md)',
-                overflow: 'hidden',
-            }
-        case 'ghost':
-            return {
-                background: 'transparent',
-                border: 'none',
-                borderRadius: 0,
-                overflow: 'visible',
-            }
-        case 'outlined':
-        default:
-            return {
-                background: 'var(--ds-color-background-card)',
-                border: '1px solid var(--ds-color-border-subtle)',
-                borderRadius: 'var(--ds-radius-md)',
-                overflow: 'hidden',
-            }
-    }
+    className?: string
 }
 
 export const Accordion = ({
@@ -69,120 +28,68 @@ export const Accordion = ({
     value,
     defaultValue,
     onValueChange,
-    variant: variantProp,
+    appearance,
+    variant,
+    collapsible = true,
+    density = 'default',
     children,
     style,
+    className,
 }: AccordionProps) => {
-    const variant = useBorderVariant(variantProp)
-    const initial: string[] =
-        defaultValue === undefined
-            ? []
-            : Array.isArray(defaultValue)
-              ? defaultValue
-              : [defaultValue]
-    const [internal, setInternal] = useState<string[]>(initial)
-    const controlled =
-        value === undefined
-            ? null
-            : Array.isArray(value)
-              ? value
-              : [value]
-    const open = controlled ?? internal
-
+    const toArr = (v?: string | string[]) => (v === undefined ? [] : Array.isArray(v) ? v : v ? [v] : [])
+    const [inner, setInner] = useState<string[]>(toArr(defaultValue))
+    const open = value === undefined ? inner : toArr(value)
     const toggle = (v: string) => {
         let next: string[]
-        if (type === 'single') {
-            next = open.includes(v) ? [] : [v]
-        } else {
-            next = open.includes(v)
-                ? open.filter((x) => x !== v)
-                : [...open, v]
-        }
-        if (controlled === null) setInternal(next)
+        if (type === 'single') next = open.includes(v) ? (collapsible ? [] : open) : [v]
+        else next = open.includes(v) ? open.filter((x) => x !== v) : [...open, v]
+        if (value === undefined) setInner(next)
         onValueChange?.(type === 'single' ? (next[0] ?? '') : next)
     }
-
+    const app = appearance ?? (variant === 'ghost' ? 'flush' : 'default')
     return (
-        <Ctx.Provider value={{ type, open, toggle }}>
-            <div style={mergeStyles(wrapperStyle(variant), style)}>{children}</div>
-        </Ctx.Provider>
+        <AccCtx.Provider value={{ type, open, toggle }}>
+            <div data-ds-accordion="" data-appearance={app} data-density={density} className={className} style={style}>
+                {children}
+            </div>
+        </AccCtx.Provider>
     )
 }
 
 export type AccordionItemProps = {
     value: string
     title: ReactNode
+    icon?: ReactNode
+    /** 제목 오른쪽 보조 (배지 · 개수) */
+    extra?: ReactNode
+    disabled?: boolean
     children: ReactNode
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 
-export const AccordionItem = ({
-    value,
-    title,
-    children,
-    style,
-    ...rest
-}: AccordionItemProps) => {
-    const ctx = useContext(Ctx)!
+export const AccordionItem = ({ value, title, icon, extra, disabled, children, ...rest }: AccordionItemProps) => {
+    const ctx = useContext(AccCtx)!
     const isOpen = ctx.open.includes(value)
+    const id = useId()
     return (
-        <div
-            style={mergeStyles(
-                {
-                    borderBottom: '1px solid var(--ds-color-border-subtle)',
-                },
-                style,
-            )}
-            {...rest}
-        >
-            <button
-                data-ds-interactive="subtle"
-                type="button"
-                onClick={() => ctx.toggle(value)}
-                aria-expanded={isOpen}
-                data-ds-focusable=""
-                style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 16px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--ds-color-foreground-primary)',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    fontFamily: 'inherit',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                }}
-            >
-                <span>{title}</span>
-                <IconChevronDown
-                    size={16}
-                    style={{
-                        transform: isOpen ? 'rotate(180deg)' : 'none',
-                        transition: 'transform 160ms ease',
-                        color: 'var(--ds-color-foreground-tertiary)',
-                    }}
-                />
-            </button>
-            <div
-                style={{
-                    overflow: 'hidden',
-                    maxHeight: isOpen ? '1000px' : '0',
-                    transition: 'max-height 200ms ease',
-                }}
-            >
-                <div
-                    style={{
-                        padding: '0 16px 14px',
-                        fontSize: '13px',
-                        color: 'var(--ds-color-foreground-secondary)',
-                        lineHeight: 1.6,
-                    }}
+        <div data-ds-accordion-item="" data-open={isOpen ? '' : undefined} data-disabled={disabled ? '' : undefined} {...rest}>
+            <h3 data-slot="heading">
+                <button
+                    type="button"
+                    id={`${id}-h`}
+                    aria-expanded={isOpen}
+                    aria-controls={`${id}-p`}
+                    disabled={disabled}
+                    data-slot="trigger"
+                    onClick={() => ctx.toggle(value)}
                 >
-                    {children}
-                </div>
+                    {icon && <span data-slot="icon" aria-hidden>{icon}</span>}
+                    <span data-slot="title">{title}</span>
+                    {extra && <span data-slot="extra">{extra}</span>}
+                    <IconChevronDown size={16} data-slot="chevron" aria-hidden />
+                </button>
+            </h3>
+            <div id={`${id}-p`} role="region" aria-labelledby={`${id}-h`} hidden={!isOpen} data-slot="panel">
+                {children}
             </div>
         </div>
     )
