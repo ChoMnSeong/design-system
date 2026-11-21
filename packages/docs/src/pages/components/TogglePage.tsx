@@ -1,69 +1,87 @@
 import { useState } from 'react'
-import {
-    IconBold,
-    IconItalic,
-    IconUnderline,
-    Toggle,
-} from '@ensnif/design-system'
+import { Toggle, ToggleGroup } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
 
 export const TogglePage = () => {
-    const [bold, setBold] = useState(true)
-    const [italic, setItalic] = useState(false)
-    const [under, setUnder] = useState(false)
-
+    const [defect, setDefect] = useState(true)
+    const [view, setView] = useState<string | null>('card')
+    const [lines, setLines] = useState<string[]>(['1', '2'])
     return (
         <>
             <PageHeader
-                title="Toggle"
-                description="버튼 형태의 on/off. Switch와 달리 버튼 그룹(예: 텍스트 서식)에 적합."
+                title="Toggle · ToggleGroup"
+                description="켜고 끄는 버튼. appearance(outline · ghost · soft) × tone. 눌림은 aria-pressed 로 나갑니다."
             />
-
             <ComponentPreview
-                title="기본"
-                code={`<Toggle pressed={bold} onPressedChange={setBold}>
-    <IconBold />
-</Toggle>`}
+                title="appearance"
+                description="outline · ghost 는 눌리면 강조색 옅은 바탕, soft + 의미 톤은 눌리면 그 톤 solid 가 됩니다."
+                code={`<Toggle pressed={defect} onValueChange={setDefect}>불량만</Toggle>
+<Toggle appearance="ghost" defaultPressed>고정</Toggle>
+<Toggle appearance="soft" tone="danger" defaultPressed>알람 켜짐</Toggle>`}
             >
-                <Toggle
-                    pressed={bold}
-                    onPressedChange={setBold}
-                    aria-label="Bold"
-                >
-                    <IconBold size={16} />
+                <Toggle pressed={defect} onValueChange={setDefect}>
+                    불량만
                 </Toggle>
-                <Toggle
-                    pressed={italic}
-                    onPressedChange={setItalic}
-                    aria-label="Italic"
-                >
-                    <IconItalic size={16} />
+                <Toggle appearance="ghost" defaultPressed>
+                    고정
                 </Toggle>
-                <Toggle
-                    pressed={under}
-                    onPressedChange={setUnder}
-                    aria-label="Underline"
-                >
-                    <IconUnderline size={16} />
+                <Toggle appearance="soft" tone="danger" defaultPressed>
+                    알람 켜짐
+                </Toggle>
+                <Toggle appearance="soft" tone="success">
+                    자동 갱신
                 </Toggle>
             </ComponentPreview>
-
             <ComponentPreview
-                title="Sizes"
-                code={`<Toggle size="sm" defaultPressed>Small</Toggle>
-<Toggle size="md" defaultPressed>Medium</Toggle>
-<Toggle size="lg" defaultPressed>Large</Toggle>`}
+                title="iconOnly"
+                code={`<Toggle appearance="ghost" size="sm" iconOnly aria-label="굵게" defaultPressed><b>B</b></Toggle>`}
             >
-                <Toggle size="sm" defaultPressed>
-                    Small
+                <Toggle appearance="ghost" size="sm" iconOnly aria-label="굵게" defaultPressed>
+                    <b>B</b>
                 </Toggle>
-                <Toggle size="md" defaultPressed>
-                    Medium
+                <Toggle appearance="ghost" size="sm" iconOnly aria-label="기울임">
+                    <i>I</i>
                 </Toggle>
-                <Toggle size="lg" defaultPressed>
-                    Large
+                <Toggle appearance="ghost" size="sm" iconOnly aria-label="밑줄">
+                    <u>U</u>
                 </Toggle>
+            </ComponentPreview>
+            <ComponentPreview
+                title="ToggleGroup · single"
+                description="하나만 켜집니다. 기본으로 붙어서 그려집니다."
+                code={`<ToggleGroup value={view} onValueChange={setView} aria-label="보기">
+    <Toggle value="list">목록</Toggle>
+    <Toggle value="card">카드</Toggle>
+    <Toggle value="kanban">칸반</Toggle>
+</ToggleGroup>`}
+            >
+                <ToggleGroup value={view} onValueChange={setView} aria-label="보기">
+                    <Toggle value="list">목록</Toggle>
+                    <Toggle value="card">카드</Toggle>
+                    <Toggle value="kanban">칸반</Toggle>
+                </ToggleGroup>
+            </ComponentPreview>
+            <ComponentPreview
+                title="ToggleGroup · multiple"
+                code={`<ToggleGroup type="multiple" size="sm" value={lines} onValueChange={setLines} aria-label="라인 필터">
+    <Toggle value="1">1라인</Toggle>
+    ...
+</ToggleGroup>`}
+            >
+                <ToggleGroup
+                    type="multiple"
+                    size="sm"
+                    value={lines}
+                    onValueChange={setLines}
+                    aria-label="라인 필터"
+                >
+                    {['1', '2', '3', '4'].map((l) => (
+                        <Toggle key={l} value={l}>
+                            {l}라인
+                        </Toggle>
+                    ))}
+                </ToggleGroup>
             </ComponentPreview>
         </>
     )

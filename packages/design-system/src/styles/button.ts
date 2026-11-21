@@ -89,7 +89,8 @@ export const BUTTON_CSS = `
     color: var(--_c);
     background: transparent;
     border: var(--_bw) solid transparent;
-    border-radius: var(--ds-radius-md);
+    --_r: var(--ds-radius-md);
+    border-radius: var(--_r);
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -188,18 +189,40 @@ ${['accent', 'neutral', 'success', 'warning', 'danger', 'info'].map(toneClass).j
 [data-ds-button][data-link-style="external"]${ENABLED}:hover::after { transform: translate(2px, -2px); }
 
 /* ── size ───────────────────────────────────── */
-[data-ds-button][data-size="xs"] { height: 24px; padding: 0 8px; font-size: 12px; gap: 4px; border-radius: var(--ds-radius-sm); }
-[data-ds-button][data-size="sm"] { height: 28px; padding: 0 10px; font-size: 12px; border-radius: var(--ds-radius-sm); }
-[data-ds-button][data-size="lg"] { height: 44px; padding: 0 18px; font-size: 16px; border-radius: var(--ds-radius-lg); }
+[data-ds-button][data-size="xs"] { height: 24px; padding: 0 8px; font-size: 12px; gap: 4px; --_r: var(--ds-radius-sm); }
+[data-ds-button][data-size="sm"] { height: 28px; padding: 0 10px; font-size: 12px; --_r: var(--ds-radius-sm); }
+[data-ds-button][data-size="lg"] { height: 44px; padding: 0 18px; font-size: 16px; --_r: var(--ds-radius-lg); }
 [data-ds-button][data-appearance="link"] { height: auto; padding: 0 2px; }
 
 /* ── shape ──────────────────────────────────── */
-[data-ds-button][data-shape="pill"] { border-radius: var(--ds-radius-full); }
+[data-ds-button][data-shape="pill"] { --_r: var(--ds-radius-full); }
 [data-ds-button][data-icon-only] { width: 36px; padding: 0; }
 [data-ds-button][data-icon-only][data-size="xs"] { width: 24px; }
 [data-ds-button][data-icon-only][data-size="sm"] { width: 28px; }
 [data-ds-button][data-icon-only][data-size="lg"] { width: 44px; }
 [data-ds-button][data-full-width] { width: 100%; }
+
+/* ── ButtonGroup ────────────────────────────── */
+[data-ds-button-group] { display: inline-flex; align-items: center; flex-wrap: wrap; }
+[data-ds-button-group][data-orientation="vertical"] { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+[data-ds-button-group][data-full-width] { display: flex; width: 100%; }
+[data-ds-button-group][data-full-width] > [data-ds-button] { flex: 1 1 0; }
+[data-ds-button-group][data-attached] { flex-wrap: nowrap; }
+[data-ds-button-group][data-attached] > [data-ds-button] { border-radius: 0; }
+[data-ds-button-group][data-attached] > [data-ds-button]:hover,
+[data-ds-button-group][data-attached] > [data-ds-button]:focus-visible { z-index: 1; }
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button]:not(:first-child) { margin-left: calc(var(--_bw) * -1); }
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button]:first-child { border-radius: var(--_r) 0 0 var(--_r); }
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button]:last-child { border-radius: 0 var(--_r) var(--_r) 0; }
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button]:only-child { border-radius: var(--_r); }
+[data-ds-button-group][data-attached][data-orientation="vertical"] > [data-ds-button]:not(:first-child) { margin-top: calc(var(--_bw) * -1); }
+[data-ds-button-group][data-attached][data-orientation="vertical"] > [data-ds-button]:first-child { border-radius: var(--_r) var(--_r) 0 0; }
+[data-ds-button-group][data-attached][data-orientation="vertical"] > [data-ds-button]:last-child { border-radius: 0 0 var(--_r) var(--_r); }
+/* 붙은 solid·soft 사이에는 글자색 기반의 옅은 구분선 */
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button][data-appearance="solid"]:not(:first-child),
+[data-ds-button-group][data-attached][data-orientation="horizontal"] > [data-ds-button][data-appearance="soft"]:not(:first-child) {
+    border-left: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+}
 
 /* ── 상태 ───────────────────────────────────── */
 [data-ds-button][aria-pressed="true"] {
@@ -208,6 +231,22 @@ ${['accent', 'neutral', 'success', 'warning', 'danger', 'info'].map(toneClass).j
     border-color: color-mix(in oklab, var(--ds-palette-primary-500) 55%, transparent);
 }
 /* [data-appearance] 를 붙여 solid accent(속성 3개)보다 우선순위를 높인다 */
+/* Toggle: ghost 는 눌려도 테두리 없이, soft + 의미 톤은 눌리면 그 톤 solid (예: 알람 켜짐) */
+[data-ds-button][data-appearance="ghost"][aria-pressed="true"] { border-color: transparent; }
+[data-ds-button][data-appearance="ghost"][data-tone="neutral"][data-icon-only][aria-pressed="true"] {
+    background: color-mix(in oklab, var(--ds-color-foreground-primary) 10%, transparent);
+    color: var(--ds-color-foreground-primary);
+}
+[data-ds-button][data-appearance="soft"][aria-pressed="true"]:not([data-tone="neutral"]):not([data-tone="accent"]) {
+    background: var(--_cs);
+    color: var(--_on);
+    border-color: transparent;
+}
+${GLASS} [data-ds-button][data-appearance="soft"][aria-pressed="true"]:not([data-tone="neutral"]):not([data-tone="accent"]) {
+    background: linear-gradient(-75deg, color-mix(in oklab, var(--_cs) 70%, transparent), color-mix(in oklab, var(--_cs) 82%, transparent), color-mix(in oklab, var(--_cs) 70%, transparent));
+    color: var(--_on);
+}
+
 [data-ds-button][data-appearance]:disabled {
     cursor: not-allowed;
     background: var(--ds-color-background-muted);
@@ -472,10 +511,3 @@ ${GLASS_DARK} [data-ds-button][data-appearance="solid"][data-tone="accent"]:not(
     }
 }
 `.trim()
-
-export const ButtonStyles = () => (
-    <style
-        data-ds-button-styles
-        dangerouslySetInnerHTML={{ __html: BUTTON_CSS }}
-    />
-)

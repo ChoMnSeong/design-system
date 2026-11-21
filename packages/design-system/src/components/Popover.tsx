@@ -14,7 +14,7 @@ export type PopoverProps = {
     children: ReactNode
     offset?: number
     align?: 'start' | 'center' | 'end'
-    placement?: 'auto' | 'bottom' | 'top'
+    placement?: 'auto' | 'bottom' | 'top' | 'left' | 'right'
     matchTriggerWidth?: boolean
     minWidth?: number
     style?: CSSProperties
@@ -25,7 +25,7 @@ type Pos = {
     top: number
     left: number
     width: number
-    placement: 'bottom' | 'top'
+    placement: 'bottom' | 'top' | 'left' | 'right'
 }
 
 export const Popover = ({
@@ -60,11 +60,24 @@ export const Popover = ({
                         : 'bottom'
                     : placement
 
+            const triggerWidth = rect.width
+            if (resolvedPlacement === 'left' || resolvedPlacement === 'right') {
+                // 옆으로 펼칠 때 align 은 세로 기준이다 (start = 위 맞춤).
+                let top = rect.top + window.scrollY
+                if (align === 'center') top = rect.top + rect.height / 2 + window.scrollY
+                if (align === 'end') top = rect.bottom + window.scrollY
+                const left =
+                    resolvedPlacement === 'right'
+                        ? rect.right + offset + window.scrollX
+                        : rect.left - offset + window.scrollX
+                setPos({ top, left, width: triggerWidth, placement: resolvedPlacement })
+                return
+            }
+
             const top =
                 resolvedPlacement === 'bottom'
                     ? rect.bottom + offset + window.scrollY
                     : rect.top - offset + window.scrollY
-            const triggerWidth = rect.width
 
             let left = rect.left + window.scrollX
             if (align === 'center')
@@ -91,13 +104,25 @@ export const Popover = ({
 
     if (!open || !pos || typeof document === 'undefined') return null
 
-    const transformY = pos.placement === 'top' ? 'translateY(-100%)' : 'none'
-    const transformX =
-        align === 'center'
-            ? 'translateX(-50%)'
+    const side = pos.placement === 'left' || pos.placement === 'right'
+    const transformY = side
+        ? align === 'center'
+            ? 'translateY(-50%)'
             : align === 'end'
-              ? 'translateX(-100%)'
+              ? 'translateY(-100%)'
               : 'none'
+        : pos.placement === 'top'
+          ? 'translateY(-100%)'
+          : 'none'
+    const transformX = side
+        ? pos.placement === 'left'
+            ? 'translateX(-100%)'
+            : 'none'
+        : align === 'center'
+          ? 'translateX(-50%)'
+          : align === 'end'
+            ? 'translateX(-100%)'
+            : 'none'
     const transform = [transformX, transformY]
         .filter((s) => s !== 'none')
         .join(' ')

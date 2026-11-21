@@ -22,11 +22,7 @@ import {
     PieChart,
     ScrollArea,
     Stack,
-    Toolbar,
-    ToolbarGroup,
-    ToolbarSeparator,
     Tree,
-    Toggle,
 } from '@ensnif/design-system'
 import { PageHeader } from '../../components/PageHeader'
 import { ComponentPreview } from '../../components/ComponentPreview'
@@ -74,67 +70,6 @@ export const ImagePage = () => (
         </ComponentPreview>
     </>
 )
-
-export const ToolbarPage = () => {
-    const [bold, setBold] = useState(false)
-    const [italic, setItalic] = useState(false)
-    return (
-        <>
-            <PageHeader
-                title="Toolbar"
-                description="가로 액션 그룹. ToolbarGroup, ToolbarSeparator로 구획화."
-            />
-            <ComponentPreview
-                title="에디터 툴바"
-                code={`<Toolbar>
-    <ToolbarGroup>
-        <Toggle pressed={bold} onPressedChange={setBold}><strong>B</strong></Toggle>
-        <Toggle pressed={italic} onPressedChange={setItalic}><em>I</em></Toggle>
-    </ToolbarGroup>
-    <ToolbarSeparator />
-    <ToolbarGroup>
-        <Button variant="ghost" size="sm">정렬</Button>
-        <Button variant="ghost" size="sm">링크</Button>
-    </ToolbarGroup>
-    <ToolbarSeparator />
-    <Button size="sm">저장</Button>
-</Toolbar>`}
-            >
-                <Toolbar>
-                    <ToolbarGroup>
-                        <Toggle
-                            pressed={bold}
-                            onPressedChange={setBold}
-                            size="sm"
-                        >
-                            <strong>B</strong>
-                        </Toggle>
-                        <Toggle
-                            pressed={italic}
-                            onPressedChange={setItalic}
-                            size="sm"
-                        >
-                            <em>I</em>
-                        </Toggle>
-                    </ToolbarGroup>
-                    <ToolbarSeparator />
-                    <ToolbarGroup>
-                        <Button variant="ghost" size="sm">
-                            정렬
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                            링크
-                        </Button>
-                    </ToolbarGroup>
-                    <ToolbarSeparator />
-                    <Button size="sm">
-                        <IconCheck size={14} /> 저장
-                    </Button>
-                </Toolbar>
-            </ComponentPreview>
-        </>
-    )
-}
 
 export const ScrollAreaPage = () => (
     <>

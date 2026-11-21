@@ -2,7 +2,6 @@ import {
     Divider,
     Empty,
     HStack,
-    Kbd,
     Skeleton,
     Spacer,
     Spinner,
@@ -267,29 +266,3 @@ export const StatPage = () => (
     </>
 )
 
-export const KbdPage = () => (
-    <>
-        <PageHeader
-            title="Kbd"
-            description="키보드 단축키 표시."
-        />
-
-        <ComponentPreview
-            title="기본"
-            code={`<Kbd>⌘</Kbd>
-<Kbd>K</Kbd>`}
-        >
-            <HStack gap={6} align="center">
-                <Kbd>⌘</Kbd>
-                <Kbd>K</Kbd>
-            </HStack>
-            <HStack gap={6} align="center">
-                <Kbd>Ctrl</Kbd>
-                <span style={{ fontSize: '12px' }}>+</span>
-                <Kbd>Shift</Kbd>
-                <span style={{ fontSize: '12px' }}>+</span>
-                <Kbd>P</Kbd>
-            </HStack>
-        </ComponentPreview>
-    </>
-)

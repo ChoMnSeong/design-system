@@ -77,3 +77,11 @@ export const toneColor = (tone: Tone): string => {
             return 'var(--ds-color-foreground-secondary)'
     }
 }
+
+/** spacing 토큰 단계. var(--ds-spacing-<n>) 으로 풀린다. */
+export type SpaceToken = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20 | 24 | 32
+export const space = (t: SpaceToken | string): string =>
+    typeof t === 'number' ? `var(--ds-spacing-${t})` : t
+
+/** 정보 밀도. compact 는 업무 화면의 표·툴바, comfortable 은 B2C·터치 화면. */
+export type Density = 'compact' | 'default' | 'comfortable'

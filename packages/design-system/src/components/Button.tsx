@@ -9,6 +9,7 @@ import type { Tone } from './types.js'
 import { Kbd } from './Kbd.js'
 import { Tooltip } from './Tooltip.js'
 import { Dialog, DialogActions } from './Dialog.js'
+import { useButtonGroup } from './ButtonGroup.js'
 
 /** @deprecated appearance + tone 을 쓴다. */
 export type ButtonVariant =
@@ -101,7 +102,7 @@ export const Button = ({
     appearance: appearanceProp,
     tone: toneProp,
     linkStyle = 'underline',
-    size = 'md',
+    size: sizeProp,
     shape = 'default',
     iconOnly,
     iconLeft,
@@ -120,9 +121,13 @@ export const Button = ({
     ref,
     ...rest
 }: ButtonProps) => {
+    const group = useButtonGroup()
     const mapped = fromVariant(variant)
-    const appearance = appearanceProp ?? mapped.appearance
-    const tone = toneProp ?? (appearanceProp ? 'accent' : mapped.tone)
+    const explicitAppearance = appearanceProp ?? group?.appearance
+    const appearance = explicitAppearance ?? mapped.appearance
+    const tone =
+        toneProp ?? group?.tone ?? (explicitAppearance ? 'accent' : mapped.tone)
+    const size = sizeProp ?? group?.size ?? 'md'
     const isDisabled = disabled || loading
     const square = iconOnly || shape === 'square'
     const keys = shortcut?.split(/\s+/).filter(Boolean)
@@ -181,7 +186,7 @@ export const Button = ({
             {keys?.length ? (
                 <span aria-hidden style={{ display: 'inline-flex', gap: '2px' }}>
                     {keys.map((k) => (
-                        <Kbd key={k} size="sm">
+                        <Kbd key={k} size="xs">
                             {k}
                         </Kbd>
                     ))}

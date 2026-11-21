@@ -36,13 +36,18 @@ import { PaginationPage } from '../pages/components/PaginationPage'
 import { AccordionPage } from '../pages/components/AccordionPage'
 import { MenuPage } from '../pages/components/MenuPage'
 import {
+    ButtonGroupPage,
+    KbdPage,
+    SplitButtonPage,
+    ToolbarPage,
+} from '../pages/components/ActionPages'
+import {
     DividerPage,
     StackPage,
     SpinnerPage,
     SkeletonPage,
     EmptyPage,
     StatPage,
-    KbdPage,
 } from '../pages/components/MiscPage'
 import { ColorPickerPage } from '../pages/components/ColorPickerPage'
 import { FileUploadPage } from '../pages/components/FileUploadPage'
@@ -54,7 +59,6 @@ import { CodeBlockPage } from '../pages/components/CodeBlockPage'
 import { HoverCardPage } from '../pages/components/HoverCardPage'
 import {
     ImagePage,
-    ToolbarPage,
     ScrollAreaPage,
     FormFieldPage,
     PiePage,
@@ -79,6 +83,8 @@ export type RouteId =
     | 'typography'
     | 'tokens'
     | 'c-button'
+    | 'c-buttongroup'
+    | 'c-splitbutton'
     | 'c-input'
     | 'c-textarea'
     | 'c-label'
@@ -167,6 +173,8 @@ export const routes: RouteMeta[] = [
     { id: 'tokens', label: 'Tokens', group: 'foundation', page: TokensPage },
 
     { id: 'c-button', label: 'Button', group: 'form', page: ButtonPage },
+    { id: 'c-buttongroup', label: 'ButtonGroup', group: 'form', page: ButtonGroupPage },
+    { id: 'c-splitbutton', label: 'SplitButton', group: 'form', page: SplitButtonPage },
     { id: 'c-input', label: 'Input', group: 'form', page: InputPage },
     { id: 'c-textarea', label: 'Textarea', group: 'form', page: TextareaPage },
     { id: 'c-label', label: 'Label', group: 'form', page: LabelPage },
