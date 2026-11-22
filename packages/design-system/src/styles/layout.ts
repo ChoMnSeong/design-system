@@ -233,10 +233,15 @@ export const SHELL_CSS = `
 [data-ds-app-shell] [data-slot="sidebar-footer"] { padding: 8px; border-top: 1px solid var(--ds-color-border-subtle); }
 [data-ds-app-shell] > [data-slot="header"][data-composed] { padding: 0 16px 0 0; gap: 16px; }
 [data-ds-app-shell] > [data-slot="header"] > [data-slot="brand"] { flex: none; width: var(--_sw); min-width: 56px; box-sizing: border-box; height: 100%; display: flex; align-items: center; gap: 10px; padding: 0 16px; font-weight: 700; font-size: 15px; letter-spacing: -.01em; overflow: hidden; white-space: nowrap; transition: width var(--ds-motion-duration-normal, 200ms) var(--ds-motion-easing-ease-out); }
-[data-ds-app-shell][data-collapsed] > [data-slot="header"] > [data-slot="brand"] { padding: 0 0 0 19px; }
+[data-ds-app-shell][data-collapsed] > [data-slot="header"] > [data-slot="brand"] { padding: 0; justify-content: center; }
+[data-ds-app-shell][data-collapsed] > [data-slot="header"][data-composed] { gap: 8px; }
 [data-ds-app-shell] > [data-slot="header"] > [data-slot="header-search"] { flex: 1; min-width: 0; display: flex; align-items: center; }
 [data-ds-app-shell] > [data-slot="header"] > [data-slot="header-actions"] { flex: none; display: flex; align-items: center; gap: 4px; }
 [data-ds-app-shell] [data-slot="collapse"] span { margin-left: 6px; font-size: 12px; }
+[data-ds-app-shell] [data-slot="header-toggle"] { all: unset; flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--ds-radius-md); color: var(--ds-color-foreground-tertiary); cursor: pointer; transition: background var(--ds-motion-duration-fast, 120ms), color var(--ds-motion-duration-fast, 120ms); }
+[data-ds-app-shell] [data-slot="header-toggle"]:hover { background: var(--ds-color-background-muted); color: var(--ds-color-foreground-primary); }
+[data-ds-app-shell] [data-slot="header-toggle"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 1px; }
+[data-ds-app-shell] > [data-slot="header"] > [data-slot="brand"] > [data-slot="header-toggle"] { margin-left: auto; margin-right: -6px; }
 [data-ds-app-shell] [data-slot="collapse"] {
     display: flex; align-items: center; justify-content: center;
     height: 36px; border: none; border-top: 1px solid var(--ds-color-border-subtle); font: inherit;

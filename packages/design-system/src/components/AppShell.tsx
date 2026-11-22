@@ -2,6 +2,7 @@ import { Children, createContext, Fragment, isValidElement, useContext, useEffec
 import { Button } from './Button.js'
 import { Tag } from './Tag.js'
 import { NavigationMenu, type NavItem } from './NavigationMenu.js'
+import { LuPanelLeftClose, LuPanelLeftOpen } from 'react-icons/lu'
 import { IconArrowLeft, IconChevronDown, IconChevronLeft, IconChevronRight } from './icons.js'
 
 /* ───────────────────────── AppShell ───────────────────────── */
@@ -23,8 +24,12 @@ export type AppShellProps = {
     navigation?: NavItem[]
     activeNavId?: string
     onNavigate?: (item: NavItem) => void
-    /** 사이드바 아래 (접기 버튼 위) */
+    /** 사이드바 아래 */
     sidebarFooter?: ReactNode
+    /** 접기 버튼 위치. 기본: 머리말을 슬롯으로 짜면 'header', header 를 직접 그리면 'sidebar' */
+    collapseButton?: 'header' | 'sidebar' | 'none'
+    /** ⌘B / Ctrl+B 로 접기 (기본 true) */
+    collapseShortcut?: boolean
     sidebar?: ReactNode
     /** 맨 아래 상태 줄 (PLC 연결 · 마지막 갱신 · 버전) */
     footer?: ReactNode
@@ -48,6 +53,8 @@ export const AppShell = ({
     activeNavId,
     onNavigate,
     sidebarFooter,
+    collapseButton,
+    collapseShortcut = true,
     sidebar: sidebarProp,
     footer,
     sidebarWidth = 220,
@@ -68,9 +75,30 @@ export const AppShell = ({
     }
     const withNav = (items: NavItem[]): NavItem[] => items.map((n) => ({ ...n, onClick: n.onClick ?? (onNavigate && !n.children?.length ? () => onNavigate(n) : undefined), children: n.children && withNav(n.children) }))
     const sidebar = sidebarProp ?? (navigation ? <NavigationMenu items={onNavigate ? withNav(navigation) : navigation} activeId={activeNavId} collapsed={collapsed} aria-label="주 메뉴" /> : null)
+    const hasSide = !!(sidebarProp || navigation) && !kiosk
+    const btnAt = collapseButton ?? (header ? 'sidebar' : 'header')
+    const shortcutLabel = typeof navigator !== 'undefined' && /Mac|iP/.test(navigator.platform) ? '⌘B' : 'Ctrl+B'
+    const headerToggle = hasSide && btnAt === 'header' && (
+        <button type="button" data-slot="header-toggle" aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'} aria-expanded={!collapsed} title={`${collapsed ? '메뉴 펼치기' : '메뉴 접기'} (${shortcutLabel})`} onClick={toggle}>
+            {collapsed ? <LuPanelLeftOpen size={18} /> : <LuPanelLeftClose size={18} />}
+        </button>
+    )
+    useEffect(() => {
+        if (!hasSide || !collapseShortcut) return
+        const on = (e: KeyboardEvent) => {
+            if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== 'b' || e.shiftKey || e.altKey) return
+            const t = e.target as HTMLElement | null
+            if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return
+            e.preventDefault()
+            toggle()
+        }
+        window.addEventListener('keydown', on)
+        return () => window.removeEventListener('keydown', on)
+    })
     const headerNode = header ?? (brand || headerSearch || headerActions ? (
         <>
-            {brand && <div data-slot="brand">{brand}</div>}
+            {brand && <div data-slot="brand">{brand}{!collapsed && headerToggle}</div>}
+            {(collapsed || !brand) && headerToggle}
             <div data-slot="header-search">{headerSearch}</div>
             {headerActions && <div data-slot="header-actions">{headerActions}</div>}
         </>
@@ -90,9 +118,11 @@ export const AppShell = ({
                 <div data-slot="sidebar" role={sidebarProp ? 'navigation' : undefined} aria-label={sidebarProp ? '주 메뉴' : undefined}>
                     <div data-slot="sidebar-body">{sidebar}</div>
                     {sidebarFooter && <div data-slot="sidebar-footer">{sidebarFooter}</div>}
+{btnAt === 'sidebar' && (
                     <button type="button" data-slot="collapse" aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'} aria-expanded={!collapsed} onClick={toggle}>
                         {collapsed ? <IconChevronRight size={16} /> : <><IconChevronLeft size={16} /><span>접기</span></>}
                     </button>
+                    )}
                 </div>
                 </AppShellContext.Provider>
             )}

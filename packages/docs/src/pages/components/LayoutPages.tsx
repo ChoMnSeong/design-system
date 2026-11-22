@@ -238,7 +238,7 @@ export const AppShellPage = () => {
     return (
         <>
             <PageHeader title="AppShell · PageHeader · FilterBar · Splitter" description="업무 화면 뼈대. AppShell 은 사이드바 접기 · kiosk(현장 모니터) 모드, FilterBar 는 접힘 줄 수 · 적용 칩, Splitter 는 크기 저장." />
-            <ComponentPreview title="AppShell" description="brand · headerSearch · headerActions 로 머리말을, navigation 으로 아이콘 · 선택 표시 · 그룹이 맞춰진 사이드바를 그립니다. 왼쪽 아래 '접기'를 누르면 아이콘만 남습니다." code={`<AppShell
+            <ComponentPreview title="AppShell" description="brand · headerSearch · headerActions 로 머리말을, navigation 으로 아이콘 · 선택 표시 · 그룹이 맞춰진 사이드바를 그립니다. 로고 옆 버튼이나 ⌘B · Ctrl+B 로 접으면 아이콘만 남습니다." code={`<AppShell
     brand={<><Logo /> MES</>}
     headerSearch={<Button>⌘K 검색</Button>}
     headerActions={<><Button iconOnly badge={3} /> <Menu trigger={<Avatar />} /></>}
