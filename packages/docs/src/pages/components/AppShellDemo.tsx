@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { LuBell, LuBoxes, LuClipboardList, LuFactory, LuGauge, LuLayoutDashboard, LuSearch, LuSettings, LuShieldCheck, LuWrench } from 'react-icons/lu'
+import { LuBell, LuFileText, LuMonitor, LuPanelLeft, LuBoxes, LuClipboardList, LuFactory, LuGauge, LuLayoutDashboard, LuSearch, LuSettings, LuShieldCheck, LuWrench } from 'react-icons/lu'
 import {
-    AppShell, Avatar, Badge, Button, DataGrid, Kbd, KpiCard, Menu, PageHeader as DsPageHeader, StatusIndicator, type GridColumn, type NavItem,
+    AppShell, Avatar, Badge, Button, CommandPalette, DataGrid, Kbd, KpiCard, Menu, PageHeader as DsPageHeader, StatusIndicator, type CommandItem, type GridColumn, type NavItem,
 } from '@ensnif/design-system'
 
 const NAV: NavItem[] = [
@@ -31,6 +31,34 @@ export const AppShellDemo = () => {
     const [kiosk, setKiosk] = useState(false)
     const [active, setActive] = useState('prod-status')
     const [collapsed, setCollapsed] = useState(false)
+    const [paletteOpen, setPaletteOpen] = useState(false)
+    const [query, setQuery] = useState('')
+    const flat = (items: NavItem[], parent?: NavItem): Array<NavItem & { parentLabel?: string; parentIcon?: React.ReactNode }> =>
+        items.flatMap((n) => (n.children?.length ? flat(n.children, n) : [{ ...n, parentLabel: parent ? String(parent.label) : undefined, parentIcon: parent?.icon }]))
+    const commands = useMemo<CommandItem[]>(() => [
+        ...flat(NAV).map((n) => ({
+            id: `nav:${n.id}`,
+            label: String(n.label),
+            description: n.parentLabel,
+            icon: n.icon ?? n.parentIcon,
+            group: '메뉴',
+            onSelect: () => { setActive(n.id); setQuery('') },
+        })),
+        ...ROWS.map((r) => ({
+            id: `wo:${r.id}`,
+            label: r.id,
+            description: `${r.item} · ${r.line} · ${r.status}`,
+            icon: <LuFileText size={16} />,
+            group: '작업지시',
+            keywords: [r.item, r.line, r.status],
+            onSelect: () => { setActive('prod-wo'); setQuery(r.id) },
+        })),
+        { id: 'act:collapse', label: collapsed ? '메뉴 펼치기' : '메뉴 접기', icon: <LuPanelLeft size={16} />, group: '동작', shortcut: '⌘B', onSelect: () => setCollapsed((c) => !c) },
+        { id: 'act:kiosk', label: '모니터 모드', icon: <LuMonitor size={16} />, group: '동작', onSelect: () => setKiosk(true) },
+    ], [collapsed])
+    const cur = flat(NAV).find((n) => n.id === active)
+    const title = String(cur?.label ?? '생산 현황')
+    const crumb = cur?.parentLabel ? `${cur.parentLabel} / ${title}` : title
     const totals = useMemo(() => ({ plan: ROWS.reduce((a, r) => a + r.plan, 0), actual: ROWS.reduce((a, r) => a + r.actual, 0) }), [])
     const rate = Math.round((totals.actual / totals.plan) * 100)
     return (
@@ -41,7 +69,7 @@ export const AppShellDemo = () => {
                 onSidebarCollapsedChange={setCollapsed}
                 brand={<><span style={{ width: 22, height: 22, flex: 'none', borderRadius: 6, background: 'var(--ds-palette-primary-600)', display: 'grid', placeItems: 'center', color: '#fff' }}><LuGauge size={14} /></span>{!collapsed && <span>MES</span>}</>}
                 headerSearch={
-                    <Button appearance="outline" tone="neutral" size="sm" iconLeft={<LuSearch size={15} />} style={{ width: 280, justifyContent: 'flex-start', color: 'var(--ds-color-foreground-tertiary)' }}>
+                    <Button appearance="outline" tone="neutral" size="sm" iconLeft={<LuSearch size={15} />} onClick={() => setPaletteOpen(true)} aria-haspopup="dialog" style={{ width: 280, justifyContent: 'flex-start', color: 'var(--ds-color-foreground-tertiary)' }}>
                         <span style={{ flex: 1, textAlign: 'left' }}>메뉴 · 작업지시 검색</span>
                         <Kbd size="xs" keys={['⌘', 'K']} />
                     </Button>
@@ -65,8 +93,8 @@ export const AppShellDemo = () => {
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <DsPageHeader
-                        breadcrumb="생산 / 생산 현황"
-                        title="생산 현황"
+                        breadcrumb={crumb}
+                        title={title}
                         extra={<Badge size="sm" tone="success" dot>가동</Badge>}
                         meta="1공장 · 2026-11-21 주간"
                         actions={kiosk ? <Button size="sm" appearance="outline" tone="neutral" onClick={() => setKiosk(false)}>모니터 끝내기</Button> : <><Button size="sm" appearance="outline" tone="neutral">내보내기</Button><Button size="sm">실적 등록</Button></>}
@@ -77,9 +105,16 @@ export const AppShellDemo = () => {
                         <KpiCard label="달성률" value={rate} unit="%" sparkline={[72, 75, 71, 78, 80, 77, rate]} />
                         <KpiCard label="불량률" value="1.8" unit="%" delta={{ value: '-0.3%p' }} trend="down-good" />
                     </div>
-                    <DataGrid rows={ROWS} columns={COLS} density="compact" statusBar={['count']} aria-label="작업지시 목록" />
+                    {query && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                            검색: <Badge tone="accent">{query}</Badge>
+                            <Button size="xs" appearance="ghost" tone="neutral" onClick={() => setQuery('')}>지우기</Button>
+                        </div>
+                    )}
+                    <DataGrid rows={ROWS} columns={COLS} quickFilter={query} density="compact" statusBar={['count']} aria-label="작업지시 목록" />
                 </div>
             </AppShell>
+            <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} items={commands} recent="docs-appshell-recent" placeholder="메뉴 · 작업지시 · 동작 검색" />
         </div>
     )
 }
