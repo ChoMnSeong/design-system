@@ -75,7 +75,7 @@ export const OptionPicker = ({ type = 'chip', label, options, value, defaultValu
     const lowSel = sel && low(sel)
     if (type === 'select')
         return (
-            <label data-ds-option="" data-type="select" style={{ ...style, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13 }}>
+            <label data-ds-option-picker="" data-type="select" style={{ ...style, display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13 }}>
                 {label}
                 <select value={v ?? ''} onChange={(e) => set(e.target.value)} style={{ height: 40, borderRadius: 8, border: '1px solid var(--ds-color-border-subtle)', padding: '0 10px', font: 'inherit', background: 'var(--ds-surface-card-background)', color: 'inherit' }}>
                     <option value="" disabled>선택하세요</option>
@@ -94,7 +94,7 @@ export const OptionPicker = ({ type = 'chip', label, options, value, defaultValu
         if (n) set(n.value)
     }
     return (
-        <fieldset data-ds-option="" data-type={type} style={style}>
+        <fieldset data-ds-option-picker="" data-type={type} style={style}>
             {label && <legend>{label}{sel && <b>{sel.label}</b>}</legend>}
             <div data-slot="list" role="radiogroup" onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); move(1) } if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); move(-1) } }}>
                 {options.map((o, i) => {

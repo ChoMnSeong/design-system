@@ -175,22 +175,22 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-qty] button:focus-visible { outline: 2px solid ${ACC}; outline-offset: -2px; border-radius: var(--ds-radius-md); }
 [data-ds-qty] input { width: 40px; border: 0; text-align: center; font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; background: transparent; color: ${FG}; -moz-appearance: textfield; }
 [data-ds-qty] input::-webkit-inner-spin-button { display: none; }
-[data-ds-option] { display: block; border: 0; padding: 0; margin: 0; min-width: 0; }
-[data-ds-option] legend { padding: 0; font-size: 13px; color: ${FG2}; margin-bottom: 10px; }
-[data-ds-option] legend b { color: ${FG}; margin-left: 6px; }
-[data-ds-option] [data-slot="list"] { display: flex; flex-wrap: wrap; gap: 8px; }
-[data-ds-option] [data-slot="opt"] { all: unset; position: relative; box-sizing: border-box; cursor: pointer; font-size: 13px; color: ${FG}; }
-[data-ds-option][data-type="chip"] [data-slot="opt"] { min-width: 52px; height: 40px; padding: 0 12px; display: inline-grid; place-items: center; border: 1px solid ${BD}; border-radius: var(--ds-radius-md); background: ${BG}; }
-[data-ds-option][data-type="chip"] [data-slot="opt"][aria-checked="true"] { border-color: ${FG}; box-shadow: inset 0 0 0 1px ${FG}; font-weight: 700; }
-[data-ds-option][data-type="swatch"] [data-slot="opt"] { width: 36px; height: 36px; border-radius: 999px; padding: 3px; box-shadow: inset 0 0 0 1px ${BD}; }
-[data-ds-option][data-type="swatch"] [data-slot="opt"] > i { display: block; width: 100%; height: 100%; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }
-[data-ds-option][data-type="swatch"] [data-slot="opt"][aria-checked="true"] { box-shadow: inset 0 0 0 2px ${FG}; }
-[data-ds-option] [data-slot="opt"]:focus-visible { outline: 2px solid ${ACC}; outline-offset: 2px; }
-[data-ds-option] [data-slot="opt"][aria-disabled="true"] { cursor: not-allowed; color: ${FG3}; background-image: linear-gradient(to top right, transparent calc(50% - .5px), color-mix(in oklab, ${FG} 35%, transparent) 50%, transparent calc(50% + .5px)); }
-[data-ds-option][data-type="swatch"] [data-slot="opt"][aria-disabled="true"] > i { opacity: .4; }
-[data-ds-option] [data-slot="low"] { position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 999px; background: var(--ds-palette-danger-500); }
-[data-ds-option][data-type="swatch"] [data-slot="low"] { top: 0; right: 0; }
-[data-ds-option] [data-slot="hint"] { margin-top: 8px; font-size: 12px; color: var(--ds-tone-danger-text); }
+[data-ds-option-picker] { display: block; border: 0; padding: 0; margin: 0; min-width: 0; }
+[data-ds-option-picker] legend { padding: 0; font-size: 13px; color: ${FG2}; margin-bottom: 10px; }
+[data-ds-option-picker] legend b { color: ${FG}; margin-left: 6px; }
+[data-ds-option-picker] [data-slot="list"] { display: flex; flex-wrap: wrap; gap: 8px; }
+[data-ds-option-picker] [data-slot="opt"] { all: unset; position: relative; box-sizing: border-box; cursor: pointer; font-size: 13px; color: ${FG}; }
+[data-ds-option-picker][data-type="chip"] [data-slot="opt"] { min-width: 52px; height: 40px; padding: 0 12px; display: inline-grid; place-items: center; border: 1px solid ${BD}; border-radius: var(--ds-radius-md); background: ${BG}; }
+[data-ds-option-picker][data-type="chip"] [data-slot="opt"][aria-checked="true"] { border-color: ${FG}; box-shadow: inset 0 0 0 1px ${FG}; font-weight: 700; }
+[data-ds-option-picker][data-type="swatch"] [data-slot="opt"] { width: 36px; height: 36px; border-radius: 999px; padding: 3px; box-shadow: inset 0 0 0 1px ${BD}; }
+[data-ds-option-picker][data-type="swatch"] [data-slot="opt"] > i { display: block; width: 100%; height: 100%; border-radius: inherit; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .08); }
+[data-ds-option-picker][data-type="swatch"] [data-slot="opt"][aria-checked="true"] { box-shadow: inset 0 0 0 2px ${FG}; }
+[data-ds-option-picker] [data-slot="opt"]:focus-visible { outline: 2px solid ${ACC}; outline-offset: 2px; }
+[data-ds-option-picker] [data-slot="opt"][aria-disabled="true"] { cursor: not-allowed; color: ${FG3}; background-image: linear-gradient(to top right, transparent calc(50% - .5px), color-mix(in oklab, ${FG} 35%, transparent) 50%, transparent calc(50% + .5px)); }
+[data-ds-option-picker][data-type="swatch"] [data-slot="opt"][aria-disabled="true"] > i { opacity: .4; }
+[data-ds-option-picker] [data-slot="low"] { position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 999px; background: var(--ds-palette-danger-500); }
+[data-ds-option-picker][data-type="swatch"] [data-slot="low"] { top: 0; right: 0; }
+[data-ds-option-picker] [data-slot="hint"] { margin-top: 8px; font-size: 12px; color: var(--ds-tone-danger-text); }
 [data-ds-search] { position: relative; }
 [data-ds-search] [data-slot="box"] { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 14px; border-radius: 999px; background: ${MUTED}; border: 1px solid transparent; color: ${FG}; }
 [data-ds-search] [data-slot="box"]:focus-within { border-color: ${FG}; background: ${BG}; }
