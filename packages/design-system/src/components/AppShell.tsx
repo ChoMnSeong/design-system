@@ -1,12 +1,30 @@
-import { Children, Fragment, isValidElement, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { Children, createContext, Fragment, isValidElement, useContext, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { Button } from './Button.js'
 import { Tag } from './Tag.js'
+import { NavigationMenu, type NavItem } from './NavigationMenu.js'
 import { IconArrowLeft, IconChevronDown, IconChevronLeft, IconChevronRight } from './icons.js'
 
 /* ───────────────────────── AppShell ───────────────────────── */
 
+export const AppShellContext = createContext<{ collapsed: boolean; toggle: () => void }>({ collapsed: false, toggle: () => {} })
+/** 사이드바 안에서 접힘 상태를 읽는다 */
+export const useAppShell = () => useContext(AppShellContext)
+
 export type AppShellProps = {
+    /** 머리말 전체를 직접 그린다. 없으면 brand · headerSearch · headerActions 로 짠다 */
     header?: ReactNode
+    /** 로고 + 이름. 사이드바 폭에 맞춰 왼쪽에 놓인다 */
+    brand?: ReactNode
+    /** 머리말 가운데 (⌘K 검색 버튼 등) */
+    headerSearch?: ReactNode
+    /** 머리말 오른쪽 (알림 · 사용자 메뉴) */
+    headerActions?: ReactNode
+    /** 메뉴 항목. 주면 아이콘 · 선택 표시 · 접힘이 맞춰진 NavigationMenu 를 그린다 */
+    navigation?: NavItem[]
+    activeNavId?: string
+    onNavigate?: (item: NavItem) => void
+    /** 사이드바 아래 (접기 버튼 위) */
+    sidebarFooter?: ReactNode
     sidebar?: ReactNode
     /** 맨 아래 상태 줄 (PLC 연결 · 마지막 갱신 · 버전) */
     footer?: ReactNode
@@ -23,9 +41,16 @@ export type AppShellProps = {
 
 export const AppShell = ({
     header,
-    sidebar,
+    brand,
+    headerSearch,
+    headerActions,
+    navigation,
+    activeNavId,
+    onNavigate,
+    sidebarFooter,
+    sidebar: sidebarProp,
     footer,
-    sidebarWidth = 232,
+    sidebarWidth = 220,
     sidebarCollapsed,
     defaultSidebarCollapsed = false,
     onSidebarCollapsedChange,
@@ -41,6 +66,15 @@ export const AppShell = ({
         if (sidebarCollapsed === undefined) setInner(!collapsed)
         onSidebarCollapsedChange?.(!collapsed)
     }
+    const withNav = (items: NavItem[]): NavItem[] => items.map((n) => ({ ...n, onClick: n.onClick ?? (onNavigate && !n.children?.length ? () => onNavigate(n) : undefined), children: n.children && withNav(n.children) }))
+    const sidebar = sidebarProp ?? (navigation ? <NavigationMenu items={onNavigate ? withNav(navigation) : navigation} activeId={activeNavId} collapsed={collapsed} aria-label="주 메뉴" /> : null)
+    const headerNode = header ?? (brand || headerSearch || headerActions ? (
+        <>
+            {brand && <div data-slot="brand">{brand}</div>}
+            <div data-slot="header-search">{headerSearch}</div>
+            {headerActions && <div data-slot="header-actions">{headerActions}</div>}
+        </>
+    ) : null)
     const showSide = !!sidebar && !kiosk
     return (
         <div
@@ -50,14 +84,17 @@ export const AppShell = ({
             style={{ ['--_sw' as string]: `${showSide ? (collapsed ? collapsedWidth : sidebarWidth) : 0}px`, ...style } as CSSProperties}
             {...rest}
         >
-            {header && !kiosk && <header data-slot="header">{header}</header>}
+            {headerNode && !kiosk && <header data-slot="header" data-composed={header ? undefined : ''}>{headerNode}</header>}
             {showSide && (
-                <nav data-slot="sidebar" aria-label="주 메뉴">
+                <AppShellContext.Provider value={{ collapsed, toggle }}>
+                <div data-slot="sidebar" role={sidebarProp ? 'navigation' : undefined} aria-label={sidebarProp ? '주 메뉴' : undefined}>
                     <div data-slot="sidebar-body">{sidebar}</div>
+                    {sidebarFooter && <div data-slot="sidebar-footer">{sidebarFooter}</div>}
                     <button type="button" data-slot="collapse" aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'} aria-expanded={!collapsed} onClick={toggle}>
-                        {collapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
+                        {collapsed ? <IconChevronRight size={16} /> : <><IconChevronLeft size={16} /><span>접기</span></>}
                     </button>
-                </nav>
+                </div>
+                </AppShellContext.Provider>
             )}
             <main data-slot="main">{children}</main>
             {footer && <footer data-slot="footer">{footer}</footer>}

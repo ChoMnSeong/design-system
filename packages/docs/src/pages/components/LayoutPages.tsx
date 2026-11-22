@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { AppShellDemo } from './AppShellDemo'
 import {
     Accordion,
     AccordionItem,
-    AppShell,
     Badge,
     Box,
     Button,
@@ -30,7 +30,6 @@ import {
     Splitter,
     Stack,
     StatusCard,
-    StatusIndicator,
     Tab,
     TabList,
     TabPanel,
@@ -234,36 +233,31 @@ export const AccordionPage = () => (
 )
 
 export const AppShellPage = () => {
-    const [kiosk, setKiosk] = useState(false)
     const [line, setLine] = useState<string | null>('all')
     const [items, setItems] = useState<string[]>(['A', 'B', 'C', 'D'])
     return (
         <>
             <PageHeader title="AppShell · PageHeader · FilterBar · Splitter" description="업무 화면 뼈대. AppShell 은 사이드바 접기 · kiosk(현장 모니터) 모드, FilterBar 는 접힘 줄 수 · 적용 칩, Splitter 는 크기 저장." />
-            <ComponentPreview title="AppShell" code={`<AppShell header={…} sidebar={…} footer={…} kiosk={kiosk}>…</AppShell>`}>
-                <div style={{ width: '100%', height: 460, border: '1px solid var(--ds-color-border-default)', borderRadius: 10, overflow: 'hidden' }}>
-                    <AppShell
-                        kiosk={kiosk}
-                        header={<><span style={{ width: 18, height: 18, borderRadius: 5, background: 'var(--ds-palette-primary-600)' }} /><b>MES</b><span style={{ flex: 1 }} /><Button size="xs" appearance="outline" tone="neutral" onClick={() => setKiosk(true)}>모니터 모드</Button></>}
-                        sidebar={<Stack gap={2} style={{ fontSize: 13 }}><b style={{ padding: '6px 8px', fontSize: 12, color: 'var(--ds-color-foreground-tertiary)' }}>생산</b><span style={{ padding: '6px 8px' }}>생산 현황</span><span style={{ padding: '6px 8px' }}>작업지시</span></Stack>}
-                        footer={<><StatusIndicator tone="success" size="sm" label="PLC 연결" /><span>마지막 갱신 15:10:22</span><span style={{ marginLeft: 'auto' }}>v0.3.0</span></>}
-                    >
-                        <Stack gap={12}>
-                            <DsPageHeader
-                                breadcrumb="생산 / 생산 현황"
-                                title="생산 현황"
-                                extra={<Badge size="sm" tone="success">가동</Badge>}
-                                actions={kiosk ? <Button size="sm" appearance="outline" tone="neutral" onClick={() => setKiosk(false)}>모니터 끝내기</Button> : <Button size="sm">실적 등록</Button>}
-                                meta="1공장 · 2026-11-21"
-                            />
-                            <div style={{ height: 220 }}>
-                                <Splitter defaultSize="55%" collapsible stateKey="docs-split">
-                                    <Card style={{ height: '100%' }}><CardTitle>목록</CardTitle></Card>
-                                    <Card style={{ height: '100%' }}><CardTitle>상세</CardTitle><CardDescription>손잡이를 끌거나 ← → 키</CardDescription></Card>
-                                </Splitter>
-                            </div>
-                        </Stack>
-                    </AppShell>
+            <ComponentPreview title="AppShell" description="brand · headerSearch · headerActions 로 머리말을, navigation 으로 아이콘 · 선택 표시 · 그룹이 맞춰진 사이드바를 그립니다. 왼쪽 아래 '접기'를 누르면 아이콘만 남습니다." code={`<AppShell
+    brand={<><Logo /> MES</>}
+    headerSearch={<Button>⌘K 검색</Button>}
+    headerActions={<><Button iconOnly badge={3} /> <Menu trigger={<Avatar />} /></>}
+    navigation={items}          // NavItem[] — icon · children · group · badge
+    activeNavId={active}
+    onNavigate={(n) => setActive(n.id)}
+    footer={<StatusIndicator label="PLC 연결" />}
+    kiosk={kiosk}
+>
+    …
+</AppShell>`}>
+                <AppShellDemo />
+            </ComponentPreview>
+            <ComponentPreview title="Splitter" description="손잡이를 끌거나 ← → 키. stateKey 로 크기를 기억합니다." code={`<Splitter defaultSize="55%" collapsible stateKey="wo-split">…</Splitter>`}>
+                <div style={{ width: '100%', height: 220 }}>
+                    <Splitter defaultSize="55%" collapsible stateKey="docs-split">
+                        <Card style={{ height: '100%' }}><CardTitle>목록</CardTitle></Card>
+                        <Card style={{ height: '100%' }}><CardTitle>상세</CardTitle><CardDescription>손잡이를 끌거나 ← → 키</CardDescription></Card>
+                    </Splitter>
                 </div>
             </ComponentPreview>
             <ComponentPreview title="PageHeader · tabs · onBack" code={`<PageHeader breadcrumb="…" title="브래킷 A형" extra={<Badge>사용</Badge>} actions={…} meta="…" tabs={<Tabs>…</Tabs>} onBack={…} />`}>
