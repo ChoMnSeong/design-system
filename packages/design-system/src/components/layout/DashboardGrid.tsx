@@ -6,7 +6,7 @@ const BREAK: Record<BP, number> = { sm: 640, md: 1024, lg: 1440 }
 
 export type DashboardLayoutItem = { id: string; colSpan: number; rowSpan: number; order: number }
 
-type Ctx = { editable: boolean; dragId: string | null; setDrag: (id: string | null) => void; drop: (target: string) => void; resize: (id: string, dc: number, dr: number) => void }
+type Ctx = { editable: boolean; dragId: string | null; setDrag: (id: string | null) => void; drop: (target: string) => void; resize: (id: string, dc: number, dr: number) => void; move: (id: string, dir: -1 | 1) => void }
 const GridCtx = createContext<Ctx | null>(null)
 
 export type DashboardGridProps = {
@@ -48,6 +48,8 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
         }),
     )
     const [dragId, setDrag] = useState<string | null>(null)
+    // 키보드로 옮기거나 크기를 바꾸면 화면 낭독기에 결과를 알린다
+    const [announce, setAnnounce] = useState('')
     const commit = (next: DashboardLayoutItem[]) => {
         setLayout(next)
         onLayoutChange?.(next)
@@ -62,7 +64,25 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
             const b = layout.find((l) => l.id === target)!
             commit(layout.map((l) => (l.id === a.id ? { ...l, order: b.order } : l.id === b.id ? { ...l, order: a.order } : l)))
         },
-        resize: (iid, dc, dr) => commit(layout.map((l) => (l.id === iid ? { ...l, colSpan: Math.max(1, l.colSpan + dc), rowSpan: Math.max(1, l.rowSpan + dr) } : l))),
+        resize: (iid, dc, dr) => {
+            const next = layout.map((l) => (l.id === iid ? { ...l, colSpan: Math.max(1, l.colSpan + dc), rowSpan: Math.max(1, l.rowSpan + dr) } : l))
+            const it = next.find((l) => l.id === iid)
+            commit(next)
+            if (it) setAnnounce(`크기 가로 ${it.colSpan}칸 · 세로 ${it.rowSpan}칸`)
+        },
+        move: (iid, dir) => {
+            const sorted = [...layout].sort((x, y) => x.order - y.order)
+            const i = sorted.findIndex((l) => l.id === iid)
+            const j = i + dir
+            if (i < 0 || j < 0 || j >= sorted.length) {
+                setAnnounce(dir < 0 ? '맨 앞입니다' : '맨 뒤입니다')
+                return
+            }
+            const a = sorted[i]!
+            const b = sorted[j]!
+            commit(layout.map((l) => (l.id === a.id ? { ...l, order: b.order } : l.id === b.id ? { ...l, order: a.order } : l)))
+            setAnnounce(`${j + 1}번째 / ${sorted.length}개`)
+        },
     }
     // 단계별 CSS
     // 기본값도 스타일시트에 둔다 (인라인이면 @media 가 이기지 못한다)
@@ -117,6 +137,11 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
                     )
                 })}
             </div>
+            {editable && (
+                <span data-ds-sr-only="" aria-live="polite">
+                    {announce}
+                </span>
+            )}
         </GridCtx.Provider>
     )
 }
@@ -160,9 +185,27 @@ export const DashboardGridItem = ({ id: _ignored, colSpan, rowSpan, area, childr
             {children}
             {editable && (
                 <span
+                    data-slot="move"
+                    role="button"
+                    aria-label="위치 옮기기 (← ↑ 앞으로 · → ↓ 뒤로)"
+                    aria-keyshortcuts="ArrowLeft ArrowUp ArrowRight ArrowDown"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        const dir = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : 0
+                        if (dir && _id) {
+                            e.preventDefault()
+                            ctx?.move(_id, dir)
+                        }
+                    }}
+                >
+                    ⠿
+                </span>
+            )}
+            {editable && (
+                <span
                     data-slot="resize"
                     role="button"
-                    aria-label="크기 조절 (방향키)"
+                    aria-label="크기 조절 (→ ← 가로 · ↓ ↑ 세로)"
                     tabIndex={0}
                     onKeyDown={(e) => {
                         const d = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] }[e.key]

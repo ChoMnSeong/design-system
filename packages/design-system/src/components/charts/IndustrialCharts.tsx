@@ -1,4 +1,5 @@
 import { pressable } from './chartUtils.js'
+import { Button } from '../actions/Button.js'
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { CartesianChart, chartColor } from './CartesianChart.js'
 import type { Tone } from '../types.js'
@@ -420,10 +421,27 @@ const hhmm = (ms: number) => {
 }
 
 /** 설비별 가동 · 대기 · 정지 구간 (하루 · 교대) */
+/** StatusTimeline 확대의 최소 폭 (10분) */
+const MIN_SPAN = 10 * 60 * 1000
+
 export const StatusTimeline = ({ rows, statusMap, range, now, highlight, onSegmentClick, zoom, rowHeight = 28, style }: StatusTimelineProps) => {
     const [view, setView] = useState<[number, number]>([t(range[0]), t(range[1])])
     useEffect(() => setView([t(range[0]), t(range[1])]), [range[0], range[1]])
     const [sel, setSel] = useState<[number, number] | null>(null)
+    // 버튼(키보드)으로도 확대 · 축소 · 이동: 끌기와 같은 view 를 바꾼다
+    const full: [number, number] = [t(range[0]), t(range[1])]
+    const isFull = view[0] <= full[0] && view[1] >= full[1]
+    const zoomBy = (k: number) => setView(([va, vb]) => {
+        const span = Math.min(full[1] - full[0], Math.max(MIN_SPAN, (vb - va) * k))
+        const c = (va + vb) / 2
+        const s0 = Math.min(Math.max(full[0], c - span / 2), full[1] - span)
+        return [s0, s0 + span]
+    })
+    const panBy = (k: number) => setView(([va, vb]) => {
+        const span = vb - va
+        const s0 = Math.min(Math.max(full[0], va + span * k), full[1] - span)
+        return [s0, s0 + span]
+    })
     const track = useRef<HTMLDivElement | null>(null)
     const [a, b] = view
     const pct = (ms: number) => ((Math.max(a, Math.min(b, ms)) - a) / (b - a)) * 100
@@ -453,7 +471,16 @@ export const StatusTimeline = ({ rows, statusMap, range, now, highlight, onSegme
                         {v.label}
                     </span>
                 ))}
-                {zoom && <small>드래그해 확대 · 더블클릭으로 원래대로</small>}
+                {zoom && (
+                    <span data-slot="zoom" role="group" aria-label="시간 확대">
+                        <small>드래그해 확대 · 더블클릭으로 원래대로</small>
+                        <Button size="xs" appearance="ghost" tone="neutral" onClick={() => zoomBy(0.5)} disabled={b - a <= MIN_SPAN}>확대</Button>
+                        <Button size="xs" appearance="ghost" tone="neutral" onClick={() => zoomBy(2)} disabled={isFull}>축소</Button>
+                        <Button size="xs" appearance="ghost" tone="neutral" shape="square" aria-label="앞 시간으로" onClick={() => panBy(-0.25)} disabled={a <= full[0]}>‹</Button>
+                        <Button size="xs" appearance="ghost" tone="neutral" shape="square" aria-label="뒤 시간으로" onClick={() => panBy(0.25)} disabled={b >= full[1]}>›</Button>
+                        <Button size="xs" appearance="ghost" tone="neutral" onClick={() => setView(full)} disabled={isFull}>원래대로</Button>
+                    </span>
+                )}
             </div>
             <div data-slot="grid" style={{ gridTemplateRows: `repeat(${rows.length}, ${rowHeight}px) 22px` }}>
                 {rows.map((r) => (

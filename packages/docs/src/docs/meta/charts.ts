@@ -29,7 +29,8 @@ data: ChartPoint[]          단일 시리즈 단축형
 const CARTESIAN_A11Y = [
     '차트 svg 는 role="img" 이고 aria-label 로 접근성 이름을 줍니다. 무엇을 보여 주는지 적어 주세요.',
     '범례 항목은 <button> 이고 aria-pressed 로 시리즈가 보이는지 알립니다. Tab 으로 잡히고 Enter · Space 로 시리즈를 숨기거나 켭니다.',
-    'tooltip 은 마우스를 올릴 때만 role="status" 로 나타납니다. onPointClick 을 주면 막대 · 점이 role="button" 이 되어 Tab 으로 잡히고 Enter · Space 로 눌리며 "{항목} {시리즈} {값}" 으로 읽힙니다. 이때 그림은 role="group" 이 됩니다.',
+    '그림이 Tab 으로 잡히고 ← → 로 항목을, Home · End 로 처음 · 끝을 옮기면 tooltip(role="status")이 그 값을 읽어 줍니다. Esc 나 Tab 으로 나가면 사라집니다. 마우스를 올려도 같은 tooltip 이 나옵니다.',
+    'onPointClick 을 주면 막대 · 점이 role="button" 이 되어 Tab 으로 잡히고 Enter · Space 로 눌리며 "{항목} {시리즈} {값}" 으로 읽힙니다. 이때 그림은 role="group" 이 됩니다.',
     'loading 중에는 aria-busy="true" 가 붙습니다.',
 ]
 
@@ -102,7 +103,7 @@ DonutChart
         a11y: [
             'svg 는 role="img" 입니다. aria-label 이 없으면 "가동 79.2%, 대기 11.2%" 처럼 조각별 이름과 비율을 이어 붙여 읽습니다.',
             'DonutChart 가운데 값 · 설명은 aria-hidden 이라 읽히지 않습니다. 필요하면 aria-label 에 함께 적어 주세요.',
-            'tooltip 은 조각에 마우스를 올릴 때만 role="status" 로 나타나고, onSliceClick 을 주면 조각이 role="button" 이 되어 Tab · Enter · Space 로 누를 수 있고 "{이름} {비율}%" 로 읽힙니다.',
+            '그림이 Tab 으로 잡히고 ← → 로 조각을 옮기면 tooltip(role="status")이 이름과 비율을 읽어 줍니다. onSliceClick 을 주면 조각이 role="button" 이 되어 Tab · Enter · Space 로 누를 수 있고 "{이름} {비율}%" 로 읽힙니다.',
         ],
     },
     'c-radarchart': {

@@ -68,8 +68,9 @@ DashboardGrid           columns · rowHeight · gap · areas · editable
     └── Card …          칸 안 내용`,
         compositionNote: 'DashboardGrid 의 직계 자식은 DashboardGridItem 이어야 합니다. colSpan · rowSpan 은 { sm, md, lg } 로 단계별로 줄 수 있습니다. editable 에서 바뀐 배치는 onLayoutChange 로 받고, Item 의 id 가 배치 항목의 id 가 됩니다.',
         a11y: [
-            'editable 이면 칸마다 오른쪽 아래에 role="button" · aria-label="크기 조절 (방향키)" 인 손잡이가 생기고, Tab 으로 잡아 ← → 로 열 수, ↑ ↓ 로 행 수를 1칸씩 바꿉니다.',
-            '순서 바꾸기는 끌어 놓기로만 되고 키보드 대체 수단은 없습니다.',
+            'editable 이면 칸마다 오른쪽 아래에 role="button" · aria-label="크기 조절" 인 손잡이가 생기고, Tab 으로 잡아 ← → 로 열 수, ↑ ↓ 로 행 수를 1칸씩 바꿉니다.',
+            '위 가운데의 옮기기 손잡이(role="button")를 Tab 으로 잡아 ← ↑ 로 한 칸 앞, → ↓ 로 한 칸 뒤로 옮깁니다. 끌어 놓기도 그대로 됩니다.',
+            '옮기거나 크기를 바꾸면 "3번째 / 6개" · "크기 가로 2칸 · 세로 1칸" 처럼 aria-live 로 결과를 알립니다. 화면 순서는 CSS order 로 바뀌고 Tab 순서는 그대로입니다.',
         ],
     },
     'c-splitter': {

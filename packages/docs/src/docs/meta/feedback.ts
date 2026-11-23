@@ -43,7 +43,7 @@ ToastProvider           placement · max
         a11y: [
             '토스트 목록은 "알림" 라벨의 <ol> 입니다. danger · warning 토스트는 role="alert" · aria-live="assertive", 그 밖은 role="status" · aria-live="polite" 로 읽힙니다.',
             '토스트가 떠도 포커스는 옮기지 않습니다. 닫기 버튼은 "알림 닫기" 라벨을 가지고, action 버튼은 누르면 onClick 뒤 토스트를 닫습니다.',
-            '기본 4초 뒤 저절로 닫히고 마우스를 올려도 멈추지 않습니다. 사용자가 꼭 봐야 하는 내용은 persistent 나 duration: 0 으로 남겨 두세요.',
+            '기본 4초 뒤 저절로 닫힙니다. 알림 위에 마우스가 있거나 포커스가 안에 있는 동안은 모든 알림의 시간이 멈추고(진행 막대도 멈춤), 벗어나면 남은 시간만큼 이어집니다(pauseOnHover, 기본 켜짐). 꼭 봐야 하는 내용은 persistent 로 남겨 두세요.',
         ],
         functions: [
             {

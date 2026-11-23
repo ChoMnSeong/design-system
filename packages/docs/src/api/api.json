@@ -9068,6 +9068,13 @@
     "required": false,
     "default": "5",
     "description": "한 번에 보일 최대 개수. 넘치면 오래된 것부터 닫는다"
+   },
+   {
+    "name": "pauseOnHover",
+    "type": "boolean",
+    "required": false,
+    "default": "true",
+    "description": "알림 위에 마우스가 있거나 포커스가 안에 있으면 저절로 닫히는 시간을 멈춘다"
    }
   ],
   "extends": []
@@ -10120,7 +10127,7 @@
  "StatusTimeline": {
   "file": "components/charts/IndustrialCharts.tsx",
   "propsType": "StatusTimelineProps",
-  "description": "설비별 가동 · 대기 · 정지 구간 (하루 · 교대)",
+  "description": "",
   "props": [
    {
     "name": "rows",

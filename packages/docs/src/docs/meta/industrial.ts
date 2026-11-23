@@ -41,7 +41,7 @@ rows[]                    행 = 설비
         compositionNote: 'statusMap 에 적은 순서대로 위쪽 범례가 그려집니다. 없는 상태 키는 이름 그대로 neutral 색으로 그립니다.',
         a11y: [
             'StatusTimeline 의 각 구간은 "프레스 1호 가동 06:00부터 10:30까지" 같은 aria-label 을 가진 <button> 이라 Tab 으로 잡히고 Enter · Space 로 onSegmentClick 이 불립니다.',
-            'zoom(드래그 확대 · 더블클릭 복귀)은 포인터 전용입니다.',
+            'zoom 이면 드래그 확대 · 더블클릭 복귀와 함께 "확대 · 축소 · ‹ › · 원래대로" 버튼이 생겨 키보드로도 같은 범위를 바꿀 수 있습니다(최소 10분).',
             'BulletChart 는 role="meter" 와 aria-valuenow · aria-valuemax 로 값을 알리고, label 이 문자열이면 접근성 이름으로 씁니다.',
         ],
     },

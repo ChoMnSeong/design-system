@@ -308,7 +308,28 @@ export const CartesianChart = ({
         <div ref={ref} data-ds-chart="" className={className} style={style}>
             {legend === 'top' && legendEl}
             <div ref={wrapRef} data-slot="plot" style={{ position: 'relative' }}>
-                <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role={onPointClick ? 'group' : 'img'} aria-label={ariaLabel} onMouseLeave={() => { setHover(null); setHoverSeries(null) }}>
+                <svg
+                    width={W}
+                    height={H}
+                    viewBox={`0 0 ${W} ${H}`}
+                    role={onPointClick ? 'group' : 'img'}
+                    aria-label={ariaLabel}
+                    onMouseLeave={() => { setHover(null); setHoverSeries(null) }}
+                    // 키보드로 값 읽기: Tab 으로 그림에 와서 ← → 로 항목을 옮기면 tooltip(role=status)이 그 값을 알린다
+                    tabIndex={tooltip !== 'none' && n > 0 ? 0 : undefined}
+                    aria-keyshortcuts={tooltip !== 'none' ? 'ArrowLeft ArrowRight Home End Escape' : undefined}
+                    onFocus={(e) => { if (e.target === e.currentTarget && hover === null && n > 0) setHover(0) }}
+                    onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) { setHover(null); setHoverSeries(null) } }}
+                    onKeyDown={(e) => {
+                        if (e.target !== e.currentTarget || tooltip === 'none' || !n) return
+                        const cur = hover ?? -1
+                        const next = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? Math.min(n - 1, cur + 1) : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? Math.max(0, cur - 1) : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : e.key === 'Escape' ? null : undefined
+                        if (next === undefined) return
+                        e.preventDefault()
+                        setHover(next)
+                        setHoverSeries(null)
+                    }}
+                >
                     {/* 구간 · 격자 */}
                     {bands.map((b, i) => {
                         const d = (b.axis ?? 'left') === 'right' ? R : L

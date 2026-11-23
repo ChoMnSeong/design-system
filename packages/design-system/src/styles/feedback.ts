@@ -406,6 +406,8 @@ ${['accent', 'neutral', 'success', 'warning', 'danger', 'info'].map((t) => `[dat
     transform-origin: left;
     animation: ds-toast-progress linear forwards;
 }
+/* 마우스 · 포커스로 멈춘 동안 진행 막대도 멈춘다 */
+[data-ds-toaster][data-paused] [data-slot="progress"] { animation-play-state: paused; }
 @keyframes ds-toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 `.trim()
 

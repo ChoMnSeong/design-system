@@ -21,6 +21,12 @@ export const RadarChartPage = () => (
             </Card>
         </ComponentPreview>
 
+        <ComponentPreview title='두 시리즈 · legend="top"' description="범례를 그래프 위에 둡니다." code={`<RadarChart axes={...} series={[a, b]} legend="top" />`}>
+            <Card>
+                <RadarChart axes={RADAR_AXES} max={100} series={[RADAR_A, RADAR_B]} legend="top" />
+            </Card>
+        </ComponentPreview>
+
         <ComponentPreview
             title="라인만 (fill={false})"
             description="채움 없이 윤곽선만"

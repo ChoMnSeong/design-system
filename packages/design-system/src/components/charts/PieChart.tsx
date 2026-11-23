@@ -99,7 +99,20 @@ export const PieChart = ({
     return (
         <div data-ds-pie="" data-legend={lg} className={className} style={style}>
             <div data-slot="plot" style={{ width: size, height: size }}>
-                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role={onSliceClick ? 'group' : 'img'} aria-label={ariaLabel ?? data.map((d) => `${d.label} ${((d.value / total) * 100).toFixed(1)}%`).join(', ')}>
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}
+                    // 키보드로 조각 값 읽기: Tab 으로 와서 ← → 로 조각을 옮기면 tooltip(role=status)이 알린다
+                    tabIndex={data.length ? 0 : undefined}
+                    onFocus={(e) => { if (e.target === e.currentTarget && hover === null) setHover(0) }}
+                    onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setHover(null) }}
+                    onKeyDown={(e) => {
+                        if (e.target !== e.currentTarget || !data.length) return
+                        const cur = hover ?? -1
+                        const next = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? (cur + 1) % data.length : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? (cur - 1 + data.length) % data.length : e.key === 'Escape' ? null : undefined
+                        if (next === undefined) return
+                        e.preventDefault()
+                        setHover(next)
+                    }}
+                    role={onSliceClick ? 'group' : 'img'} aria-label={ariaLabel ?? data.map((d) => `${d.label} ${((d.value / total) * 100).toFixed(1)}%`).join(', ')}>
                     {data.map((d, i) => {
                         const span = (d.value / total) * Math.PI * 2
                         const a0 = a + pad / 2

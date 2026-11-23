@@ -67,16 +67,23 @@ export type ToastProviderProps = {
     placement?: ToastPlacement
     /** 한 번에 보일 최대 개수. 넘치면 오래된 것부터 닫는다 */
     max?: number
+    /** 알림 위에 마우스가 있거나 포커스가 안에 있으면 저절로 닫히는 시간을 멈춘다 */
+    pauseOnHover?: boolean
 }
 
 const toOpts = (v: ToastOptions | ReactNode): ToastOptions =>
     v && typeof v === 'object' && !('$$typeof' in (v as object)) && ('title' in (v as object) || 'description' in (v as object)) ? (v as ToastOptions) : { title: v as ReactNode }
 
 /** 토스트 상태를 관리하고 화면에 띄우는 Provider */
-export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }: ToastProviderProps) => {
+export const ToastProvider = ({ children, placement = 'bottom-right', max = 5, pauseOnHover = true }: ToastProviderProps) => {
     const [items, setItems] = useState<ToastItem[]>([])
     const seq = useRef(0)
     const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+    // 남은 시간: 멈췄다 다시 갈 때 처음부터가 아니라 남은 만큼만 기다린다
+    const deadlines = useRef(new Map<string, number>())
+    const remaining = useRef(new Map<string, number>())
+    const paused = useRef(false)
+    const [isPaused, setPaused] = useState(false)
 
     const dismiss = useCallback((id?: string) => {
         if (id === undefined) {
@@ -88,6 +95,8 @@ export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }:
         const t = timers.current.get(id)
         if (t) clearTimeout(t)
         timers.current.delete(id)
+        deadlines.current.delete(id)
+        remaining.current.delete(id)
         setItems((prev) => prev.filter((x) => x.id !== id))
     }, [])
 
@@ -96,10 +105,40 @@ export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }:
             const old = timers.current.get(item.id)
             if (old) clearTimeout(old)
             const d = item.duration ?? 4000
-            if (!item.persistent && !item.loading && d > 0) timers.current.set(item.id, setTimeout(() => dismiss(item.id), d))
+            if (item.persistent || item.loading || d <= 0) return
+            if (paused.current) {
+                remaining.current.set(item.id, d)
+                return
+            }
+            deadlines.current.set(item.id, Date.now() + d)
+            timers.current.set(item.id, setTimeout(() => dismiss(item.id), d))
         },
         [dismiss],
     )
+
+    const pause = useCallback(() => {
+        if (!pauseOnHover || paused.current) return
+        paused.current = true
+        setPaused(true)
+        const now = Date.now()
+        timers.current.forEach((t, id) => {
+            clearTimeout(t)
+            remaining.current.set(id, Math.max(0, (deadlines.current.get(id) ?? now) - now))
+        })
+        timers.current.clear()
+    }, [pauseOnHover])
+    const resume = useCallback(() => {
+        if (!paused.current) return
+        paused.current = false
+        setPaused(false)
+        const now = Date.now()
+        remaining.current.forEach((left, id) => {
+            const wait = Math.max(600, left)
+            deadlines.current.set(id, now + wait)
+            timers.current.set(id, setTimeout(() => dismiss(id), wait))
+        })
+        remaining.current.clear()
+    }, [dismiss])
 
     const toast = useCallback(
         (opts: ToastOptions): string => {
@@ -155,13 +194,30 @@ export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }:
     }, [toast, update, dismiss])
 
     useEffect(() => () => timers.current.forEach(clearTimeout), [])
+    // 알림이 다 사라지면 멈춤 상태도 푼다 (영역이 없어지면 mouseleave 가 오지 않는다)
+    useEffect(() => {
+        if (items.length === 0 && paused.current) {
+            paused.current = false
+            setPaused(false)
+            remaining.current.clear()
+        }
+    }, [items.length])
 
     return (
         <ToastContext.Provider value={{ toast: api, success: api.success, error: api.error, warning: api.warning, info: api.info, update, dismiss, promise: api.promise }}>
             {children}
             {typeof document !== 'undefined' &&
                 createPortal(
-                    <ol data-ds-toaster="" data-placement={placement} aria-label="알림">
+                    <ol
+                        data-ds-toaster=""
+                        data-placement={placement}
+                        data-paused={isPaused ? '' : undefined}
+                        aria-label="알림"
+                        onMouseEnter={pause}
+                        onMouseLeave={(e) => { if (!e.currentTarget.contains(document.activeElement)) resume() }}
+                        onFocus={pause}
+                        onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node) && !e.currentTarget.matches(':hover')) resume() }}
+                    >
                         {(placement.startsWith('top') ? [...items].reverse() : items).map((t) => (
                             <ToastView key={t.id} item={t} onDismiss={() => dismiss(t.id)} />
                         ))}

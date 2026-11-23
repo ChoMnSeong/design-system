@@ -456,6 +456,9 @@ export const DASH_CSS = `
 [data-ds-dashboard-grid] [data-ds-dashboard-item][data-dragging] { opacity: 0.5; }
 [data-ds-dashboard-grid] [data-slot="resize"] { position: absolute; right: 2px; bottom: 2px; width: 14px; height: 14px; cursor: nwse-resize; border-right: 3px solid var(--ds-palette-primary-500); border-bottom: 3px solid var(--ds-palette-primary-500); border-radius: 0 0 4px 0; z-index: 2; }
 [data-ds-dashboard-grid] [data-slot="resize"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 2px; }
+[data-ds-dashboard-grid] [data-slot="move"] { position: absolute; left: 50%; top: 2px; translate: -50% 0; width: 32px; height: 16px; display: grid; place-items: center; z-index: 2; border-radius: 6px; font-size: 14px; line-height: 1; color: var(--ds-color-foreground-tertiary); background: color-mix(in oklab, var(--ds-surface-card-background) 85%, transparent); cursor: grab; user-select: none; }
+[data-ds-dashboard-grid] [data-slot="move"]:hover { color: var(--ds-color-foreground-primary); }
+[data-ds-dashboard-grid] [data-slot="move"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 2px; color: var(--ds-tone-accent-text); }
 `.trim()
 
 /** 테마 프리셋 · Liquid Glass */

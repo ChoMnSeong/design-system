@@ -3,6 +3,11 @@ export const CHART_CSS = `
 [data-ds-chart] { display: flex; flex-direction: column; gap: 8px; min-width: 0; width: 100%; font-variant-numeric: tabular-nums; }
 [data-ds-chart][data-empty] { align-items: center; justify-content: center; font-size: 13px; color: var(--ds-color-foreground-tertiary); border: 1px dashed var(--ds-color-border-default); border-radius: var(--ds-radius-md); }
 [data-ds-chart] svg { display: block; overflow: visible; }
+/* 키보드: 그림 자체 · 누를 수 있는 막대 · 점 · 조각의 포커스 표시 */
+[data-ds-chart] svg:focus-visible, [data-ds-pie] svg:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 4px; border-radius: 4px; }
+svg [data-pressable]:focus { outline: none; }
+svg [data-pressable]:focus-visible { stroke: var(--ds-palette-primary-500); stroke-width: 3; paint-order: stroke; }
+td[data-pressable]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: -2px; }
 [data-ds-chart] [data-slot="grid"] { stroke: var(--ds-color-border-subtle); }
 [data-ds-chart] [data-slot="axis"] { stroke: var(--ds-color-border-default); }
 [data-ds-chart] [data-slot="zero"] { stroke: var(--ds-color-foreground-tertiary); stroke-width: 1; }
@@ -98,7 +103,8 @@ export const INDUSTRIAL_CSS = `
 [data-ds-status-timeline] [data-slot="legend"] { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; color: var(--ds-color-foreground-secondary); }
 [data-ds-status-timeline] [data-slot="legend"] span { display: inline-flex; align-items: center; gap: 6px; }
 [data-ds-status-timeline] [data-slot="legend"] i { width: 10px; height: 10px; border-radius: 2px; }
-[data-ds-status-timeline] [data-slot="legend"] small { margin-left: auto; color: var(--ds-color-foreground-tertiary); }
+[data-ds-status-timeline] [data-slot="legend"] small { margin-right: 6px; color: var(--ds-color-foreground-tertiary); }
+[data-ds-status-timeline] [data-slot="legend"] [data-slot="zoom"] { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; }
 [data-ds-status-timeline] [data-slot="grid"] { position: relative; display: grid; gap: 4px; }
 [data-ds-status-timeline] [data-slot="row"] { display: grid; grid-template-columns: var(--_lw) minmax(0, 1fr); align-items: center; }
 [data-ds-status-timeline] [data-slot="row-label"] { font-weight: 600; color: var(--ds-color-foreground-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
