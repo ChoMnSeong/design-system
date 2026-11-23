@@ -1,5 +1,13 @@
 /* 문서 사이트 틀. 900px 미만에서는 사이드바를 왼쪽에서 밀려 나오는 서랍으로 바꾼다. */
 
+/* 앱 상자 밖(창 크기를 바꾸는 순간 · 스크롤 끝 등)에도 흰 바탕이 비치지 않게 문서 전체에 페이지 바탕을 깐다 */
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--ds-color-background-page);
+}
+
 .docs-shell {
     display: grid;
     grid-template-columns: 240px minmax(0, 1fr);
