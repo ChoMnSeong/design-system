@@ -256,24 +256,34 @@ export const WaterfallChart = ({ steps, increase = 'success', decrease = 'danger
         run += s.value
         return { ...s, from, to: run }
     })
-    // 합계 막대가 커도 증감이 보이도록, 값이 모두 양수면 축을 데이터 근처에서 시작한다 (합계 막대는 아래가 잘린다)
+    // 합계 막대가 커도 증감이 보이도록, 값이 모두 양수면 축을 데이터 근처에서 시작한다 (합계 막대는 축 아래를 잘라 끊김 표시를 단다)
     const dmin = Math.min(...bars.filter((b) => b.type !== 'total').map((b) => Math.min(b.from, b.to)))
     const dmax = Math.max(...bars.map((b) => Math.max(b.from, b.to)))
     const span = dmax - dmin || dmax
-    const lo = dmin > 0 ? Math.max(0, dmin - span * 1.5) : Math.min(0, dmin)
-    const hi = dmax + span * 0.25
+    const rawLo = dmin > 0 ? Math.max(0, dmin - span * 1.5) : Math.min(0, dmin)
+    const rawHi = dmax + span * 0.25
+    // 눈금은 1 · 2 · 5 × 10ⁿ 단위로 끊어 읽기 쉬운 값에 둔다
+    const step = (() => {
+        const raw = (rawHi - rawLo) / 4 || 1
+        const p10 = 10 ** Math.floor(Math.log10(raw))
+        return ([1, 2, 2.5, 5, 10].find((m) => m * p10 >= raw) ?? 10) * p10
+    })()
+    const lo = Math.floor(rawLo / step) * step
+    const hi = Math.ceil(rawHi / step) * step
+    const ticks = Array.from({ length: Math.round((hi - lo) / step) + 1 }, (_, i) => lo + step * i)
     const pad = { t: 20, r: 12, b: 26, l: 48 }
     const H = height
     const ih = H - pad.t - pad.b
     const bw = (W - pad.l - pad.r) / bars.length
     const y = (v: number) => pad.t + ih - ((v - lo) / (hi - lo)) * ih
+    // 막대는 축 범위 안에서만 그린다. 축이 0 이 아닌 곳에서 시작하면 합계 막대 아래를 자르고 끊김 표시를 단다
+    const yc = (v: number) => y(Math.min(hi, Math.max(lo, v)))
     return (
         <div ref={ref} data-ds-chart="" style={style}>
             <svg width={W} height={H} role="img" aria-label={bars.map((b) => `${b.label} ${b.value}`).join(', ')}>
-                {[0, 0.25, 0.5, 0.75, 1].map((f) => {
-                    const v = lo + (hi - lo) * f
+                {ticks.map((v) => {
                     return (
-                        <g key={f}>
+                        <g key={v}>
                             <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} data-slot="grid" />
                             <text x={pad.l - 6} y={y(v) + 4} textAnchor="end" data-slot="tick">{formatValue(Math.round(v))}</text>
                         </g>
@@ -285,13 +295,23 @@ export const WaterfallChart = ({ steps, increase = 'success', decrease = 'danger
                     const fill = b.type === 'total' ? chartColor('neutral') : chartColor(b.value >= 0 ? increase : decrease)
                     return (
                         <g key={i}>
-                            <rect x={x} y={Math.min(y(b.from), y(b.to))} width={w} height={Math.max(1, Math.abs(y(b.to) - y(b.from)))} rx={2} fill={fill}>
+                            <rect x={x} y={Math.min(yc(b.from), yc(b.to))} width={w} height={Math.max(1, Math.abs(yc(b.to) - yc(b.from)))} rx={2} fill={fill}>
                                 <title>{`${b.label}: ${b.type === 'total' ? '' : b.value > 0 ? '+' : ''}${formatValue(b.value)}`}</title>
                             </rect>
-                            <text x={x + w / 2} y={Math.min(y(b.from), y(b.to)) - 5} textAnchor="middle" data-slot="value">
+                            {Math.min(b.from, b.to) < lo && (
+                                <path
+                                    d={`M ${x - 2} ${pad.t + ih - 10} l ${w / 4 + 2} -4 l ${w / 4} 4 l ${w / 4} -4 l ${w / 4 + 2} 4 M ${x - 2} ${pad.t + ih - 5} l ${w / 4 + 2} -4 l ${w / 4} 4 l ${w / 4} -4 l ${w / 4 + 2} 4`}
+                                    fill="none"
+                                    stroke="var(--ds-surface-card-background)"
+                                    strokeWidth={2}
+                                    data-slot="axis-break"
+                                    aria-hidden
+                                />
+                            )}
+                            <text x={x + w / 2} y={Math.min(yc(b.from), yc(b.to)) - 5} textAnchor="middle" data-slot="value">
                                 {b.type === 'total' ? formatValue(b.value) : `${b.value > 0 ? '+' : ''}${formatValue(b.value)}`}
                             </text>
-                            {connectors && i < bars.length - 1 && <line x1={x + w} x2={x + bw} y1={y(b.to)} y2={y(b.to)} stroke="var(--ds-color-border-strong)" strokeDasharray="3 3" />}
+                            {connectors && i < bars.length - 1 && <line x1={x + w} x2={x + bw} y1={yc(b.to)} y2={yc(b.to)} stroke="var(--ds-color-border-strong)" strokeDasharray="3 3" />}
                             <text x={x + w / 2} y={H - 8} textAnchor="middle" data-slot="tick">{b.label}</text>
                         </g>
                     )
