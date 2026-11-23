@@ -54,7 +54,7 @@ export type PriceProps = {
     coupon?: number
     soldOut?: boolean
     size?: 'sm' | 'md' | 'lg'
-    /** 정가를 같은 줄 앞에 (목록 카드용) */
+    /** stacked: 정가를 위 줄에 · inline: 판매가 뒤에 작게 (목록 카드용, 카드 폭 168 이하면 정가를 숨김) */
     layout?: 'stacked' | 'inline'
     /** 할인이 없어도 정가 줄 높이를 비워 둔다. 목록에서 카드 높이 · 가격 위치를 맞출 때 */
     reserveListRow?: boolean
@@ -70,7 +70,7 @@ export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', un
     const valueNode = krw ? <>{value.toLocaleString(locale)}<small>원</small></> : formatPrice(value, currency, locale)
     const list = rate > 0 && <span data-slot="list"><span data-ds-sr-only="">정가 </span>{formatPrice(listPrice!, currency, locale)}</span>
     return (
-        <span data-ds-price="" data-size={size} data-sold-out={soldOut ? '' : undefined} style={style}>
+        <span data-ds-price="" data-size={size} data-layout={layout} data-sold-out={soldOut ? '' : undefined} style={style}>
             {layout === 'stacked' && (list || (reserveListRow && <span data-slot="list" data-placeholder="" aria-hidden>&nbsp;</span>))}
             <span data-slot="row">
                 {rate > 0 && <span data-slot="rate" aria-label={`${rate}% 할인`}>{rate}%</span>}

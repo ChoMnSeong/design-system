@@ -184,8 +184,8 @@ export const Rail = ({ title, subtitle, action, children, perView = { sm: 2, md:
                         {action}
                         {arrows && (
                             <>
-                                <button type="button" aria-label="이전" onClick={() => scroll(-1)} style={{ all: 'unset', cursor: 'pointer', width: 32, height: 32, display: 'grid', placeItems: 'center', borderRadius: 999, border: '1px solid var(--ds-color-border-subtle)' }}><LuChevronLeft size={16} /></button>
-                                <button type="button" aria-label="다음" onClick={() => scroll(1)} style={{ all: 'unset', cursor: 'pointer', width: 32, height: 32, display: 'grid', placeItems: 'center', borderRadius: 999, border: '1px solid var(--ds-color-border-subtle)' }}><LuChevronRight size={16} /></button>
+                                <button type="button" data-slot="nav" aria-label="이전" onClick={() => scroll(-1)}><LuChevronLeft size={16} /></button>
+                                <button type="button" data-slot="nav" aria-label="다음" onClick={() => scroll(1)}><LuChevronRight size={16} /></button>
                             </>
                         )}
                     </div>

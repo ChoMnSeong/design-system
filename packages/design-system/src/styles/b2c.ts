@@ -122,7 +122,15 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-rail] [data-slot="head"] { display: flex; align-items: flex-end; gap: 12px; }
 [data-ds-rail] [data-slot="head"] h3 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.02em; color: ${FG}; }
 [data-ds-rail] [data-slot="head"] p { margin: 2px 0 0; font-size: 13px; color: ${FG3}; }
-[data-ds-rail] [data-slot="head"] [data-slot="action"] { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+[data-ds-rail] [data-slot="head"] [data-slot="action"] { margin-left: auto; display: flex; gap: 2px; align-items: center; }
+[data-ds-rail] [data-slot="head"] [data-slot="action"] > :not([data-slot="nav"]) { min-height: 44px; display: inline-flex; align-items: center; }
+/* 화살표: 보이는 원 32, 누르는 영역 44. 손으로 넘기는 작은 화면에서는 숨긴다 */
+[data-ds-rail] [data-slot="nav"] { all: unset; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; color: ${FG}; }
+[data-ds-rail] [data-slot="nav"]::before { content: ''; grid-area: 1 / 1; width: 32px; height: 32px; border-radius: 999px; border: 1px solid ${BD}; box-sizing: border-box; transition: background .15s; }
+[data-ds-rail] [data-slot="nav"] > svg { grid-area: 1 / 1; }
+[data-ds-rail] [data-slot="nav"]:hover::before { background: ${MUTED}; }
+[data-ds-rail] [data-slot="nav"]:focus-visible::before { outline: 2px solid ${ACC}; outline-offset: 1px; }
+@media (max-width: 767px) { [data-ds-rail] [data-slot="nav"] { display: none; } }
 [data-ds-rail] [data-slot="track"] { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - var(--_gap) * (var(--_pv) - 1 + var(--_peek))) / (var(--_pv) + var(--_peek))); gap: var(--_gap); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
 [data-ds-rail] [data-slot="track"]::-webkit-scrollbar { display: none; }
 [data-ds-rail] [data-slot="track"] > * { scroll-snap-align: var(--_snap, start); min-width: 0; }
@@ -137,17 +145,23 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-media] [data-slot="caption"] { position: absolute; inset-inline: 0; bottom: 0; padding: 32px 14px 12px; color: #fff; font-size: 13px; line-height: 1.4; background: linear-gradient(to top, rgb(0 0 0 / .55), transparent); }
 [data-ds-media] [data-slot="overlay"] > * { pointer-events: auto; }
 [data-ds-price] { display: inline-flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; color: ${FG}; }
-[data-ds-price] [data-slot="list"] { font-size: .85em; color: ${FG3}; text-decoration: line-through; }
+[data-ds-price] [data-slot="list"] { font-size: max(.8125em, 13px); font-weight: 400; color: ${FG3}; text-decoration: line-through; }
+[data-ds-price][data-layout="inline"] { display: flex; width: 100%; container-type: inline-size; }
+[data-ds-price][data-layout="inline"] [data-slot="row"] { flex-wrap: nowrap; white-space: nowrap; }
+[data-ds-price][data-layout="inline"] [data-slot="list"] { margin-left: 2px; }
+/* 좁은 카드에서는 정가를 빼고 할인율 · 판매가만 (줄바꿈으로 카드 높이가 흔들리지 않게) */
+@container (max-width: 168px) { [data-ds-price][data-layout="inline"] [data-slot="list"] { display: none; } }
 [data-ds-price] [data-slot="list"][data-placeholder] { visibility: hidden; }
 [data-ds-price] [data-slot="row"] { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-[data-ds-price] [data-slot="rate"] { color: var(--ds-tone-danger-text); font-weight: 800; }
-[data-ds-price] [data-slot="value"] { font-weight: 800; letter-spacing: -.01em; }
-[data-ds-price] [data-slot="value"] small { font-size: .7em; font-weight: 600; margin-left: 1px; }
-[data-ds-price] [data-slot="coupon"] { font-size: .8em; color: var(--ds-tone-accent-text); font-weight: 600; }
-[data-ds-price] [data-slot="unit"] { font-size: .75em; color: ${FG3}; }
-[data-ds-price][data-size="sm"] { font-size: 14px; } [data-ds-price][data-size="md"] { font-size: 18px; } [data-ds-price][data-size="lg"] { font-size: 26px; }
+[data-ds-price][data-layout="inline"] [data-slot="row"] { display: flex; }
+[data-ds-price] [data-slot="rate"] { color: var(--ds-tone-danger-text); font-weight: 700; }
+[data-ds-price] [data-slot="value"] { font-weight: 700; letter-spacing: -.01em; }
+[data-ds-price] [data-slot="value"] small { font-size: max(.75em, 12px); font-weight: 600; margin-left: 1px; }
+[data-ds-price] [data-slot="coupon"] { font-size: max(.8em, 12px); color: var(--ds-tone-accent-text); font-weight: 600; }
+[data-ds-price] [data-slot="unit"] { font-size: max(.75em, 12px); color: ${FG3}; }
+[data-ds-price][data-size="sm"] { font-size: 16px; } [data-ds-price][data-size="md"] { font-size: 18px; } [data-ds-price][data-size="lg"] { font-size: 26px; }
 [data-ds-price][data-sold-out] [data-slot="value"] { color: ${FG3}; }
-[data-ds-price] [data-slot="soldout"] { font-size: .75em; font-weight: 700; color: ${FG3}; padding: 1px 6px; border: 1px solid ${BD}; border-radius: 4px; }
+[data-ds-price] [data-slot="soldout"] { font-size: max(.75em, 12px); font-weight: 700; color: ${FG3}; padding: 1px 6px; border: 1px solid ${BD}; border-radius: 4px; }
 [data-ds-rating-display] { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: ${FG2}; font-variant-numeric: tabular-nums; }
 [data-ds-rating-display] [data-slot="stars"] { position: relative; display: inline-block; letter-spacing: 1px; color: color-mix(in oklab, ${FG} 18%, transparent); line-height: 1; }
 [data-ds-rating-display] [data-slot="stars"] > span { position: absolute; inset: 0; overflow: hidden; color: var(--ds-palette-warning-500); white-space: nowrap; }
