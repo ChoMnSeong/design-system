@@ -70,9 +70,9 @@ WaterfallChart
     └── { label, value, type }   'total' 합계 · 'delta' 증감`,
         compositionNote: 'GanttChart 는 parent 로 이은 작업을 들여 쓴 트리로 그리고, 하위 작업이 있는 행에만 접기 버튼을 붙입니다.',
         a11y: [
-            'GanttChart 의 접기 버튼은 aria-expanded 로 펼침 상태를 알립니다. 일정 그림은 role="img" aria-label="작업 일정" 입니다.',
-            'GanttChart 막대 끌기(onTaskChange)는 포인터 전용이므로, 날짜를 바꾸는 다른 입력 수단을 함께 두세요.',
-            'Heatmap 은 <table> 에 열 · 행 머리(th scope)를 두어 칸마다 행 · 열 이름을 읽을 수 있습니다. aria-label 로 표 이름을 주세요. 칸 클릭(onCellClick)은 마우스 전용입니다.',
+            'GanttChart 의 접기 버튼은 aria-expanded 로 펼침 상태를 알립니다. 일정 그림은 role="img" aria-label="작업 일정" 입니다(onTaskChange 가 있으면 role="group").',
+            'onTaskChange 가 있으면 막대가 Tab 으로 잡히고 "작업명 시작 ~ 끝, 진행 %" 로 읽힙니다. ← → 로 하루씩 옮기고 Shift + ← → 로 끝 날짜를 늘이거나 줄입니다. 끌기도 그대로 됩니다.',
+            'Heatmap 은 <table> 에 열 · 행 머리(th scope)를 두어 칸마다 행 · 열 이름을 읽을 수 있습니다. aria-label 로 표 이름을 주세요. onCellClick 을 주면 칸이 Tab 으로 잡히고 Enter · Space 로 눌립니다.',
             'WaterfallChart 는 role="img" 이고 "시작 120, 자재비 30" 처럼 단계 이름과 값을 이어 붙여 읽습니다.',
         ],
     },

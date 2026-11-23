@@ -214,6 +214,16 @@ export const SiteHeader = ({
                                     data-highlight={n.highlight ? '' : undefined}
                                     onMouseEnter={() => setMega(n.mega ? n.key : null)}
                                     onFocus={() => setMega(n.mega ? n.key : null)}
+                                    onKeyDown={(e) => {
+                                        // Esc: 큰 메뉴 닫기 · ↓: 큰 메뉴의 첫 카테고리로 들어가기
+                                        if (e.key === 'Escape') setMega(null)
+                                        if (e.key === 'ArrowDown' && n.mega) {
+                                            e.preventDefault()
+                                            setMega(n.key)
+                                            const header = e.currentTarget.closest('[data-ds-site-header]')
+                                            requestAnimationFrame(() => header?.querySelector<HTMLElement>('[data-ds-mega] [role="tab"]')?.focus())
+                                        }
+                                    }}
                                     onClick={(e) => { if (onNavSelect) { e.preventDefault(); onNavSelect(n.key) } }}
                                 >
                                     {n.label}

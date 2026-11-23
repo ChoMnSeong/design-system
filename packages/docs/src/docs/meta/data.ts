@@ -23,7 +23,7 @@ Table                   바깥 스크롤 상자 + <table>
         a11y: [
             '<table> · <thead> · <tbody> · <tfoot> · <tr> · <th> · <td> 를 그대로 써서 스크린 리더의 표 탐색이 그대로 동작합니다.',
             'TableHeaderCell 의 sortDirection 은 aria-sort(ascending · descending)로 알리고, 화살표 아이콘은 aria-hidden 입니다.',
-            'TableHeaderCell 은 정렬 표시만 하고 클릭 · 키보드 동작을 넣지 않습니다. 키보드로 정렬하게 하려면 셀 안에 <button> 을 넣으세요.',
+            'TableHeaderCell 은 정렬 표시(aria-sort)만 하고 클릭 · 키보드 동작을 넣지 않습니다. 정렬 기능이 필요하면 셀 안에 <button> 을 넣거나 DataTable · DataGrid 를 쓰세요.',
             'TableRow 의 selected 는 aria-selected 로 알립니다.',
         ],
     },
@@ -75,10 +75,10 @@ columns: GridColumn<T>[]
 └── cellClassRules        { danger: (p) => … } 톤 이름이면 셀 바탕`,
         compositionNote: '열 하나가 정렬 · 필터 · 편집 · 집계 · 표시 방식을 모두 들고 있습니다. 그리드 전체 동작(그룹 · 피벗 · 트리 · 범위 선택 · 가상화)은 DataGrid props 로 켭니다.',
         a11y: [
-            '본문 스크롤 영역이 role="grid" 이고 tabIndex=0 이라 Tab 으로 잡힙니다. 셀을 누른 뒤 화살표로 포커스 셀을 옮기고, cellSelection 이면 Shift+화살표로 범위를 넓힙니다.',
+            '본문 스크롤 영역이 role="grid" 이고 tabIndex=0 이라 Tab 으로 잡힙니다. 처음 화살표를 누르면 첫 칸부터, 이후 화살표로 포커스 셀을 옮기고 aria-activedescendant 로 지금 칸을 알립니다. cellSelection 이면 Shift+화살표로 범위를 넓힙니다.',
             'Enter · F2 로 편집을 시작하고 편집기에서 Enter · Tab 은 저장, Esc 는 취소입니다. Delete · Backspace 는 선택 범위의 값을 지웁니다.',
             'clipboard 면 Ctrl/⌘+C · V 로 복사 · 붙여넣기, undoRedo 면 Ctrl/⌘+Z 되돌리기 · Shift+Z 또는 Y 다시 하기가 됩니다.',
-            '정렬은 머리를 눌러(Shift+클릭은 다중) 바꾸고 상태는 aria-sort 로 알립니다. 열 메뉴 · 값 필터 버튼은 "{열} 열 메뉴" · "{열} 값 필터" 라벨을 가집니다.',
+            '정렬할 수 있는 머리 칸은 Tab 으로 잡히고 Enter · Space(Shift 와 함께면 다중)나 클릭으로 정렬하며, 상태는 aria-sort 로 알립니다. 열 메뉴 · 값 필터 버튼은 "{열} 열 메뉴" · "{열} 값 필터" 라벨을 가집니다.',
             '그룹 · 트리 펼침 버튼은 aria-expanded 를 가집니다. 상태 막대는 role="status", 오류는 role="alert", 불러오는 중에는 aria-busy 로 알립니다.',
         ],
     },

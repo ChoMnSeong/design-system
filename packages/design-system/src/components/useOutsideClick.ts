@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 
 type AnyRef = RefObject<HTMLElement | null>
 
@@ -29,4 +29,27 @@ export const useOutsideClick = (
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enabled, onOutside])
+}
+
+/**
+ * 열린 패널을 Esc 로 닫고 포커스를 여는 요소로 돌려준다.
+ * 캡처 단계에서 처리하고 전파를 막아, 대화상자 안에 있어도 패널만 닫힌다.
+ */
+export const useEscapeClose = (enabled: boolean, close: () => void, returnFocus?: AnyRef) => {
+    const closeRef = useRef(close)
+    closeRef.current = close
+    useEffect(() => {
+        if (!enabled) return
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape' || e.defaultPrevented) return
+            e.stopPropagation()
+            closeRef.current()
+            const el = returnFocus?.current as HTMLElement | null | undefined
+            const target = el?.matches?.('input, button, [tabindex]') ? el : el?.querySelector?.<HTMLElement>('input, button, [tabindex]:not([tabindex="-1"])')
+            target?.focus()
+        }
+        document.addEventListener('keydown', onKey, true)
+        return () => document.removeEventListener('keydown', onKey, true)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [enabled])
 }

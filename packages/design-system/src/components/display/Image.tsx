@@ -1,5 +1,5 @@
 import {
-    useEffect,
+    useRef,
     useState,
     type CSSProperties,
     type KeyboardEvent as ReactKeyboardEvent,
@@ -8,6 +8,7 @@ import {
     type Ref,
 } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalBehavior } from '../overlay/Dialog.js'
 import { mergeStyles } from '../types.js'
 
 export type ImageProps = {
@@ -68,12 +69,9 @@ export const Image = ({
             ? `var(--ds-radius-${radiusProp})`
             : radiusProp
     const [open, setOpen] = useState(false)
-    useEffect(() => {
-        if (!open) return
-        const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-        window.addEventListener('keydown', onKey)
-        return () => window.removeEventListener('keydown', onKey)
-    }, [open])
+    // 크게 보기: 열리면 포커스를 창으로 옮기고 가두며, Esc 로 닫으면 원래 이미지로 돌아간다
+    const previewRef = useRef<HTMLDivElement>(null)
+    useModalBehavior(open, previewRef, () => setOpen(false))
     const [loaded, setLoaded] = useState(false)
     const [errored, setErrored] = useState(false)
     // 숫자 크기는 HTML 속성으로도 넘긴다. 브라우저가 로드 전에 자리를 잡아 CLS 를 막는다.
@@ -174,6 +172,8 @@ export const Image = ({
         open && typeof document !== 'undefined'
             ? createPortal(
                   <div
+                      ref={previewRef}
+                      tabIndex={-1}
                       role="dialog"
                       aria-modal="true"
                       aria-label={alt || '이미지 미리보기'}

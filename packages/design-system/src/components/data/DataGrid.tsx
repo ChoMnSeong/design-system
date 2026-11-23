@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { LuChevronRight, LuEllipsisVertical, LuX } from 'react-icons/lu'
 import { Button } from '../actions/Button.js'
 import { Menu } from '../overlay/Menu.js'
@@ -234,6 +234,7 @@ export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
     /* 셀 선택 */
     const [anchor, setAnchor] = useState<[number, number] | null>(null)
     const [focus, setFocus] = useState<[number, number] | null>(null)
+    const gridId = useId().replace(/:/g, '')
     const [editing, setEditing] = useState<[number, number] | null>(null)
     const [fillTo, setFillTo] = useState<number | null>(null)
     const dragging = useRef<'select' | 'fill' | null>(null)
@@ -334,7 +335,15 @@ export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
         if (mod && undoDepth && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return }
         if (clipboard && mod && e.key.toLowerCase() === 'c') { copy(); return }
         if (clipboard && mod && e.key.toLowerCase() === 'v') { paste(); return }
-        if (!focus) return
+        if (!focus) {
+            // 표에 Tab 으로 들어와 처음 화살표를 누르면 첫 칸부터
+            if (/^Arrow/.test(e.key) && dataRows.length && leaves.length) {
+                e.preventDefault()
+                setFocus([0, 0])
+                setAnchor([0, 0])
+            }
+            return
+        }
         const mv: Record<string, [number, number]> = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }
         if (mv[e.key]) {
             e.preventDefault()
@@ -428,6 +437,14 @@ export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
                 {...(isLeaf ? pinAttrs(c.field) : {})}
                 style={{ ...(isLeaf ? pinStyle(c.field, level * rh) : { top: level * rh }) }}
                 onClick={(e) => sortable && onSortClick(c, e)}
+                // 키보드 정렬: Tab 으로 머리 칸에 와서 Enter · Space (Shift 와 함께면 다중 정렬)
+                tabIndex={sortable ? 0 : undefined}
+                onKeyDown={(e) => {
+                    if (!sortable || e.target !== e.currentTarget || (e.key !== 'Enter' && e.key !== ' ')) return
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onSortClick(c, e as unknown as React.MouseEvent)
+                }}
                 draggable={groupPanel && isLeaf}
                 onDragStart={(e) => e.dataTransfer.setData('text/ds-grid-col', c.field)}
             >
@@ -518,6 +535,8 @@ export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
                             data-align={c.align}
                             data-tone={tone}
                             data-selected={cellSelection && inRange(ri, ci) && range && (range.r0 !== range.r1 || range.c0 !== range.c1) ? '' : undefined}
+                            id={isFocus ? `${gridId}-cell` : undefined}
+                            role="gridcell"
                             data-focus={isFocus && !isEditing ? '' : undefined}
                             data-editable={editable ? '' : undefined}
                             data-editing={isEditing ? '' : undefined}
@@ -612,7 +631,7 @@ export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
                 </div>
             )}
             <div data-slot="body" style={{ height }}>
-                <div data-slot="scroll" ref={scrollRef} tabIndex={0} onKeyDown={onKeyDown} onScroll={onScroll} role="grid" aria-rowcount={dataRows.length + 1} aria-busy={loading || undefined}>
+                <div data-slot="scroll" ref={scrollRef} tabIndex={0} onKeyDown={onKeyDown} onScroll={onScroll} role="grid" aria-label={props['aria-label']} aria-rowcount={dataRows.length + 1} aria-busy={loading || undefined} aria-activedescendant={focus ? `${gridId}-cell` : undefined}>
                     <table>
                         <colgroup>{leaves.map((c) => <col key={c.field} style={{ width: widthOf(c) }} />)}</colgroup>
                         <thead>

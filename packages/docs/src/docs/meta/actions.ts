@@ -68,7 +68,8 @@ Toolbar                 안쪽 Button 기본 ghost · neutral · size
 ├── ToolbarSpacer       뒤 항목을 오른쪽 끝으로
 └── (overflow="menu")   overflowItems 를 ··· 메뉴로`,
         a11y: [
-            'role="toolbar" 로 그립니다. aria-label 로 이름을 붙이세요. 항목 사이 방향키 이동은 없고 Tab 으로 옮깁니다.',
+            'role="toolbar" 로 그립니다. aria-label 로 이름을 붙이세요.',
+            'Tab 으로 한 번 들어오고(마지막에 있던 항목), ← → 로 항목 사이를 옮기며 Home · End 로 처음 · 끝으로 갑니다. 다음 Tab 은 툴바 밖으로 나갑니다. 글자 입력칸 안에서는 화살표가 커서를 움직입니다.',
             'ToolbarGroup 은 role="group", ToolbarSeparator 는 role="separator" · aria-orientation="vertical" 이고 ToolbarSpacer 는 aria-hidden 입니다.',
             'overflow="menu" 의 ··· 버튼은 overflowLabel(기본 "더 보기") 을 aria-label 로 쓰는 메뉴 버튼입니다.',
         ],

@@ -85,6 +85,7 @@ export const OptionPicker = ({ type = 'chip', label, options, value, defaultValu
     const [inner, setInner] = useState(defaultValue)
     const v = value ?? inner
     const set = (x: string) => { setInner(x); onChange?.(x) }
+    const listRef = useRef<HTMLDivElement>(null)
     const sel = options.find((o) => o.value === v)
     const soldOut = (o: PickerOption) => o.stock === 0
     const low = (o: PickerOption) => o.stock != null && o.stock > 0 && o.stock <= lowStock
@@ -107,12 +108,16 @@ export const OptionPicker = ({ type = 'chip', label, options, value, defaultValu
         const usable = options.filter((o) => allowSoldOut || !soldOut(o))
         const i = usable.findIndex((o) => o.value === v)
         const n = usable[(i + dir + usable.length) % usable.length]
-        if (n) set(n.value)
+        if (!n) return
+        set(n.value)
+        // 라디오 묶음 규칙: 고른 옵션으로 포커스도 옮긴다
+        const idx = options.indexOf(n)
+        requestAnimationFrame(() => listRef.current?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[idx]?.focus())
     }
     return (
         <fieldset data-ds-option-picker="" data-type={type} style={style}>
             {label && <legend>{label}{sel && <b>{sel.label}</b>}</legend>}
-            <div data-slot="list" role="radiogroup" onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); move(1) } if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); move(-1) } }}>
+            <div ref={listRef} data-slot="list" role="radiogroup" onKeyDown={(e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); move(1) } if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); move(-1) } }}>
                 {options.map((o, i) => {
                     const dis = soldOut(o) && !allowSoldOut
                     const checked = o.value === v

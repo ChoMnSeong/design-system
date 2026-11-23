@@ -76,3 +76,25 @@ export type CommonChartProps = {
     /** 바깥 요소 style */
     style?: CSSProperties
 }
+
+/**
+ * 눌러서 동작하는 차트 요소(막대 · 점 · 조각 · 칸)를 키보드로도 쓰게 한다.
+ * 핸들러가 없으면 아무것도 붙이지 않는다.
+ */
+export const pressable = (fn: (() => void) | undefined, label: string) =>
+    fn
+        ? {
+              role: 'button' as const,
+              tabIndex: 0,
+              'aria-label': label,
+              'data-pressable': '',
+              style: { cursor: 'pointer' } as CSSProperties,
+              onClick: fn,
+              onKeyDown: (e: { key: string; preventDefault: () => void }) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      fn()
+                  }
+              },
+          }
+        : {}

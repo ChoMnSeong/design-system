@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useModalBehavior } from '../overlay/Dialog.js'
 import { LuCaptions, LuMaximize, LuPause, LuPlay, LuSettings, LuSkipForward, LuVolume2, LuVolumeX } from 'react-icons/lu'
 
 /* 영상 재생기 · 모바일 하단 시트 · 하단 탭 */
@@ -192,13 +193,15 @@ export const BottomSheet = ({ open, onOpenChange, snapPoints = [0.5, 0.9], defau
     const ref = useRef<HTMLDivElement>(null)
     const hostH = () => (inline ? ref.current?.parentElement?.clientHeight ?? 600 : window.innerHeight)
     useEffect(() => { if (open) setSnap(defaultSnap) }, [open, defaultSnap])
+    // Esc 로 닫기 · 포커스 복귀. 딤이 있으면(모달) 포커스를 시트 안에 가두고 뒤 화면 스크롤을 막는다
+    // inline(미리보기용)은 페이지 안에 박혀 있으니 포커스를 빼앗지 않고 Esc 만 받는다
+    useModalBehavior(open && !inline, ref, () => onOpenChange(false), { trap: dim, lockScroll: dim })
     useEffect(() => {
-        if (!open) return
-        const k = (e: KeyboardEvent) => e.key === 'Escape' && onOpenChange(false)
+        if (!open || !inline) return
+        const k = (e: KeyboardEvent) => e.key === 'Escape' && ref.current?.contains(document.activeElement) && onOpenChange(false)
         window.addEventListener('keydown', k)
-        ref.current?.focus()
         return () => window.removeEventListener('keydown', k)
-    }, [open, onOpenChange])
+    }, [open, inline, onOpenChange])
     if (!open) return null
     const H = hostH()
     const height = drag ?? (snapPoints[snap] ?? 0.5) * H

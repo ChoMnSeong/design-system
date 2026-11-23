@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import { useOutsideClick } from '../useOutsideClick.js'
+import { useEscapeClose, useOutsideClick } from '../useOutsideClick.js'
 import { Popover } from '../overlay/Popover.js'
 import { IconCalendar, IconClose } from '../icons.js'
 import type { BorderVariant } from '../borderVariant.js'
@@ -116,6 +116,7 @@ export const DatePicker = ({
     const boxRef = useRef<HTMLSpanElement | null>(null)
     const popRef = useRef<HTMLDivElement | null>(null)
     useOutsideClick([boxRef, popRef], () => setOpen(false), open)
+    useEscapeClose(open, () => setOpen(false), boxRef)
 
     const date = parseISODate(value)
     const fmt = format ?? `${DEFAULT_FORMAT[picker]}${showTime ? ' HH:mm' : ''}`
@@ -286,6 +287,7 @@ export const DateRangePicker = ({
     const boxRef = useRef<HTMLSpanElement | null>(null)
     const popRef = useRef<HTMLDivElement | null>(null)
     useOutsideClick([boxRef, popRef], () => setOpen(false), open)
+    useEscapeClose(open, () => setOpen(false), boxRef)
 
     const [s, e] = value.map(parseISODate) as [Date | null, Date | null]
     const tooLong = !!s && !!e && !!maxRange && diffDays(s, e) + 1 > maxRange

@@ -126,9 +126,10 @@ export const RadarChart = ({
             })
             .join(' ') + ' Z'
 
+    const legendPos = legend ?? (showLegend === false ? 'none' : 'bottom')
     return (
         <div style={{ display: aside ? 'inline-flex' : 'inline-block', gap: 20, alignItems: 'center', ...style }}>
-            <div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
             <svg
                 width={size}
                 height={size}
@@ -283,13 +284,15 @@ export const RadarChart = ({
                     )
                 })}
             </svg>
-            {(legend ?? (showLegend === false ? 'none' : 'bottom')) !== 'none' && (
+            {legendPos !== 'none' && (
                 <div
                     style={{
                         display: 'flex',
                         gap: '16px',
                         flexWrap: 'wrap',
-                        marginTop: '8px',
+                        // legend="top" 이면 그래프 위로 (DOM 은 아래지만 보이는 순서만 바꾼다)
+                        order: legendPos === 'top' ? -1 : undefined,
+                        margin: legendPos === 'top' ? '0 0 8px' : '8px 0 0',
                         justifyContent: 'center',
                     }}
                 >

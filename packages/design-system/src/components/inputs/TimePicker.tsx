@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Popover } from '../overlay/Popover.js'
-import { useOutsideClick } from '../useOutsideClick.js'
+import { useEscapeClose, useOutsideClick } from '../useOutsideClick.js'
 import { FieldAction, FieldBox, useFormSize } from '../form/Field.js'
 import { IconClose } from '../icons.js'
 import type { BorderVariant } from '../borderVariant.js'
@@ -229,6 +229,7 @@ export const TimePicker = ({
     const boxRef = useRef<HTMLSpanElement | null>(null)
     const popRef = useRef<HTMLDivElement | null>(null)
     useOutsideClick([boxRef, popRef], () => setOpen(false), open)
+    useEscapeClose(open, () => setOpen(false), boxRef)
 
     const fmt = format ?? `${use24Hours ? 'HH' : 'A hh'}:mm${secondStep !== false ? ':ss' : ''}`
     const lo = toSec(minTime)

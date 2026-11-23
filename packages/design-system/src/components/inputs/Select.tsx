@@ -83,6 +83,10 @@ export type SelectProps = {
     'aria-label'?: string
     /** 이름이 되는 요소 id */
     'aria-labelledby'?: string
+    /** 설명 · 오류 문구 요소 id (FormField 가 넣어 준다) */
+    'aria-describedby'?: string
+    /** 필수 입력 (FormField required 가 넣어 준다) */
+    'aria-required'?: boolean
 }
 
 const ROW = 32
@@ -135,6 +139,8 @@ export const Select = ({
     id: idProp,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-required': ariaRequired,
 }: SelectProps) => {
     const variant = useBorderVariant(variantProp)
     const size = useFormSize(sizeProp)
@@ -339,7 +345,10 @@ export const Select = ({
         'aria-activedescendant': activeId,
         'aria-invalid': invalid || undefined,
         'aria-label': ariaLabel,
-        'aria-labelledby': ariaLabelledby,
+        // aria-label 을 직접 주면 그것이 이름. 아니면 FormField 라벨(aria-labelledby)
+        'aria-labelledby': ariaLabel ? undefined : ariaLabelledby,
+        'aria-describedby': ariaDescribedby,
+        'aria-required': ariaRequired || undefined,
         'aria-disabled': disabled || undefined,
         'aria-readonly': readOnly || undefined,
         onKeyDown: onKey,

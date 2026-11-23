@@ -1,3 +1,4 @@
+import { pressable } from './chartUtils.js'
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { chartColor } from './CartesianChart.js'
 import type { Tone } from '../types.js'
@@ -98,7 +99,7 @@ export const PieChart = ({
     return (
         <div data-ds-pie="" data-legend={lg} className={className} style={style}>
             <div data-slot="plot" style={{ width: size, height: size }}>
-                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={ariaLabel ?? data.map((d) => `${d.label} ${((d.value / total) * 100).toFixed(1)}%`).join(', ')}>
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role={onSliceClick ? 'group' : 'img'} aria-label={ariaLabel ?? data.map((d) => `${d.label} ${((d.value / total) * 100).toFixed(1)}%`).join(', ')}>
                     {data.map((d, i) => {
                         const span = (d.value / total) * Math.PI * 2
                         const a0 = a + pad / 2
@@ -114,10 +115,11 @@ export const PieChart = ({
                                     fill={colorOf(d, i)}
                                     opacity={active !== null && active !== i ? 0.55 : 1}
                                     data-slot="slice"
-                                    style={onSliceClick ? { cursor: 'pointer' } : undefined}
                                     onMouseEnter={() => setHover(i)}
                                     onMouseLeave={() => setHover(null)}
-                                    onClick={() => onSliceClick?.(dataProp[i] ?? d, i)}
+                                    onFocus={() => setHover(i)}
+                                    onBlur={() => setHover(null)}
+                                    {...pressable(onSliceClick && (() => onSliceClick(dataProp[i] ?? d, i)), `${d.label} ${((d.value / total) * 100).toFixed(1)}%`)}
                                 />
                                 {lt !== 'none' && span > 0.35 && (
                                     <text x={cx + lr * Math.sin(mid)} y={cx - lr * Math.cos(mid) + 4} textAnchor="middle" data-slot="slice-label">

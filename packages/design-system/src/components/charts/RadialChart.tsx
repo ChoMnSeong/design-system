@@ -1,3 +1,4 @@
+import { pressable } from './chartUtils.js'
 import { useState, type CSSProperties, type ReactNode } from 'react'
 
 export type RadialDatum = {
@@ -242,6 +243,7 @@ export const RadialChart = ({
                                 )}
                                 {pct > 0 && (
                                     <path
+                                        {...pressable(onBarClick && (() => onBarClick(d, i)), `${d.label} ${d.value}`)}
                                         d={arcPath(cx, cy, r, 0, endDeg)}
                                         fill="none"
                                         stroke={color}
@@ -264,7 +266,7 @@ export const RadialChart = ({
                                             cursor: 'pointer',
                                         }}
                                         onMouseEnter={() => setHover(i)}
-                                        onClick={() => onBarClick?.(d, i)}
+                                        onFocus={() => setHover(i)}
                                     >
                                         {tooltip && <title>{`${d.label}: ${d.value}`}</title>}
                                     </path>

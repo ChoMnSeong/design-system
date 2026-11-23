@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useId, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react'
 import { mergeStyles, type Tone } from '../types.js'
 
 export type RatingProps = {
@@ -125,10 +125,40 @@ export const Rating = ({
         return starIdx + (xRatio < 0.5 ? 0.5 : 1)
     }
 
+    // 라디오 묶음 키보드: 현재 값 별 하나만 Tab 으로 잡히고, 화살표로 값을 바꾼다 (allowHalf 면 0.5 씩)
+    const step = allowHalf ? 0.5 : 1
+    const groupRef = useRef<HTMLDivElement>(null)
+    const focusStar = (v: number) => {
+        const i = Math.max(0, Math.ceil(v) - 1)
+        groupRef.current?.querySelectorAll<HTMLButtonElement>('button[role="radio"]')[i]?.focus()
+    }
+    const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        if (readOnly) return
+        const cur = value || 0
+        const next =
+            e.key === 'ArrowRight' || e.key === 'ArrowUp' ? Math.min(max, cur + step)
+            : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? Math.max(step, cur - step)
+            : e.key === 'Home' ? step
+            : e.key === 'End' ? max
+            : null
+        if (next === null) return
+        e.preventDefault()
+        if (next !== value) {
+            if (controlled === undefined) setInternal(next)
+            onChange?.(next)
+            onValueChange?.(next)
+        }
+        focusStar(next)
+    }
+    const tabStop = Math.max(0, Math.ceil(value || 0) - 1)
+
     return (
         <div
+            ref={groupRef}
             role="radiogroup"
-            aria-label="평점"
+            aria-label={readOnly ? `평점 ${value}점 (${max}점 만점)` : '평점'}
+            aria-readonly={readOnly || undefined}
+            onKeyDown={onKeyDown}
             style={mergeStyles(
                 {
                     display: 'inline-flex',
@@ -155,7 +185,8 @@ export const Rating = ({
                         key={i}
                         type="button"
                         role="radio"
-                        aria-checked={Math.ceil(display) === i + 1}
+                        aria-checked={Math.ceil(value || 0) === i + 1}
+                        tabIndex={i === tabStop ? 0 : -1}
                         disabled={readOnly}
                         onClick={(e) => set(computeStarValue(i, e))}
                         onMouseMove={(e) => {
@@ -163,7 +194,7 @@ export const Rating = ({
                                 setHover(computeStarValue(i, e))
                         }}
                         onMouseLeave={() => !readOnly && setHover(null)}
-                        aria-label={`${i + 1}점`}
+                        aria-label={allowHalf && Math.ceil(value || 0) === i + 1 && value % 1 ? `${value}점` : `${i + 1}점`}
                         style={{
                             background: 'transparent',
                             border: 'none',

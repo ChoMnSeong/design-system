@@ -3092,6 +3092,20 @@
     "description": "이름이 되는 요소 id"
    },
    {
+    "name": "aria-describedby",
+    "type": "string",
+    "required": false,
+    "default": null,
+    "description": "설명 · 오류 문구 요소 id (FormField 가 넣어 준다)"
+   },
+   {
+    "name": "aria-required",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "필수 입력 (FormField required 가 넣어 준다)"
+   },
+   {
     "name": "onChange",
     "type": "(value: string) => void",
     "required": false,
@@ -3302,6 +3316,20 @@
     "required": false,
     "default": null,
     "description": "이름이 되는 요소 id"
+   },
+   {
+    "name": "aria-describedby",
+    "type": "string",
+    "required": false,
+    "default": null,
+    "description": "설명 · 오류 문구 요소 id (FormField 가 넣어 준다)"
+   },
+   {
+    "name": "aria-required",
+    "type": "boolean",
+    "required": false,
+    "default": null,
+    "description": "필수 입력 (FormField required 가 넣어 준다)"
    },
    {
     "name": "onChange",

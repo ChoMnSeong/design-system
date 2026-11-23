@@ -1,3 +1,4 @@
+import { pressable } from './chartUtils.js'
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { chartColor } from './CartesianChart.js'
 import type { Tone } from '../types.js'
@@ -419,7 +420,7 @@ export const TargetScatter = ({ points, rings = [], domain: domainProp, colorBy 
     const hmax = Math.max(1, ...hist)
     return (
         <div data-ds-target-scatter="" style={style}>
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`측정점 ${points.length}개`}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role={onPointClick ? 'group' : 'img'} aria-label={`측정점 ${points.length}개`}>
                 <line x1={0} x2={size} y1={c} y2={c} data-slot="axis" />
                 <line x1={c} x2={c} y1={0} y2={size} data-slot="axis" />
                 {[...rings].reverse().map((r, i) => (
@@ -429,7 +430,7 @@ export const TargetScatter = ({ points, rings = [], domain: domainProp, colorBy 
                     </g>
                 ))}
                 {points.map((p, i) => (
-                    <circle key={p.id ?? i} cx={c + s(p.x)} cy={c - s(p.y)} r={4.5} fill={chartColor(toneOf(p))} stroke="var(--ds-surface-card-background)" strokeWidth={1.5} style={onPointClick ? { cursor: 'pointer' } : undefined} onClick={() => onPointClick?.(p)}>
+                    <circle key={p.id ?? i} cx={c + s(p.x)} cy={c - s(p.y)} r={4.5} fill={chartColor(toneOf(p))} stroke="var(--ds-surface-card-background)" strokeWidth={1.5} {...pressable(onPointClick && (() => onPointClick(p)), `측정점 ${i + 1}: x ${p.x}, y ${p.y}`)}>
                         <title>{`${p.label ?? p.id ?? i + 1}: x ${p.x}, y ${p.y}`}</title>
                     </circle>
                 ))}

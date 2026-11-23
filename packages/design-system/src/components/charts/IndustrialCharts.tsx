@@ -1,3 +1,4 @@
+import { pressable } from './chartUtils.js'
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { CartesianChart, chartColor } from './CartesianChart.js'
 import type { Tone } from '../types.js'
@@ -365,9 +366,10 @@ export const Heatmap = ({ rows, columns, values, scale = 'sequential', min, max,
                                 return (
                                     <td
                                         key={c}
-                                        style={{ height: cellHeight, background: v == null ? undefined : color(v), color: t > 0.6 && scale === 'sequential' ? '#fff' : undefined, cursor: onCellClick ? 'pointer' : undefined }}
                                         title={v == null ? `${r} · ${c}: 없음` : `${r} · ${c}: ${formatValue(v)}`}
-                                        onClick={() => onCellClick?.(ri, ci)}
+                                        {...pressable(onCellClick && (() => onCellClick(ri, ci)), v == null ? `${r} · ${c}: 없음` : `${r} · ${c}: ${formatValue(v)}`)}
+                                        role={onCellClick ? 'gridcell' : undefined}
+                                        style={{ height: cellHeight, background: v == null ? undefined : color(v), color: t > 0.6 && scale === 'sequential' ? '#fff' : undefined, cursor: onCellClick ? 'pointer' : undefined }}
                                     >
                                         {showValues && v != null ? formatValue(v) : null}
                                     </td>
@@ -587,6 +589,17 @@ export const GanttChart = ({ tasks, dependencies = [], scale = 'day', today, onT
         window.addEventListener('pointermove', move)
         window.addEventListener('pointerup', up)
     }
+    // 키보드로 일정 바꾸기: ← → 하루씩 옮기기, Shift + ← → 끝 날짜 늘이기 · 줄이기
+    const onTaskKey = (task: GanttTask) => (e: React.KeyboardEvent) => {
+        if (!onTaskChange || task.type === 'milestone') return
+        const dd = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+        if (!dd) return
+        e.preventDefault()
+        const s = t(task.start) + (e.shiftKey ? 0 : dd * DAY)
+        const en = t(task.end) + dd * DAY
+        if (en <= s) return
+        onTaskChange({ ...task, start: iso(s), end: iso(en) })
+    }
     const headers = Array.from({ length: days }, (_, i) => lo + i * DAY).filter((d) => (scale === 'day' ? true : scale === 'week' ? new Date(d).getDay() === 1 : new Date(d).getDate() === 1))
 
     return (
@@ -614,7 +627,7 @@ export const GanttChart = ({ tasks, dependencies = [], scale = 'day', today, onT
                         </span>
                     ))}
                 </div>
-                <svg width={width} height={height} role="img" aria-label="작업 일정">
+                <svg width={width} height={height} role={onTaskChange ? 'group' : 'img'} aria-label={onTaskChange ? '작업 일정 (막대를 선택하고 ← → 로 옮기기, Shift + ← → 로 끝 날짜 조정)' : '작업 일정'}>
                     {headers.map((d) => (
                         <line key={d} x1={x(d)} x2={x(d)} y1={0} y2={height} data-slot="grid" />
                     ))}
@@ -649,7 +662,22 @@ export const GanttChart = ({ tasks, dependencies = [], scale = 'day', today, onT
                             return <path key={task.id} d={`M ${cx} ${cy - 7} L ${cx + 7} ${cy} L ${cx} ${cy + 7} L ${cx - 7} ${cy} Z`} fill={chartColor('warning')}><title>{`마일스톤 ${iso(t(task.start))}`}</title></path>
                         }
                         return (
-                            <g key={task.id} data-slot="task" style={{ cursor: onTaskChange ? 'grab' : undefined }} onPointerDown={startDrag(task, 'move')}>
+                            <g
+                                key={task.id}
+                                data-slot="task"
+                                style={{ cursor: onTaskChange ? 'grab' : undefined }}
+                                onPointerDown={startDrag(task, 'move')}
+                                {...(onTaskChange
+                                    ? {
+                                          tabIndex: 0,
+                                          role: 'button',
+                                          'aria-label': `${typeof task.name === 'string' ? task.name : task.id} ${iso(t(task.start))} ~ ${iso(t(task.end))}, 진행 ${task.progress ?? 0}%`,
+                                          'aria-roledescription': '일정 막대',
+                                          'aria-keyshortcuts': 'ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight',
+                                          onKeyDown: onTaskKey(task),
+                                      }
+                                    : {})}
+                            >
                                 <rect x={sx} y={y} width={Math.max(4, ex - sx)} height={h} rx={4} fill={c} opacity={0.3} />
                                 <rect x={sx} y={y} width={Math.max(0, (ex - sx) * ((task.progress ?? 0) / 100))} height={h} rx={4} fill={c} />
                                 <title>{`${iso(t(task.start))} ~ ${iso(t(task.end))} · ${task.progress ?? 0}%`}</title>

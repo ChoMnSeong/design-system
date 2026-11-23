@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode, type Ref } from 'react'
-import { niceMax, smoothPath } from './chartUtils.js'
+import { niceMax, pressable, smoothPath } from './chartUtils.js'
 import type { Tone } from '../types.js'
 
 /** 시리즈 색 순서 (tone 미지정 시) */
@@ -308,7 +308,7 @@ export const CartesianChart = ({
         <div ref={ref} data-ds-chart="" className={className} style={style}>
             {legend === 'top' && legendEl}
             <div ref={wrapRef} data-slot="plot" style={{ position: 'relative' }}>
-                <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} onMouseLeave={() => { setHover(null); setHoverSeries(null) }}>
+                <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role={onPointClick ? 'group' : 'img'} aria-label={ariaLabel} onMouseLeave={() => { setHover(null); setHoverSeries(null) }}>
                     {/* 구간 · 격자 */}
                     {bands.map((b, i) => {
                         const d = (b.axis ?? 'left') === 'right' ? R : L
@@ -382,9 +382,9 @@ export const CartesianChart = ({
                                                 fill={fill}
                                                 opacity={hoverSeries && hoverSeries !== s.key ? 0.45 : 1}
                                                 data-slot="bar"
-                                                style={onPointClick ? { cursor: 'pointer' } : undefined}
                                                 onMouseEnter={() => { setHover(i); setHoverSeries(s.key) }}
-                                                onClick={() => onPointClick?.(s, (brush ? win[0] : 0) + i)}
+                                                onFocus={() => { setHover(i); setHoverSeries(s.key) }}
+                                                {...pressable(onPointClick && (() => onPointClick(s, (brush ? win[0] : 0) + i)), `${labels[(brush ? win[0] : 0) + i] ?? ''} ${s.label ?? s.key} ${d.fmt(Number(raw))}`)}
                                             />
                                             {showValues && (
                                                 <text data-slot="value" x={horizontal ? Math.max(a, b) + 4 : c + bw / 2 - 1} y={horizontal ? c + bw / 2 + 3 : Math.min(a, b) - 4} textAnchor={horizontal ? 'start' : 'middle'}>
@@ -438,9 +438,9 @@ export const CartesianChart = ({
                                                         fill="var(--ds-surface-card-background)"
                                                         stroke={color}
                                                         strokeWidth={2}
-                                                        style={onPointClick ? { cursor: 'pointer' } : undefined}
-                                                        onClick={() => onPointClick?.(s, (brush ? win[0] : 0) + i)}
                                                         onMouseEnter={() => setHoverSeries(s.key)}
+                                                        onFocus={() => { setHover(i); setHoverSeries(s.key) }}
+                                                        {...pressable(onPointClick && (() => onPointClick(s, (brush ? win[0] : 0) + i)), `${labels[(brush ? win[0] : 0) + i] ?? ''} ${s.label ?? s.key} ${d.fmt(Number(r[s.key]))}`)}
                                                     />
                                                 ),
                                             )}

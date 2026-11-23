@@ -4,7 +4,7 @@ import {
     type CSSProperties,
 } from 'react'
 import { Popover } from '../overlay/Popover.js'
-import { useOutsideClick } from '../useOutsideClick.js'
+import { useEscapeClose, useOutsideClick } from '../useOutsideClick.js'
 import { mergeStyles, type FieldSize } from '../types.js'
 
 export type ColorFormat = 'hex' | 'rgb' | 'oklch'
@@ -136,6 +136,7 @@ export const ColorPicker = ({
     const triggerRef = useRef<HTMLButtonElement | null>(null)
     const popoverRef = useRef<HTMLDivElement | null>(null)
     useOutsideClick([popoverRef, triggerRef], () => setOpen(false), open)
+    useEscapeClose(open, () => setOpen(false), triggerRef)
 
     const apply = (next: string) => {
         if (!isValidHex(next)) return

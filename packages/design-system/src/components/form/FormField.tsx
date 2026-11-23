@@ -72,6 +72,7 @@ export const FormField = ({
     const descriptionId = description ? `${uid}-description` : undefined
     const messageId = error || hint ? `${uid}-message` : undefined
     const describedBy = [descriptionId, messageId].filter(Boolean).join(' ') || undefined
+    const labelId = label ? `${uid}-label` : undefined
 
     // Fragment 는 props 를 버리고, 자식이 여럿이면 어디에 붙일지 모른다. 그때는 주입하지 않고
     // 라벨이 없는 id 를 가리키지 않도록 htmlFor 도 비운다.
@@ -83,6 +84,8 @@ export const FormField = ({
               'aria-describedby': (props['aria-describedby'] as string | undefined) ?? describedBy,
               'aria-invalid': (props['aria-invalid'] as boolean | undefined) ?? (error ? true : undefined),
               'aria-required': (props['aria-required'] as boolean | undefined) ?? (required || undefined),
+              // <label for> 로 이름이 안 붙는 사용자 정의 컨트롤(role="combobox" 인 span 등)도 라벨을 읽게
+              'aria-labelledby': (props['aria-labelledby'] as string | undefined) ?? (props['aria-label'] ? undefined : labelId),
               invalid: (props.invalid as boolean | undefined) ?? (error ? true : undefined),
           })
         : children
@@ -103,6 +106,7 @@ export const FormField = ({
             {label && (
                 <div data-slot="label" data-align={labelAlign}>
                     <Label
+                        id={labelId}
                         htmlFor={labelFor}
                         required={required}
                         optional={optional}

@@ -75,7 +75,7 @@ AvatarGroup             max · spacing · size
         a11y: [
             'alt 를 <img> 에 그대로 넘깁니다. 정보가 있는 이미지는 alt 를 꼭 주고, 꾸밈용이면 alt="" 를 주세요.',
             'preview 면 이미지 상자가 role="button" · tabIndex=0 이 되어 "{alt} 크게 보기" 로 읽히고 Enter · Space 로 엽니다.',
-            '크게 보기는 role="dialog" · aria-modal 이고 Esc 나 배경 클릭으로 닫힙니다.',
+            '크게 보기는 role="dialog" · aria-modal 이고, 열리면 포커스가 창으로 옮겨져 갇히며 Esc 나 배경 클릭으로 닫으면 이미지로 돌아옵니다.',
             '불러오기에 실패하면 대신 그리는 상자에 alt 가 aria-label 로 붙습니다.',
         ],
     },

@@ -46,7 +46,7 @@ SiteFooter
         a11y: [
             '1단 아이콘 버튼은 label 을 aria-label 로 쓰고, 배지는 "3개" 처럼 읽힙니다. 모바일 메뉴 버튼은 aria-label="메뉴" 입니다.',
             '2단은 <nav aria-label="카테고리"> 이고, activeNav 항목에 aria-current="page", mega 가 있는 항목에 aria-expanded 가 붙습니다.',
-            'MegaMenu 카테고리는 role="tablist"(세로) · role="tab" 과 aria-selected 로 그리며, Tab 으로 포커스를 옮기면 해당 카테고리가 펼쳐집니다. 큰 메뉴 안에서 Esc 를 누르면 onClose 가 불려 SiteHeader 에서는 큰 메뉴가 닫힙니다.',
+            'MegaMenu 카테고리는 role="tablist"(세로) · role="tab" 과 aria-selected 로 그리며, Tab 으로 포커스를 옮기면 해당 카테고리가 펼쳐집니다. 카테고리 줄 링크에서 ↓ 를 누르면 큰 메뉴의 첫 카테고리로 들어가고, 링크나 큰 메뉴 안에서 Esc 를 누르면 큰 메뉴가 닫힙니다.',
             'AnnouncementBar 는 role="region" aria-label="공지" 이고 닫기 버튼은 aria-label="공지 닫기" 입니다.',
             'SiteFooter 링크 열은 제목이 문자열이면 그 이름의 <nav> 가 되고, 사업자 정보는 <details> 로 접고 펼칩니다.',
         ],
@@ -119,7 +119,7 @@ Media
         a11y: [
             'QuantityInput 은 role="group"(aria-label 기본 "수량") 안에 "수량 줄이기" · "수량 늘리기" 버튼과 aria-label="수량" 숫자 입력을 둡니다. min · max 에 닿으면 해당 버튼이 비활성됩니다.',
             '수량 입력에서 Enter 를 누르거나 포커스를 옮기면 값이 min ~ max 로 맞춰 확정되고, 비우면 min 이 됩니다.',
-            'OptionPicker(swatch · chip)는 <fieldset> · <legend> 안의 role="radiogroup" 이고, 각 옵션은 role="radio" · aria-checked 를 가집니다. 선택된 옵션(없으면 첫 옵션)만 Tab 에 잡히고 ← → ↑ ↓ 로 이전 · 다음 옵션을 고릅니다.',
+            'OptionPicker(swatch · chip)는 <fieldset> · <legend> 안의 role="radiogroup" 이고, 각 옵션은 role="radio" · aria-checked 를 가집니다. 선택된 옵션(없으면 첫 옵션)만 Tab 에 잡히고 ← → ↑ ↓ 로 이전 · 다음 옵션을 고르며 포커스도 그 옵션으로 옮깁니다.',
             '품절 옵션은 aria-disabled 이고 화살표 이동에서 건너뜁니다(allowSoldOut 이면 포함). 이름에 ", 품절" · ", 2개 남음" 이 붙어 읽힙니다.',
             'type="select" 는 <label> 로 감싼 기본 <select> 입니다.',
         ],
@@ -148,7 +148,7 @@ Media
         usage: BottomSheetUsage,
         a11y: [
             'BottomSheet 는 role="dialog" 이고 dim 이면 aria-modal 이 붙습니다. 이름은 aria-label, 없으면 문자열 title 을 씁니다.',
-            '열리면 시트로 포커스가 옮겨지고 Esc 로 닫힙니다. 포커스를 시트 안에 가두지는 않습니다.',
+            '열리면 시트로 포커스가 옮겨지고 Esc 로 닫히며, 닫으면 연 버튼으로 돌아갑니다. dim 이면 포커스를 시트 안에 가두고 뒤 화면 스크롤을 막습니다. inline(미리보기용)은 포커스를 빼앗지 않고 Esc 만 받습니다.',
             '손잡이는 role="button" aria-label="시트 높이 조절" 로 Tab 에 잡히며, ↑ 로 한 단계 높이고 ↓ 로 낮춥니다. 가장 낮은 단계에서 ↓ 를 누르면 닫힙니다.',
             'MobileTabBar 는 <nav aria-label="주 메뉴"> 이고, 선택된 탭에 aria-current="page", 배지는 "3개" 처럼 읽힙니다.',
         ],
