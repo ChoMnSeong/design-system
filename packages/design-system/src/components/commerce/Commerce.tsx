@@ -63,7 +63,7 @@ export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', un
     const rate = listPrice && listPrice > value ? Math.round((1 - value / listPrice) * 100) : 0
     const krw = currency === 'KRW'
     const valueNode = krw ? <>{value.toLocaleString(locale)}<small>원</small></> : formatPrice(value, currency, locale)
-    const list = rate > 0 && <span data-slot="list"><span className="ds-sr-only">정가 </span>{formatPrice(listPrice!, currency, locale)}</span>
+    const list = rate > 0 && <span data-slot="list"><span data-ds-sr-only="">정가 </span>{formatPrice(listPrice!, currency, locale)}</span>
     return (
         <span data-ds-price="" data-size={size} data-sold-out={soldOut ? '' : undefined} style={style}>
             {layout === 'stacked' && list}

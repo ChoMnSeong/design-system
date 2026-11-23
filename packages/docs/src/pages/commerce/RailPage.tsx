@@ -9,10 +9,12 @@ export const RailPage = () => (
         <ComponentPreview title="title · action · peek" code={`<Rail style={{ width: '100%' }} title="지금 가장 많이 본" subtitle="오늘 09시 기준" action={<a>전체 보기</a>} peek={0.3}>…</Rail>`}>
             <Rail style={{ width: '100%' }} title="지금 가장 많이 본" subtitle="오늘 09시 기준" arrows action={<Button size="sm" appearance="link" tone="neutral">전체 보기</Button>}>
                 {PICS.map((p, i) => (
-                    <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         <Media src={p} alt={NAMES[i]!} ratio="3/4" />
-                        <span style={{ fontSize: 13 }}>{NAMES[i]}</span>
-                        <Price value={[62300, 129000, 59000, 89000, 45000, 79000][i]!} listPrice={i % 2 ? undefined : 89000 + i * 1000} size="sm" layout="inline" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 2px' }}>
+                            <span style={{ fontSize: 13, lineHeight: 1.4, color: 'var(--ds-color-foreground-secondary)' }}>{NAMES[i]}</span>
+                            <Price value={[62300, 129000, 59000, 89000, 45000, 79000][i]!} listPrice={i % 2 ? undefined : 89000 + i * 1000} size="sm" />
+                        </div>
                     </div>
                 ))}
             </Rail>
