@@ -8,7 +8,7 @@ export const MediaPage = () => (
         <PageHeader title="Media · WatchProgress" description="비율 고정 이미지(불러오기 전 흐린 미리보기)와 이미지 위에 얹는 순위 숫자 · 이어보기 막대." />
         <ComponentPreview title="ratio · placeholder" description="비율이 같아야 목록 줄이 맞습니다. 불러오기 전엔 흐린 미리보기." code={`<Media src={src} alt="…" ratio="4/3" placeholder="blur" placeholderSrc={tiny} />`}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, alignItems: 'start', width: '100%' }}>
-                <Media src={PICS[1]} alt="상품" ratio="1" />
+                <Media src={PICS[1]} alt="상품" ratio="1" caption="캐시미어 니트" />
                 <Media src={PICS[2]} alt="기사" ratio="4/3" />
                 <Media src={PICS[3]} alt="포스터" ratio="2/3" />
                 <Media alt="불러오는 중" ratio="1" placeholderSrc={PICS[4]} />

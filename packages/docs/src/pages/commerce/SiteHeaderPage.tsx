@@ -5,7 +5,7 @@ import { ComponentPreview } from '../../components/ComponentPreview'
 import { PICS, Frame } from '../shared/commerceDemo'
 
 const MEGA = [
-    { key: 'outer', label: '아우터', columns: [{ title: '아우터', links: ['코트', '재킷', '패딩', '점퍼', '트렌치'].map((l) => ({ label: l })) }, { title: '니트 · 가디건', links: ['가디건', '베스트', '무스탕'].map((l) => ({ label: l })) }, { title: '인기 브랜드', links: ['아우터랩', '노스필드', '모노룸', '그레이데이'].map((l) => ({ label: l })) }], promo: <Media src={PICS[0]} alt="가을 아우터 기획전" ratio="4/3" overlay={<div style={{ position: 'absolute', left: 12, bottom: 10, color: '#fff', fontSize: 13 }}><b>가을 아우터 기획전</b><br />최대 30% · 11/30까지</div>} /> },
+    { key: 'outer', label: '아우터', columns: [{ title: '아우터', links: ['코트', '재킷', '패딩', '점퍼', '트렌치'].map((l) => ({ label: l })) }, { title: '니트 · 가디건', links: ['가디건', '베스트', '무스탕'].map((l) => ({ label: l })) }, { title: '인기 브랜드', links: ['아우터랩', '노스필드', '모노룸', '그레이데이'].map((l) => ({ label: l })) }], promo: <Media src={PICS[0]} alt="가을 아우터 기획전" ratio="4/3" caption={<><b>가을 아우터 기획전</b><br />최대 30% · 11/30까지</>} /> },
     { key: 'top', label: '상의', columns: [{ title: '상의', links: ['니트', '셔츠', '티셔츠', '맨투맨'].map((l) => ({ label: l })) }] },
     { key: 'bottom', label: '하의', columns: [{ title: '하의', links: ['데님', '슬랙스', '스커트'].map((l) => ({ label: l })) }] },
 ]

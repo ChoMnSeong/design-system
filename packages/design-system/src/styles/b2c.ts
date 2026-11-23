@@ -134,6 +134,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-media] [data-slot="ph"] { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(14px); transform: scale(1.1); }
 [data-ds-media][data-placeholder="color"] [data-slot="ph"] { filter: none; transform: none; }
 [data-ds-media] [data-slot="overlay"] { position: absolute; inset: 0; pointer-events: none; }
+[data-ds-media] [data-slot="caption"] { position: absolute; inset-inline: 0; bottom: 0; padding: 32px 14px 12px; color: #fff; font-size: 13px; line-height: 1.4; background: linear-gradient(to top, rgb(0 0 0 / .55), transparent); }
 [data-ds-media] [data-slot="overlay"] > * { pointer-events: auto; }
 [data-ds-price] { display: inline-flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; color: ${FG}; }
 [data-ds-price] [data-slot="list"] { font-size: .85em; color: ${FG3}; text-decoration: line-through; }

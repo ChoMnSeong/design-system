@@ -20,11 +20,13 @@ export type MediaProps = {
     radius?: number | string
     /** 이미지 위에 얹는 요소 (배지 · 찜 버튼 · 이어보기 막대) */
     overlay?: ReactNode
+    /** 이미지 아래쪽 글. 가장자리에서 띄우고 아래만 어둡게 깔아 읽히게 한다 */
+    caption?: ReactNode
     style?: CSSProperties
     className?: string
 }
 
-export const Media = ({ src, alt, ratio = '1', placeholder = 'blur', placeholderSrc, placeholderColor, lazy = true, fit = 'cover', radius, overlay, style, className }: MediaProps) => {
+export const Media = ({ src, alt, ratio = '1', placeholder = 'blur', placeholderSrc, placeholderColor, lazy = true, fit = 'cover', radius, overlay, caption, style, className }: MediaProps) => {
     const [loaded, setLoaded] = useState(false)
     const r = typeof ratio === 'number' ? String(ratio) : ratio.replace('/', ' / ')
     const showPh = !loaded && placeholder !== 'none'
@@ -32,6 +34,7 @@ export const Media = ({ src, alt, ratio = '1', placeholder = 'blur', placeholder
         <div data-ds-media="" data-placeholder={placeholder} className={className} style={{ ...style, '--_ratio': r, '--_fit': fit, '--_r': typeof radius === 'number' ? `${radius}px` : radius } as CSSProperties}>
             {showPh && <div data-slot="ph" aria-hidden style={placeholder === 'color' ? { background: placeholderColor } : { backgroundImage: placeholderSrc ? `url(${placeholderSrc})` : undefined, background: placeholderSrc ? undefined : placeholderColor }} />}
             {src && <img src={src} alt={alt} loading={lazy ? 'lazy' : 'eager'} decoding="async" data-loading={loaded ? undefined : ''} onLoad={() => setLoaded(true)} />}
+            {caption && <div data-slot="caption">{caption}</div>}
             {overlay && <div data-slot="overlay">{overlay}</div>}
         </div>
     )
