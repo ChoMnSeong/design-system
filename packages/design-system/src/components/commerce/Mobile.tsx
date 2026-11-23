@@ -92,8 +92,8 @@ export const VideoPlayer = ({
             {!playing && t === 0 && <button type="button" data-slot="center" aria-label="재생" onClick={toggle}><LuPlay size={30} /></button>}
             <div data-slot="ui">
                 {title && <div data-slot="title">{subtitle && <small>{subtitle}</small>}{title}</div>}
-                {inSkip && <button type="button" data-slot="skip" onClick={() => seekTo(skip!.to)}>{skip!.label ?? '오프닝 건너뛰기'}</button>}
-                {showNext && !inSkip && (
+                {inSkip && (playing || t > 0) && <button type="button" data-slot="skip" onClick={() => seekTo(skip!.to)}>{skip!.label ?? '오프닝 건너뛰기'}</button>}
+                {showNext && !(inSkip && (playing || t > 0)) && (
                     <div data-slot="next">
                         <span><small style={{ display: 'block', opacity: .7 }}>다음 화</small>{next!.title}</span>
                         <button type="button" onClick={next!.onPlay} style={{ all: 'unset', cursor: 'pointer', padding: '6px 12px', background: '#fff', color: '#000', borderRadius: 6, fontWeight: 600 }}>

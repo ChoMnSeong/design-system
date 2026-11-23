@@ -18,9 +18,9 @@ export const BottomSheetPage = () => {
                     <div style={{ padding: 16 }}>
                         <div style={{ fontSize: 15, marginBottom: 6 }}>캐시미어 니트</div>
                         <Price value={62300} listPrice={89000} size="lg" />
-                        <div style={{ marginTop: 12 }}><Button onClick={() => setOpen(true)} style={{ width: '100%' }}>옵션 선택</Button></div>
+                        <div style={{ marginTop: 12 }}><Button size="lg" onClick={() => setOpen(true)} style={{ width: '100%', height: 48, fontSize: 15 }}>옵션 선택</Button></div>
                     </div>
-                    <BottomSheet inline open={open} onOpenChange={setOpen} snapPoints={[0.55, 0.88]} title="옵션 선택" footer={<><Price value={62300 * 1} size="md" /><Button style={{ flex: 1 }} onClick={() => setOpen(false)}>장바구니 담기</Button></>}>
+                    <BottomSheet inline open={open} onOpenChange={setOpen} snapPoints={[0.55, 0.88]} title="옵션 선택" footer={<><Price value={62300 * 1} size="md" /><Button size="lg" style={{ flex: 1, height: 48, fontSize: 15 }} onClick={() => setOpen(false)}>장바구니 담기</Button></>}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             <OptionPicker type="chip" label="사이즈" value={size} onChange={setSize} options={['S', 'M', 'L', 'XL'].map((s) => ({ value: s, label: s, stock: s === 'XL' ? 1 : 9 }))} />
                             <QuantityInput style={{ alignSelf: 'flex-start' }} />

@@ -43,7 +43,7 @@ export type HeroProps = {
     style?: CSSProperties
 }
 
-export const Hero = ({ layout = 'overlay', media, mediaAlt = '', scrim = 0.7, eyebrow, title, titleSize = 'md', description, actions, height, radius, style }: HeroProps) => {
+export const Hero = ({ layout = 'overlay', media, mediaAlt = '', scrim = 0.7, eyebrow, title, titleSize = 'sm', description, actions, height, radius, style }: HeroProps) => {
     const m =
         typeof media === 'string' ? <img src={media} alt={mediaAlt} /> :
         media && typeof media === 'object' && 'video' in (media as any) ? <video src={(media as any).video} poster={(media as any).poster} autoPlay muted loop playsInline aria-label={mediaAlt} /> :
