@@ -8,7 +8,7 @@ const MUTED = 'var(--ds-color-background-muted)'
 const ACC = 'var(--ds-palette-primary-500)'
 export const B2C_CSS = `
 /* 큰 제목 · 화면 폭 · 섹션 여백 */
-[data-ds-display] { margin: 0; color: ${FG}; font-family: var(--ds-typography-font-family-display, inherit); text-wrap: balance; }
+[data-ds-display] { margin: 0; color: ${FG}; font-family: var(--ds-typography-font-family-display, inherit); text-wrap: balance; word-break: keep-all; overflow-wrap: anywhere; }
 ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size: clamp(32px, calc(var(--ds-typography-role-hero-${s}-font-size, 48px) * .55 + 2vw), var(--ds-typography-role-hero-${s}-font-size)); font-weight: var(--ds-typography-role-hero-${s}-font-weight); line-height: var(--ds-typography-role-hero-${s}-line-height); letter-spacing: var(--ds-typography-role-hero-${s}-letter-spacing); }`).join('\n')}
 [data-ds-container] { width: 100%; margin-inline: auto; box-sizing: border-box; padding-inline: 16px; }
 @media (min-width: 768px) { [data-ds-container] { padding-inline: 32px; } }

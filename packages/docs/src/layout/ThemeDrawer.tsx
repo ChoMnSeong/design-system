@@ -103,6 +103,7 @@ export const ThemeDrawer = ({ open, onClose }: Props) => {
             />
             <aside
                 aria-hidden={!open}
+                inert={!open || undefined}
                 style={{
                     position: 'fixed',
                     top: 0,

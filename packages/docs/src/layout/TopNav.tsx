@@ -1,13 +1,22 @@
+import type { RefObject } from 'react'
+import { LuMenu, LuSlidersHorizontal } from 'react-icons/lu'
 import { IconMoon, IconSun, useDesignSystem } from '@ensnif/design-system'
 
 type Props = {
     onOpenSettings: () => void
+    onOpenMenu: () => void
+    menuOpen: boolean
+    menuButtonRef: RefObject<HTMLButtonElement | null>
+    /** 모바일 서랍이 열린 동안 뒤 머리말을 막는다 */
+    inert?: boolean
 }
 
-export const TopNav = ({ onOpenSettings }: Props) => {
+export const TopNav = ({ onOpenSettings, onOpenMenu, menuOpen, menuButtonRef, inert }: Props) => {
     const { theme, toggleMode } = useDesignSystem()
     return (
         <header
+            className="docs-header"
+            inert={inert || undefined}
             style={{
                 position: 'sticky',
                 top: 0,
@@ -25,14 +34,27 @@ export const TopNav = ({ onOpenSettings }: Props) => {
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '14px',
+                    gap: '10px',
+                    minWidth: 0,
                 }}
             >
+                <button
+                    ref={menuButtonRef}
+                    type="button"
+                    className="docs-menu-button"
+                    aria-label="메뉴 열기"
+                    aria-expanded={menuOpen}
+                    aria-controls="docs-sidebar"
+                    onClick={onOpenMenu}
+                >
+                    <LuMenu size={20} />
+                </button>
                 <div
                     style={{
                         width: '24px',
                         height: '24px',
                         borderRadius: '6px',
+                        flex: 'none',
                         background: 'var(--ds-color-accent-background)',
                         display: 'flex',
                         alignItems: 'center',
@@ -45,6 +67,7 @@ export const TopNav = ({ onOpenSettings }: Props) => {
                     L
                 </div>
                 <span
+                    className="docs-brand-name"
                     style={{
                         fontSize: '14px',
                         fontWeight: 600,
@@ -60,6 +83,7 @@ export const TopNav = ({ onOpenSettings }: Props) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
+                    flex: 'none',
                 }}
             >
                 <button
@@ -76,11 +100,17 @@ export const TopNav = ({ onOpenSettings }: Props) => {
                 </button>
                 <button
                     onClick={onOpenSettings}
+                    aria-label="테마 설정"
                     style={{
                         ...primaryButtonStyle,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        minHeight: '34px',
                     }}
                 >
-                    Customize
+                    <LuSlidersHorizontal size={14} className="docs-customize-icon" aria-hidden />
+                    <span className="docs-customize-label">Customize</span>
                 </button>
             </div>
         </header>
