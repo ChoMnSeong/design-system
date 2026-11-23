@@ -3,10 +3,13 @@ import { refLines, toRows, type SimpleChartCommon } from './chartSeries.js'
 import type { Tone } from '../types.js'
 
 export type BarChartProps = SimpleChartCommon & {
+    /** 막대 모서리 둥글게 */
     rounded?: boolean
+    /** vertical: 세로 막대 · horizontal: 가로 막대 */
     orientation?: 'vertical' | 'horizontal'
     /** @deprecated orientation="horizontal" */
     horizontal?: boolean
+    /** 막대 끝에 값 글자 */
     showValueOnBar?: boolean
     /** @deprecated tone 으로 일반화: (value) => Tone */
     colorByValue?: boolean
@@ -14,12 +17,17 @@ export type BarChartProps = SimpleChartCommon & {
     tone?: (value: number, index: number) => Tone | string | undefined
     /** 막대 사이 간격 비율 0~0.8 (기존 px 값은 무시) */
     barGap?: number
+    /** 작은 값도 보이게 하는 막대 최소 길이 (px) */
     minBarHeight?: number
+    /** grouped: 나란히 · stacked: 쌓기 · overlap: 겹치기 */
     barMode?: CartesianChartProps['barMode']
+    /** normal: 값 그대로 · percent: 100% 기준으로 쌓기 */
     stackMode?: CartesianChartProps['stackMode']
+    /** 막대를 눌렀을 때 (시리즈, 인덱스). onPointClick 보다 우선 */
     onBarClick?: CartesianChartProps['onPointClick']
 }
 
+/** 막대 차트 (단일 · 그룹 · 쌓기 · 가로) */
 export const BarChart = ({
     data,
     labels,

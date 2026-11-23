@@ -5,18 +5,25 @@ import { baseOf, useResponsiveCss, type Responsive } from '../responsive.js'
 const gapOf = (g: string | number) => (typeof g === 'number' ? `${g}px` : g)
 
 export type StackProps = {
+    /** row 가로 · column 세로. 단계별 값도 된다 */
     direction?: Responsive<'row' | 'column'>
     /** px 숫자 또는 CSS 길이. 토큰은 space(3) */
     gap?: Responsive<number | string>
+    /** 교차축 정렬 (align-items) */
     align?: CSSProperties['alignItems']
+    /** 주축 정렬 (justify-content) */
     justify?: CSSProperties['justifyContent']
+    /** 넘치면 줄바꿈 */
     wrap?: boolean
+    /** inline-flex 로 그린다 */
     inline?: boolean
     /** 자식 사이 구분선. true 면 기본 선, 노드면 그 노드 */
     divider?: boolean | ReactNode
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
+/** 자식을 한 방향으로 쌓는 flex 상자 */
 export const Stack = ({ direction = 'column', gap = 8, align, justify, wrap, inline, divider, style, children, ref, ...rest }: StackProps) => {
     const { attr, css } = useResponsiveCss({
         direction: [direction, (d) => `flex-direction:${d}`],
@@ -55,14 +62,19 @@ export const Stack = ({ direction = 'column', gap = 8, align, justify, wrap, inl
     )
 }
 
+/** 가로로 쌓는 Stack */
 export const HStack = (props: Omit<StackProps, 'direction'>) => <Stack {...props} direction="row" />
+/** 세로로 쌓는 Stack */
 export const VStack = (props: Omit<StackProps, 'direction'>) => <Stack {...props} direction="column" />
 
 export type SpacerProps = {
+    /** 크기. 숫자는 px, auto 는 남은 공간을 채운다 */
     size?: string | number
+    /** 크기를 줄 방향 */
     axis?: 'horizontal' | 'vertical' | 'both'
 } & HTMLAttributes<HTMLSpanElement>
 
+/** 자식 사이 빈 공간 */
 export const Spacer = ({ size = 'auto', axis = 'both', style, ...rest }: SpacerProps) => {
     const value = typeof size === 'number' ? `${size}px` : size
     return (
@@ -83,12 +95,15 @@ export const Spacer = ({ size = 'auto', axis = 'both', style, ...rest }: SpacerP
 export type GridProps = {
     /** 열 수 또는 단계별 열 수 { 0: 1, 640: 2, 1024: 4 } */
     columns?: Responsive<number>
+    /** 칸 사이 간격. 숫자는 px */
     gap?: number | string
     /** 지정하면 columns 대신 auto-fill 로 최소 폭(px)에 맞춰 채운다 */
     minChildWidth?: number
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
+/** 열 수 또는 최소 폭으로 나누는 grid 상자 */
 export const Grid = ({ columns = 2, gap = 16, minChildWidth, style, ref, ...rest }: GridProps) => {
     const { attr, css } = useResponsiveCss({ columns: [minChildWidth ? undefined : columns, (n) => `grid-template-columns:repeat(${n},minmax(0,1fr))`] })
     return (

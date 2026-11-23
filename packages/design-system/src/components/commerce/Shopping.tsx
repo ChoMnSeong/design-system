@@ -6,20 +6,29 @@ import { LuMinus, LuPlus, LuSearch, LuX } from 'react-icons/lu'
 /* ───────── QuantityInput ───────── */
 
 export type QuantityInputProps = {
+    /** 제어 모드 값 */
     value?: number
+    /** 비제어 초기값 */
     defaultValue?: number
+    /** 값이 바뀔 때 (min ~ max 로 맞춘 새 값) */
     onChange?: (n: number) => void
+    /** 최솟값. 비우고 나가면 이 값 */
     min?: number
     /** 재고 */
     max?: number
+    /** −/+ 버튼 한 번에 바뀌는 양 */
     step?: number
     /** sm 32 (장바구니) · md 40 (상품 상세) */
     size?: 'sm' | 'md'
+    /** 버튼 · 입력 모두 끔 */
     disabled?: boolean
+    /** 묶음 이름 (스크린 리더) */
     'aria-label'?: string
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** −/+ 버튼과 직접 입력으로 고르는 수량 */
 export const QuantityInput = ({ value, defaultValue = 1, onChange, min = 1, max, step = 1, size = 'md', disabled, style, ...rest }: QuantityInputProps) => {
     const [inner, setInner] = useState(defaultValue)
     const v = value ?? inner
@@ -48,23 +57,30 @@ export const QuantityInput = ({ value, defaultValue = 1, onChange, min = 1, max,
 
 /* ───────── OptionPicker ───────── */
 
-export type PickerOption = { value: string; label: string; color?: string; stock?: number }
+export type PickerOption = { /** 옵션 값 */ value: string; /** 표시 이름 */ label: string; /** swatch 점 색 */ color?: string; /** 재고. 0 이면 품절 */ stock?: number }
 
 export type OptionPickerProps = {
     /** swatch: 색상 점 · chip: 사이즈 칩 · select: 드롭다운 */
     type?: 'swatch' | 'chip' | 'select'
+    /** 제목. swatch · chip 은 고른 옵션 이름이 옆에 붙는다 */
     label?: ReactNode
+    /** 고를 옵션 목록 */
     options: PickerOption[]
+    /** 제어 모드 값 */
     value?: string
+    /** 비제어 초기값 */
     defaultValue?: string
+    /** 값이 바뀔 때 (새 값) */
     onChange?: (v: string) => void
     /** 이 수 이하면 '적음' 표시 */
     lowStock?: number
     /** 품절도 고를 수 있게 (재입고 알림용) */
     allowSoldOut?: boolean
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 색상 · 사이즈 같은 상품 옵션 선택. 품절 · 재고 적음 표시 */
 export const OptionPicker = ({ type = 'chip', label, options, value, defaultValue, onChange, lowStock = 3, allowSoldOut, style }: OptionPickerProps) => {
     const [inner, setInner] = useState(defaultValue)
     const v = value ?? inner
@@ -127,13 +143,19 @@ export const OptionPicker = ({ type = 'chip', label, options, value, defaultValu
 /* ───────── SearchBox ───────── */
 
 export type SearchBoxProps = {
+    /** 제어 모드 값 */
     value?: string
+    /** 비제어 초기값 */
     defaultValue?: string
+    /** 값이 바뀔 때 (새 값) */
     onChange?: (q: string) => void
+    /** 검색할 때 (검색어). Enter 나 목록 항목을 고르면 */
     onSearch?: (q: string) => void
+    /** 빈 입력칸 안내 문구 */
     placeholder?: string
     /** 비었을 때 최근 검색어 */
     recent?: string[]
+    /** 최근 검색어 삭제를 누를 때 (검색어, 전체 삭제면 null) */
     onRecentRemove?: (q: string | null) => void
     /** 비었을 때 인기 검색어 */
     trending?: string[]
@@ -141,7 +163,9 @@ export type SearchBoxProps = {
     suggest?: (q: string) => Promise<string[]> | string[]
     /** 입력어 강조 */
     highlight?: boolean
+    /** 입력 뒤 suggest 를 부르기까지 기다리는 시간(ms) */
     debounce?: number
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
@@ -152,6 +176,7 @@ const hl = (text: string, q: string) => {
     return <>{text.slice(0, i)}<mark>{text.slice(i, i + q.length)}</mark>{text.slice(i + q.length)}</>
 }
 
+/** 최근 · 인기 · 연관 검색어 패널이 붙는 검색창 */
 export const SearchBox = ({ value, defaultValue = '', onChange, onSearch, placeholder = '검색어를 입력하세요', recent, onRecentRemove, trending, suggest, highlight = true, debounce = 150, style }: SearchBoxProps) => {
     const [inner, setInner] = useState(defaultValue)
     const q = value ?? inner

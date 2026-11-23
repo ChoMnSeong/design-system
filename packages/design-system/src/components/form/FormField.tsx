@@ -14,26 +14,37 @@ import { FormContext, useFormContext, type FormContextValue } from './Field.js'
 import type { FieldSize } from '../types.js'
 
 export type FormFieldProps = {
+    /** 필드 라벨 */
     label?: ReactNode
+    /** 라벨이 가리킬 id. 없으면 자동 생성해 자식에 주입 */
     htmlFor?: string
+    /** 라벨에 * 표시 + 자식에 aria-required */
     required?: boolean
+    /** true 면 "(선택)", 문자열이면 그 문구 */
     optional?: boolean | ReactNode
+    /** 라벨 옆 (i) 도움말 */
     tooltip?: ReactNode
     /** 라벨 아래 보조 설명 */
     description?: ReactNode
     /** 입력 아래 안내 (오류가 있으면 오류가 대신 보인다) */
     hint?: ReactNode
+    /** 오류 문구. 자식에 invalid · aria-invalid 주입 */
     error?: ReactNode
     /** vertical: 라벨 위 · horizontal: 라벨 왼쪽(labelWidth) · inline: 한 줄 (필터바) */
     layout?: 'vertical' | 'horizontal' | 'inline'
+    /** horizontal 라벨 열 폭 (px) */
     labelWidth?: number
+    /** horizontal 라벨 정렬 */
     labelAlign?: 'left' | 'right'
     /** Form columns 안에서 차지할 칸 수 */
     span?: number
+    /** 입력 컨트롤 (단일 요소면 id·aria 속성 주입) */
     children: ReactNode
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
+/** 라벨·설명·오류를 입력 컨트롤과 묶는 필드 */
 export const FormField = ({
     label,
     htmlFor,
@@ -120,8 +131,11 @@ export const FormField = ({
 }
 
 export type FormProps = {
+    /** 하위 FormField 의 기본 배치 (vertical · horizontal · inline) */
     layout?: FormContextValue['layout']
+    /** 하위 FormField 의 기본 라벨 폭 (px) */
     labelWidth?: number
+    /** 하위 FormField 의 기본 라벨 정렬 */
     labelAlign?: 'left' | 'right'
     /** 하위 입력 컨트롤의 기본 크기 */
     size?: FieldSize
@@ -133,9 +147,11 @@ export type FormProps = {
     columns?: number | Record<number, number>
     /** 열 사이 간격 (px) */
     gap?: number
+    /** DOM 요소 ref */
     ref?: Ref<HTMLFormElement>
 } & FormHTMLAttributes<HTMLFormElement>
 
+/** 하위 필드에 배치·크기·상태를 내려주는 격자 폼 */
 export const Form = ({
     layout = 'vertical',
     labelWidth,

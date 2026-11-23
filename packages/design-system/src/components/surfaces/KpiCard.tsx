@@ -5,17 +5,23 @@ import { StatusIndicator } from '../display/Avatar.js'
 import type { Tone } from '../types.js'
 
 export type KpiCardProps = Omit<CardProps, 'children'> & {
+    /** 지표 이름 */
     label: ReactNode
+    /** 값. 숫자로 읽히면 달성률 계산에 쓴다 */
     value: ReactNode
     /** 값보다 작게 붙는 단위 */
     unit?: ReactNode
     /** 목표. value 가 숫자면 달성률 막대와 목표 마커를 그린다 */
     target?: number
+    /** 목표 글자를 만들 때 (목표). 없으면 '목표 N' */
     targetLabel?: (target: number) => ReactNode
     /** 증감. tone 이 없으면 trend 와 부호로 정한다 */
     delta?: { value: ReactNode; tone?: Tone }
+    /** 좋은 방향. 증감 색과 달성 판정에 쓴다 */
     trend?: 'up-good' | 'down-good'
+    /** 추이 그래프 데이터. 배열이면 선 그래프 */
     sparkline?: number[] | { type: 'line' | 'bar'; data: number[] }
+    /** 카드 맨 아래 내용 */
     footer?: ReactNode
 }
 
@@ -68,7 +74,9 @@ export const KpiCard = ({ label, value, unit, target, targetLabel, delta, trend 
 export type StatusDef = { label: ReactNode; tone: Tone; pulse?: boolean }
 
 export type StatusCardProps = Omit<CardProps, 'children' | 'title' | 'status'> & {
+    /** 설비 · 라인 이름 */
     title: ReactNode
+    /** 현재 상태 값 (statusMap 의 키) */
     status: string
     /** 상태 값 → 라벨 · 톤. 업무마다 다르므로 직접 정한다 */
     statusMap: Record<string, StatusDef>
@@ -78,6 +86,7 @@ export type StatusCardProps = Omit<CardProps, 'children' | 'title' | 'status'> &
     updatedAt?: Date | string
     /** 왼쪽 아래 보조 정보 (작업지시 번호 등) */
     caption?: ReactNode
+    /** 오른쪽 아래 버튼 */
     actions?: ReactNode
 }
 

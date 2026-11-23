@@ -8,11 +8,15 @@ export type ToastTone = Tone
 export type ToastOptions = {
     /** 같은 id 로 다시 부르면 새로 쌓지 않고 바꾼다 (중복 방지) */
     id?: string
+    /** 굵은 제목 */
     title?: ReactNode
+    /** 제목 아래 설명 */
     description?: ReactNode
+    /** 색과 아이콘. danger·warning 은 role="alert" */
     tone?: Tone
     /** ms. 0 이면 닫을 때까지 남는다. 기본 4000 */
     duration?: number
+    /** 동작 버튼 (누르면 onClick 후 토스트 닫힘) */
     action?: { label: string; onClick: () => void }
     /** duration 과 무관하게 남긴다 (오류 · 확인 필요) */
     persistent?: boolean
@@ -57,7 +61,9 @@ const ToastContext = createContext<ToastContextValue | null>(null)
 export type ToastPlacement = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
 
 export type ToastProviderProps = {
+    /** useToast 를 쓸 앱 영역 */
     children: ReactNode
+    /** 토스트가 쌓이는 화면 위치 */
     placement?: ToastPlacement
     /** 한 번에 보일 최대 개수. 넘치면 오래된 것부터 닫는다 */
     max?: number
@@ -66,6 +72,7 @@ export type ToastProviderProps = {
 const toOpts = (v: ToastOptions | ReactNode): ToastOptions =>
     v && typeof v === 'object' && !('$$typeof' in (v as object)) && ('title' in (v as object) || 'description' in (v as object)) ? (v as ToastOptions) : { title: v as ReactNode }
 
+/** 토스트 상태를 관리하고 화면에 띄우는 Provider */
 export const ToastProvider = ({ children, placement = 'bottom-right', max = 5 }: ToastProviderProps) => {
     const [items, setItems] = useState<ToastItem[]>([])
     const seq = useRef(0)

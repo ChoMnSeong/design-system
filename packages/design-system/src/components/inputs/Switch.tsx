@@ -4,19 +4,25 @@ import type { FieldSize, Tone } from '../types.js'
 export type SwitchProps = {
     /** xs 24×14 · sm 28×16 · md 36×20 · lg 44×24 */
     size?: FieldSize
+    /** 스위치 옆 라벨 */
     label?: ReactNode
     /** 라벨을 스위치 앞(start)에 둘지 뒤(end)에 둘지. 기본 end */
     labelPosition?: 'start' | 'end'
     /** 켜짐·꺼짐에 따라 바뀌는 라벨. label 보다 우선 */
     onLabel?: ReactNode
+    /** 꺼짐일 때 라벨. label 보다 우선 */
     offLabel?: ReactNode
     /** 변경을 서버에 반영하는 중. 스위치 대신 스피너를 보이고 입력을 막는다 */
     loading?: boolean
+    /** 켜졌을 때 색 */
     tone?: Tone
+    /** 켜짐 상태가 바뀔 때 (checked) */
     onCheckedChange?: (checked: boolean) => void
+    /** DOM 요소 ref */
     ref?: Ref<HTMLInputElement>
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'>
 
+/** 켜고 끄는 토글 스위치 */
 export const Switch = ({
     size = 'md',
     label,

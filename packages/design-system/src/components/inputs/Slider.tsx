@@ -8,31 +8,45 @@ type SliderValue = number | [number, number]
 export type SliderProps<V extends SliderValue = SliderValue> = {
     /** 숫자 하나 또는 [시작, 끝] 범위 */
     value?: V
+    /** 비제어 초기값. 없으면 min */
     defaultValue?: V
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: V) => void
     /** @deprecated onValueChange 를 쓴다 */
     onChange?: (value: V) => void
+    /** 최솟값 */
     min?: number
+    /** 최댓값 */
     max?: number
+    /** 값 간격 */
     step?: number
+    /** 비활성 */
     disabled?: boolean
     /** 값 말풍선. auto 는 잡고 있을 때·포커스일 때만 */
     showTooltip?: 'auto' | 'always' | 'never'
     /** @deprecated showTooltip 을 쓴다. true = 'always' */
     showLabel?: boolean
+    /** 말풍선과 스크린리더에 보일 값 서식 */
     formatValue?: (n: number) => string
     /** 눈금. label 이 있으면 아래에 글자를 단다 */
     marks?: SliderMark[]
+    /** 방향. vertical 이면 length 가 높이 */
     orientation?: 'horizontal' | 'vertical'
     /** 세로일 때 높이 */
     length?: number | string
+    /** 채운 구간 색 */
     tone?: Tone
+    /** 가로일 때 부모 너비를 채운다 */
     fullWidth?: boolean
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
+    /** 접근성 이름. 범위면 뒤에 시작·끝 */
     'aria-label'?: string
+    /** DOM 요소 ref (범위면 첫 손잡이) */
     ref?: Ref<HTMLInputElement>
 }
 
+/** 끌어서 값이나 범위를 고르는 슬라이더 */
 export const Slider = <V extends SliderValue = number>({
     value: valueProp,
     defaultValue,

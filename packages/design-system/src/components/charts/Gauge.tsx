@@ -5,14 +5,19 @@ import { chartColor } from './CartesianChart.js'
 const SIZE: Record<string, number> = { sm: 96, md: 140, lg: 200 }
 
 export type GaugeProps = {
+    /** 현재 값 */
     value: number
+    /** 호 시작 값 */
     min?: number
+    /** 호 끝 값 */
     max?: number
     /** sm 96 · md 140 · lg 200 또는 px */
     size?: 'sm' | 'md' | 'lg' | number
+    /** 호 두께 px (없으면 크기에 비례) */
     thickness?: number
     /** 호 각도 */
     arc?: 180 | 240 | 270
+    /** 채움 색 톤 (ranges 구간이 우선) */
     tone?: Tone
     /** 구간 색 (불량 · 주의 · 정상). 값이 속한 구간 색으로 채운다 */
     ranges?: Array<{ from: number; to: number; tone: Tone }>
@@ -20,13 +25,19 @@ export type GaugeProps = {
     target?: number
     /** @deprecated tone · ranges 를 쓴다 (직접 색은 유지) */
     color?: string
+    /** 배경 호 색 */
     trackColor?: string
+    /** 가운데 값 아래 설명 */
     label?: ReactNode
+    /** 가운데 값 형식 (value - min, max - min) */
     formatValue?: (n: number, max: number) => string
+    /** 바깥 요소 style */
     style?: CSSProperties
+    /** 접근성 이름 (없으면 문자열 label) */
     'aria-label'?: string
 }
 
+/** 원호형 게이지 (달성률 · 가동률) */
 export const Gauge = ({
     value,
     min = 0,

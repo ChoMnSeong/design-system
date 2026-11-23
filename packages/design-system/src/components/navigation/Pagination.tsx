@@ -4,18 +4,25 @@ import { IconChevronLeft, IconChevronRight } from '../icons.js'
 import { Select } from '../inputs/Select.js'
 
 export type PaginationProps = {
+    /** 현재 페이지 (1부터) */
     page: number
+    /** 전체 페이지 수 */
     pageCount?: number
+    /** 페이지를 바꿀 때 (새 페이지) */
     onPageChange?: (page: number) => void
     /** @deprecated onPageChange 를 쓴다 */
     onChange?: (page: number) => void
+    /** 현재 페이지 양옆에 보일 번호 수 */
     siblings?: number
     /** 처음 · 끝 버튼 */
     showEdges?: boolean
     /** outlined: 버튼마다 테두리 · 그 밖: 테두리 없음 */
     variant?: BorderVariant
+    /** 페이지당 행 수 */
     pageSize?: number
+    /** 페이지당 행 수 선택지 (pageSize 와 함께면 Select 표시) */
     pageSizeOptions?: number[]
+    /** 행 수를 바꿀 때 (새 행 수) */
     onPageSizeChange?: (size: number) => void
     /** pageCount 대신 줄 수 있다 (pageSize 와 함께) */
     totalCount?: number
@@ -25,6 +32,7 @@ export type PaginationProps = {
     showJumper?: boolean
     /** full: 번호 · simple: 5 / 26 · compact: 이전/다음 + 범위 */
     appearance?: 'full' | 'simple' | 'compact'
+    /** 버튼 sm 26 · md 32 (px) */
     size?: 'sm' | 'md'
 } & Omit<HTMLAttributes<HTMLElement>, 'onChange'>
 
@@ -55,6 +63,7 @@ const ICON_LAST = (
     </svg>
 )
 
+/** 페이지 이동 버튼과 행 수 · 총 건수 표시 */
 export const Pagination = ({
     page,
     pageCount: pageCountProp,

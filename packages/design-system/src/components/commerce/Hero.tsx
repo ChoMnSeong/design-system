@@ -4,7 +4,7 @@ import { Display } from '../layout/Container.js'
 
 /* 큰 배너 · 슬라이드 · 가로로 넘기는 줄 */
 
-export type PerView = number | { sm?: number; md?: number; lg?: number }
+export type PerView = number | { /** 폭 768 미만 */ sm?: number; /** 폭 768 ~ 1279 */ md?: number; /** 폭 1280 이상 */ lg?: number }
 
 /** sm < 768 ≤ md < 1280 ≤ lg */
 export const usePerView = (pv: PerView) => {
@@ -30,19 +30,29 @@ export type HeroProps = {
     layout?: 'overlay' | 'split' | 'center'
     /** 이미지 주소, 또는 { video, poster } */
     media?: string | { video: string; poster?: string } | ReactNode
+    /** 이미지 대체 텍스트 (영상이면 aria-label) */
     mediaAlt?: string
     /** 아래쪽 어둡게 강도 0~1 */
     scrim?: number
+    /** 제목 위 작은 글 */
     eyebrow?: ReactNode
+    /** 큰 제목 (h2) */
     title: ReactNode
+    /** 제목 크기. hero 타이포 역할 sm · md · lg */
     titleSize?: 'sm' | 'md' | 'lg'
+    /** 제목 아래 설명 */
     description?: ReactNode
+    /** 아래쪽 버튼 자리 */
     actions?: ReactNode
+    /** 최소 높이. 숫자면 px (기본 overlay · center 520, split 360) */
     height?: number | string
+    /** 모서리 둥글기. 숫자면 px */
     radius?: number | string
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 큰 배너. 이미지 · 영상 위나 옆에 제목과 버튼을 놓는다 */
 export const Hero = ({ layout = 'overlay', media, mediaAlt = '', scrim = 0.7, eyebrow, title, titleSize = 'sm', description, actions, height, radius, style }: HeroProps) => {
     const m =
         typeof media === 'string' ? <img src={media} alt={mediaAlt} /> :
@@ -64,24 +74,37 @@ export const Hero = ({ layout = 'overlay', media, mediaAlt = '', scrim = 0.7, ey
 /* ───────── Carousel ───────── */
 
 export type CarouselProps = {
+    /** 슬라이드들 (자식 하나가 한 장) */
     children: ReactNode
     /** 자동 넘김 간격(ms). 마우스를 올리거나 포커스가 있으면 멈춘다 */
     autoplay?: number
+    /** 끝에서 처음으로 이어 넘기기. 끄면 양 끝 화살표 비활성 */
     loop?: boolean
+    /** 한 번에 보이는 장 수. 객체면 화면 폭별 */
     perView?: PerView
+    /** 슬라이드 사이 간격(px) */
     gap?: number
+    /** dots: 점 · count: "1 / 5" (autoplay 면 멈춤 버튼) · thumbs: 썸네일 */
     indicator?: 'dots' | 'count' | 'thumbs' | 'none'
     /** indicator="thumbs" 일 때 썸네일 주소 */
     thumbs?: string[]
+    /** 좌우 화살표 버튼 (넘길 장이 있을 때) */
     arrows?: boolean
+    /** 제어 모드 현재 장 번호 (0부터) */
     index?: number
+    /** 비제어 초기 장 번호 */
     defaultIndex?: number
+    /** 장이 바뀔 때 (새 번호) */
     onIndexChange?: (i: number) => void
+    /** 모서리 둥글기(px) */
     radius?: number
+    /** 캐러셀 영역 이름 (스크린 리더) */
     'aria-label'?: string
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 한 장씩 넘기는 슬라이드. 스와이프 · 좌우 화살표 키로 넘긴다 */
 export const Carousel = ({ children, autoplay, loop = true, perView = 1, gap = 0, indicator = 'dots', thumbs, arrows = true, index: indexProp, defaultIndex = 0, onIndexChange, radius, style, ...rest }: CarouselProps) => {
     const slides = Children.toArray(children)
     const pv = usePerView(perView)
@@ -153,21 +176,29 @@ export const Carousel = ({ children, autoplay, loop = true, perView = 1, gap = 0
 /* ───────── Rail ───────── */
 
 export type RailProps = {
+    /** 머리 제목 (h3) */
     title?: ReactNode
+    /** 제목 아래 보조 글 */
     subtitle?: ReactNode
     /** 오른쪽 위 '전체 보기' 등 */
     action?: ReactNode
+    /** 줄에 놓을 카드들 (자식 하나가 한 칸) */
     children: ReactNode
+    /** 한 화면에 보이는 칸 수. 객체면 화면 폭별 */
     perView?: PerView
     /** 다음 칸이 비치는 비율 */
     peek?: number
+    /** 칸 사이 간격(px) */
     gap?: number
+    /** 스크롤이 멈출 때 칸을 맞추는 위치 */
     snap?: 'start' | 'center'
     /** 머리 오른쪽에 이전·다음 버튼 */
     arrows?: boolean
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 가로로 스크롤해 넘기는 카드 줄 */
 export const Rail = ({ title, subtitle, action, children, perView = { sm: 2, md: 4, lg: 5 }, peek = 0.3, gap = 12, snap = 'start', arrows = false, style }: RailProps) => {
     const pv = usePerView(perView)
     const ref = useRef<HTMLDivElement>(null)

@@ -20,6 +20,7 @@ export type CardProps = {
     glass?: { blur?: number; backdrop?: ReactNode }
     /** 목표 밖일 때만 톤을 깐다 (tinted 를 조건부로) */
     status?: Tone
+    /** 테두리 방식. 없으면 Provider 설정 */
     variant?: BorderVariant
     /** 안쪽 여백. false 면 없음 (Card.Media 를 끝까지) */
     padding?: SpaceToken | false
@@ -33,17 +34,27 @@ export type CardProps = {
     density?: Density | 'touch'
     /** hover · 포커스 링 · 클릭. onClick 이 있으면 자동으로 켜진다 */
     interactive?: boolean
+    /** 눌러서 선택을 켜고 끈다 (체크박스 역할) */
     selectable?: boolean
+    /** 제어 모드 선택 */
     selected?: boolean
+    /** 비제어 초기 선택 */
     defaultSelected?: boolean
+    /** 선택이 바뀔 때 (새 상태) */
     onSelectedChange?: (selected: boolean) => void
+    /** 머리말을 눌러 본문을 접는다 */
     collapsible?: boolean
+    /** 제어 모드 접힘 */
     collapsed?: boolean
+    /** 비제어 초기 접힘 */
     defaultCollapsed?: boolean
+    /** 접힘이 바뀔 때 (새 상태) */
     onCollapsedChange?: (collapsed: boolean) => void
     /** 내용 대신 스켈레톤 */
     loading?: boolean
+    /** 클릭 · 선택을 막는다 */
     disabled?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
@@ -54,6 +65,7 @@ type CardComponent = ((props: CardProps) => ReactNode) & {
     Header: typeof CardHeader; Title: typeof CardTitle; Description: typeof CardDescription; Body: typeof CardBody; Footer: typeof CardFooter; Media: typeof CardMedia; Section: typeof CardSection
 }
 
+/** 내용을 묶는 카드 표면. 선택 · 접기 · 로딩 표시 */
 export const Card: CardComponent = (({
     surface = 'card',
     media,
@@ -165,6 +177,7 @@ export type CardHeaderProps = {
     extra?: ReactNode
 } & HTMLAttributes<HTMLDivElement>
 
+/** 카드 머리말. collapsible 카드면 눌러서 접는다 */
 export const CardHeader = ({ actions, extra, children, ...rest }: CardHeaderProps) => {
     const ctx = useContext(CardContext)
     const main = (
@@ -188,21 +201,25 @@ export const CardHeader = ({ actions, extra, children, ...rest }: CardHeaderProp
     )
 }
 
+/** 카드 제목 (h3) */
 export const CardTitle = ({ children, ...rest }: HTMLAttributes<HTMLHeadingElement>) => (
     <h3 data-ds-card-title="" {...rest}>
         {children}
     </h3>
 )
+/** 카드 설명 문단 */
 export const CardDescription = (props: HTMLAttributes<HTMLParagraphElement>) => <p data-ds-card-description="" {...props} />
 
 const useHidden = () => {
     const ctx = useContext(CardContext)
     return { hidden: !!ctx?.collapsible && ctx.collapsed, id: ctx?.bodyId }
 }
+/** 카드 본문. 접히면 숨는다 */
 export const CardBody = (props: HTMLAttributes<HTMLDivElement>) => {
     const { hidden, id } = useHidden()
     return <div data-ds-card-body="" id={id} hidden={hidden} {...props} />
 }
+/** 카드 아래 영역. 접히면 숨는다 */
 export const CardFooter = (props: HTMLAttributes<HTMLDivElement>) => {
     const { hidden } = useHidden()
     return <div data-ds-card-footer="" hidden={hidden} {...props} />
@@ -218,7 +235,7 @@ export const CardSection = (props: HTMLAttributes<HTMLDivElement>) => {
 /* ── 대시보드 카드 슬롯 ── */
 
 /** 아이콘 + 짧은 라벨 */
-export const CardEyebrow = ({ icon, children, ...rest }: { icon?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
+export const CardEyebrow = ({ icon, children, ...rest }: { /** 라벨 앞 아이콘 */ icon?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
     <div data-ds-card-eyebrow="" {...rest}>
         {icon && <span aria-hidden>{icon}</span>}
         {children}
@@ -229,10 +246,13 @@ export const CardEyebrow = ({ icon, children, ...rest }: { icon?: ReactNode } & 
 export const CardActions = (props: HTMLAttributes<HTMLDivElement>) => <div data-ds-card-actions="" {...props} />
 
 export type CardMetricProps = {
+    /** 값. 숫자면 천 단위 구분 */
     value: number | string
+    /** 값 뒤 작은 단위 */
     unit?: ReactNode
     /** sm 24 · md 32 · lg 40 */
     size?: 'sm' | 'md' | 'lg'
+    /** 숫자 서식 (toLocaleString 옵션) */
     format?: Intl.NumberFormatOptions
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
@@ -245,11 +265,13 @@ export const CardMetric = ({ value, unit, size = 'md', format, ...rest }: CardMe
 )
 
 export type CardDeltaProps = {
+    /** 증감 값. 부호로 ▲▼ 와 색을 정한다 */
     value: number
     /** 비교 기준 (예: 계획 대비) */
     comparison?: ReactNode
     /** 감소가 좋은 지표(불량 · 정지시간)는 down */
     goodWhen?: 'up' | 'down'
+    /** 값을 글자로 바꿀 때 (값) */
     format?: (n: number) => string
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
@@ -267,12 +289,12 @@ export const CardDelta = ({ value, comparison, goodWhen = 'up', format = (n) => 
 }
 
 /** 그래프 자리. bleed 면 카드 가장자리까지 */
-export const CardVisual = ({ bleed, height, style, ...rest }: { bleed?: boolean | 'x' | 'bottom'; height?: number } & HTMLAttributes<HTMLDivElement>) => (
+export const CardVisual = ({ bleed, height, style, ...rest }: { /** 카드 여백을 넘어 가장자리까지. true: 좌우 · 아래 모두 · x: 좌우만 · bottom: 아래만 */ bleed?: boolean | 'x' | 'bottom'; /** 높이(px) */ height?: number } & HTMLAttributes<HTMLDivElement>) => (
     <div data-ds-card-visual="" data-bleed={bleed === true ? 'all' : bleed || undefined} style={{ height, ...style }} {...rest} />
 )
 
 /** 한 줄 설명 + 링크 (위 구분선) */
-export const CardNote = ({ icon, action, children, ...rest }: { icon?: ReactNode; action?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
+export const CardNote = ({ icon, action, children, ...rest }: { /** 문구 앞 아이콘 */ icon?: ReactNode; /** 오른쪽 링크 · 버튼 */ action?: ReactNode } & HTMLAttributes<HTMLDivElement>) => (
     <div data-ds-card-note="" {...rest}>
         {icon && <span aria-hidden>{icon}</span>}
         <span data-slot="text">{children}</span>

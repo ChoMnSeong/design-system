@@ -13,22 +13,31 @@ import { useBorderVariant } from '../../provider/useDesignSystem.js'
 import { FieldBox, useFormSize } from '../form/Field.js'
 
 export type TextareaProps = {
+    /** 글자·여백 크기. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 오류 상태. 빨간 테두리와 aria-invalid */
     invalid?: boolean
+    /** 부모 너비를 꽉 채운다 */
     fullWidth?: boolean
     /** @deprecated minRows · maxRows 를 쓴다. true 면 minRows=rows, maxRows 없음. */
     autoResize?: boolean
     /** 내용에 맞춰 높이를 늘린다. minRows 이상 maxRows 이하. */
     minRows?: number
+    /** 자동 높이의 최대 줄 수. 넘으면 스크롤 */
     maxRows?: number
     /** maxLength 와 함께 글자 수를 보여 준다. */
     showCount?: boolean
+    /** 손잡이로 늘리는 방향. 자동 높이면 none */
     resize?: 'none' | 'vertical' | 'both'
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: string) => void
+    /** DOM 요소 ref */
     ref?: Ref<HTMLTextAreaElement>
 } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>
 
+/** 여러 줄 텍스트 입력 */
 export const Textarea = ({
     size: sizeProp,
     variant: variantProp,

@@ -3,19 +3,27 @@ import { mergeStyles } from '../types.js'
 import { IconCheck } from '../icons.js'
 
 export type CodeBlockProps = {
+    /** 표시할 코드 문자열 */
     code: string
+    /** 머리글에 표시할 언어 이름 (하이라이팅 없음) */
     language?: string
+    /** 머리글에 표시할 파일 이름 */
     fileName?: ReactNode
+    /** 왼쪽 줄 번호 표시 */
     showLineNumbers?: boolean
+    /** 머리글의 복사 버튼 표시 */
     showCopy?: boolean
+    /** 최대 높이 (숫자는 px). 넘으면 스크롤 */
     maxHeight?: number | string
     /** 강조할 줄 번호 (1부터) */
     highlightLines?: number[]
     /** 긴 줄을 줄바꿈한다 (기본은 가로 스크롤) */
     wrap?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
+/** 파일명·언어·복사 버튼이 달린 코드 블록 */
 export const CodeBlock = ({
     code,
     language,

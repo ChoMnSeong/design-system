@@ -25,42 +25,63 @@ export type ComboBoxOption = Option
 export type OptionState = { selected: boolean; active: boolean }
 
 export type SelectProps = {
+    /** 고정 선택지. loadOptions 결과가 있으면 그것을 쓴다 */
     options?: Option[]
+    /** 제어 모드 값 (multiple 이면 배열) */
     value?: string | string[] | null
+    /** 비제어 초기값 */
     defaultValue?: string | string[] | null
     /** single 이면 string | null, multiple 이면 string[] */
     onValueChange?: (value: any) => void
     /** @deprecated onValueChange 를 쓴다. single 에서만 호출된다. */
     onChange?: (value: string) => void
+    /** 선택 전 안내 문구 */
     placeholder?: string
+    /** 보일 옵션이 없을 때 문구 */
     emptyMessage?: ReactNode
+    /** 여러 개 선택. 고른 값은 태그로 보인다 */
     multiple?: boolean
     /** 입력해서 거른다. Select 는 false, ComboBox 는 true. */
     searchable?: boolean
     /** 목록에 없는 값을 새로 만든다. onCreate 에 입력값이 넘어간다. */
     creatable?: boolean
+    /** 새 항목 추가를 고를 때 (입력값) */
     onCreate?: (input: string) => void
     /** 서버 검색. 입력이 바뀔 때(250ms 뒤) 불린다. */
     loadOptions?: (query: string) => Promise<Option[]>
+    /** 서버 검색 중 목록에 보일 문구 */
     loadingMessage?: ReactNode
     /** 그룹 제목. 없으면 option.group 을 쓴다. */
     groupBy?: (o: Option) => string | undefined
+    /** 옵션 행을 직접 그린다 (옵션, 선택·활성 상태) */
     renderOption?: (o: Option, state: OptionState) => ReactNode
     /** 옵션이 많을 때 보이는 행만 그린다 (행 높이 32px 고정). */
     virtualized?: boolean
+    /** 값이 있으면 지우기(×) 버튼 */
     clearable?: boolean
     /** multiple 에서 트리거에 보일 태그 수. 넘치면 +N */
     maxTagCount?: number
+    /** 높이 xs 24 · sm 28 · md 36 · lg 44. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 오류 상태. 빨간 테두리와 aria-invalid */
     invalid?: boolean
+    /** 읽기 전용. 목록이 열리지 않는다 */
     readOnly?: boolean
+    /** 비활성 */
     disabled?: boolean
+    /** 트리거 너비 (fullWidth 가 아닐 때) */
     width?: string | number
+    /** 부모 너비를 꽉 채운다 */
     fullWidth?: boolean
+    /** 테두리 상자 인라인 스타일 */
     style?: CSSProperties
+    /** 트리거 요소 id. 없으면 자동 생성 */
     id?: string
+    /** 접근성 이름 */
     'aria-label'?: string
+    /** 이름이 되는 요소 id */
     'aria-labelledby'?: string
 }
 
@@ -83,6 +104,7 @@ const highlightText = (label: ReactNode, q: string): ReactNode => {
     )
 }
 
+/** 목록에서 하나 또는 여러 개를 고르는 선택 상자 */
 export const Select = ({
     options: staticOptions = [],
     value: valueProp,
@@ -551,8 +573,11 @@ export const Select = ({
 export const ComboBox = (props: SelectProps) => <Select searchable placeholder="검색" {...props} />
 
 export type MultiSelectProps = Omit<SelectProps, 'multiple' | 'value' | 'defaultValue' | 'onValueChange'> & {
+    /** 제어 모드 값 */
     value?: string[]
+    /** 비제어 초기값 */
     defaultValue?: string[]
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: string[]) => void
 }
 

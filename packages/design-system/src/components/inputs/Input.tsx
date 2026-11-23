@@ -74,29 +74,41 @@ const maskPlaceholder = (mask: InputMask | undefined) =>
     mask === 'bizNo' ? '000-00-00000' : mask === 'phone' ? '010-0000-0000' : undefined
 
 export type InputProps = {
+    /** 높이 xs 24 · sm 28 · md 36 · lg 44. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 오류 상태. 빨간 테두리와 aria-invalid */
     invalid?: boolean
     /** 테두리 안 앞·뒤 (아이콘, 단위 등) */
     prefix?: ReactNode
+    /** 테두리 안 뒤쪽 (아이콘, 단위 등) */
     suffix?: ReactNode
     /** 테두리 밖에 붙는 고정 문구나 버튼 (https://, kg, 찾기 버튼 등) */
     addonBefore?: ReactNode
+    /** 테두리 밖 뒤에 붙는 문구나 버튼 */
     addonAfter?: ReactNode
+    /** 부모 너비를 꽉 채운다 */
     fullWidth?: boolean
     /** password 타입일 때 보이기/숨기기 버튼. 기본값은 password 면 true */
     revealable?: boolean
+    /** 값이 있으면 지우기(×) 버튼 */
     clearable?: boolean
+    /** 지우기 버튼을 눌렀을 때 */
     onClear?: () => void
+    /** 입력 중 서식을 입히는 마스크 */
     mask?: InputMask
     /** maxLength 와 함께 "6 / 40" 글자 수를 보여 준다. */
     showCount?: boolean
+    /** 입력 글자 정렬 */
     align?: 'left' | 'right' | 'center'
     /** onValueChange 호출을 늦춘다(ms). 검색창처럼 입력마다 요청하면 안 되는 곳에 쓴다. */
     debounce?: number
+    /** 값이 바뀔 때 (새 값). debounce 를 따른다 */
     onValueChange?: (value: string) => void
     /** 뒤쪽에 스피너. 비동기 검증·검색 중 표시. */
     loading?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLInputElement>
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'prefix'>
 
@@ -110,6 +122,7 @@ const setNativeValue = (node: HTMLInputElement, value: string) => {
     node.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
+/** 접두·접미·마스크·지우기를 갖춘 한 줄 입력 */
 export const Input = ({
     size: sizeProp,
     variant: variantProp,

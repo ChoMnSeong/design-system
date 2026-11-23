@@ -32,19 +32,29 @@ export type UploadFile = {
 export type RejectReason = 'size' | 'type' | 'count'
 
 export type FileUploadProps = {
+    /** 제어 모드 값 */
     value?: UploadFile[]
+    /** 비제어 초기값 */
     defaultValue?: UploadFile[]
+    /** 값이 바뀔 때 (새 파일 목록) */
     onValueChange?: (files: UploadFile[]) => void
     /** @deprecated onValueChange 를 쓴다. 받아들인 원본 File 만 넘어간다 */
     onChange?: (files: File[]) => void
+    /** 받을 형식 (.pdf, image/* 등). 안 맞으면 거부 */
     accept?: string
+    /** 여러 파일 선택. 아니면 새 파일이 기존을 대체 */
     multiple?: boolean
     /** 바이트 */
     maxSize?: number
+    /** 최대 파일 수. 넘는 파일은 거부 */
     maxFiles?: number
+    /** 비활성. 추가·제거를 막는다 */
     disabled?: boolean
+    /** 오류 상태. 드롭존 테두리를 빨갛게 */
     invalid?: boolean
+    /** 드롭존·첨부 버튼 안 문구 */
     placeholder?: ReactNode
+    /** 안내 문구. 없으면 accept·maxSize·maxFiles 로 만든다 */
     description?: ReactNode
     /** dropzone: 끌어다 놓는 영역 · button: 첨부 버튼 · list: 버튼 없이 목록만 */
     appearance?: 'dropzone' | 'button' | 'list'
@@ -54,9 +64,13 @@ export type FileUploadProps = {
     upload?: (file: File, onProgress: (percent: number) => void) => Promise<string | void>
     /** 이미지 파일은 썸네일을 보인다 */
     preview?: boolean
+    /** 목록에서 파일을 지울 때 (파일) */
     onRemove?: (file: UploadFile) => void
+    /** button 형의 첨부 버튼 크기 */
     size?: FieldSize
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
+    /** DOM 요소 ref (숨은 file input) */
     ref?: Ref<HTMLInputElement>
 }
 
@@ -91,6 +105,7 @@ const matchesAccept = (file: File, accept?: string) => {
 
 let seq = 0
 
+/** 끌어 놓기·버튼으로 파일을 올리고 목록을 보이는 업로드 */
 export const FileUpload = ({
     value: valueProp,
     defaultValue = [],

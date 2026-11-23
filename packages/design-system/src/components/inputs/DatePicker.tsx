@@ -62,16 +62,21 @@ const resolve = <V,>(v: V | (() => V)) => (typeof v === 'function' ? (v as () =>
 export type DatePickerProps = Common & {
     /** 'YYYY-MM-DD' (showTime 이면 'YYYY-MM-DDTHH:mm') */
     value?: string | null
+    /** 비제어 초기값 */
     defaultValue?: string | null
+    /** 값이 바뀔 때 (새 값, 지우면 null) */
     onValueChange?: (value: string | null) => void
     /** @deprecated onValueChange 를 쓴다 */
     onChange?: (value: string) => void
+    /** 고르는 단위 (날짜·주·월·분기·연) */
     picker?: CalendarPicker
     /** 시간도 고른다. minuteStep 으로 분 간격 */
     showTime?: boolean | { minuteStep?: number }
+    /** 패널에 보일 빠른 선택 버튼 */
     presets?: DatePreset<string>[]
 }
 
+/** 달력 팝오버로 날짜(주·월·분기·연)를 고르는 입력 */
 export const DatePicker = ({
     value: valueProp,
     defaultValue = null,
@@ -214,12 +219,17 @@ export const DatePicker = ({
 export type DateRange = [string | null, string | null]
 
 export type DateRangePickerProps = Common & {
+    /** 제어 모드 값 ([시작, 끝]) */
     value?: DateRange
+    /** 비제어 초기값 */
     defaultValue?: DateRange
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: DateRange) => void
     /** 최대 기간(일). 시작일을 고르면 그 범위 밖은 막힌다 */
     maxRange?: number
+    /** 나란히 보일 달 수 */
     numberOfMonths?: 1 | 2
+    /** 빠른 선택 버튼. 없으면 defaultRangePresets */
     presets?: DatePreset<DateRange>[]
 }
 
@@ -237,6 +247,7 @@ export const defaultRangePresets = (weekStartsOn: 0 | 1 = 0): DatePreset<DateRan
     ]
 }
 
+/** 시작일·종료일을 고르는 기간 입력 */
 export const DateRangePicker = ({
     value: valueProp,
     defaultValue = [null, null],

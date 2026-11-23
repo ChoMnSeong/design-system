@@ -10,6 +10,7 @@ export type ToolbarSize = 'xs' | 'sm' | 'md'
 export type ToolbarProps = {
     /** 안쪽 Button 의 기본 크기. density="compact" 면 xs. */
     size?: ToolbarSize
+    /** size 가 없을 때 크기 결정. compact xs · default sm · comfortable md */
     density?: Density
     /**
      * 공간이 모자랄 때.
@@ -20,9 +21,11 @@ export type ToolbarProps = {
     overflow?: 'wrap' | 'scroll' | 'menu'
     /** overflow="menu" 일 때 ··· 메뉴 항목. */
     overflowItems?: MenuItemDef[]
+    /** ··· 메뉴 버튼의 접근성 이름 */
     overflowLabel?: string
     /** 스크롤해도 위에 붙어 있게 한다. */
     sticky?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
@@ -77,6 +80,7 @@ export const Toolbar = ({
 
 export type ToolbarSeparatorProps = HTMLAttributes<HTMLDivElement>
 
+/** 툴바 항목 사이 세로 구분선 */
 export const ToolbarSeparator = (props: ToolbarSeparatorProps) => (
     <div
         role="separator"
@@ -88,6 +92,7 @@ export const ToolbarSeparator = (props: ToolbarSeparatorProps) => (
 
 export type ToolbarGroupProps = HTMLAttributes<HTMLDivElement>
 
+/** 툴바 안에서 관련 항목을 묶는 그룹 */
 export const ToolbarGroup = (props: ToolbarGroupProps) => (
     <div role="group" data-ds-toolbar-group="" {...props} />
 )

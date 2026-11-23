@@ -18,19 +18,27 @@ const STATUS_LABEL: Record<PresenceStatus, string> = { online: '온라인', away
 const GroupSize = createContext<AvatarSize | null>(null)
 
 export type AvatarProps = {
+    /** 이미지 주소. 없거나 로드 실패면 이니셜·fallback 표시 */
     src?: string
+    /** 접근성 이름 (없으면 name) */
     alt?: string
+    /** 이니셜을 만들 이름 (한글은 성 한 글자, 영문은 두 글자) */
     name?: string
+    /** xs 20 · sm 28 · md 36 · lg 44 · xl 56 (px). 없으면 AvatarGroup 값 */
     size?: AvatarSize
+    /** circle: 원형 · rounded: 둥근 사각 */
     shape?: 'circle' | 'rounded'
     /** 이니셜 배경 톤 */
     tone?: Tone
     /** 오른쪽 아래 접속 상태 점 */
     status?: PresenceStatus
+    /** 이미지가 없을 때 이니셜 대신 보일 내용 */
     fallback?: ReactNode
+    /** DOM 요소 ref */
     ref?: Ref<HTMLSpanElement>
 } & Omit<HTMLAttributes<HTMLSpanElement>, 'children'>
 
+/** 사용자 이미지 또는 이니셜을 보여 주는 아바타 */
 export const Avatar = ({
     src,
     alt,
@@ -69,6 +77,7 @@ export const Avatar = ({
 }
 
 export type AvatarGroupProps = {
+    /** 최대 표시 개수. 넘는 수는 "+N" 아바타로 */
     max?: number
     /** 겹침 간격(px, 음수) */
     spacing?: number
@@ -76,6 +85,7 @@ export type AvatarGroupProps = {
     size?: AvatarSize
 } & HTMLAttributes<HTMLDivElement>
 
+/** 여러 Avatar 를 겹쳐 나열하는 그룹 */
 export const AvatarGroup = ({ max, spacing = -8, size, children, style, ...rest }: AvatarGroupProps) => {
     const list = Children.toArray(children).filter(isValidElement)
     const visible = max ? list.slice(0, max) : list
@@ -91,10 +101,13 @@ export const AvatarGroup = ({ max, spacing = -8, size, children, style, ...rest 
 }
 
 export type StatusIndicatorProps = {
+    /** 점 색 톤 */
     tone?: Tone
+    /** 점 옆 라벨 */
     label?: ReactNode
     /** 퍼지는 링 (가동·정지처럼 살아 있는 상태) */
     pulse?: boolean
+    /** 점 sm 6 · md 8 (px), 글자 12 · 13 */
     size?: 'sm' | 'md'
 } & HTMLAttributes<HTMLSpanElement>
 

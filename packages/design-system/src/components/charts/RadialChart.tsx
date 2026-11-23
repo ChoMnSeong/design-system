@@ -1,20 +1,30 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 
 export type RadialDatum = {
+    /** 범례 · tooltip 이름 */
     label: string
+    /** 값 (max 대비 비율이 호 길이) */
     value: number
+    /** 직접 색 (없으면 기본 팔레트) */
     color?: string
 }
 
 export type RadialChartProps = {
+    /** 링 목록 (첫 항목이 가장 안쪽) */
     data: RadialDatum[]
+    /** 한 바퀴에 해당하는 값 (없으면 data 최댓값) */
     max?: number
+    /** 너비 · 높이 (px) */
     size?: number
+    /** 링 두께 px (공간이 모자라면 줄어듦) */
     thickness?: number
+    /** 링 사이 간격 (px) */
     gap?: number
+    /** 오른쪽 범례 (이름 · 값) */
     showLegend?: boolean
     /** 링에 마우스를 올리면 값 표시 */
     tooltip?: boolean
+    /** 링을 눌렀을 때 (항목, 인덱스) */
     onBarClick?: (datum: RadialDatum, index: number) => void
     /** 각 링의 호를 따라 카테고리 라벨 표시. */
     showInlineLabels?: boolean
@@ -24,9 +34,13 @@ export type RadialChartProps = {
     showTrack?: boolean
     /** 호 끝 모양: rounded(둥글게) / sharp(뾰족하게/평평하게). */
     cap?: 'rounded' | 'sharp'
+    /** 가운데 값 아래 설명 */
     centerLabel?: ReactNode
+    /** 가운데 큰 값 */
     centerValue?: ReactNode
+    /** 범례 · hover 값 형식 (값, max) */
     formatValue?: (n: number, max: number) => string
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -100,6 +114,7 @@ const InlineRingLabel = ({
     )
 }
 
+/** 동심원 링으로 항목별 비율을 비교하는 차트 */
 export const RadialChart = ({
     data,
     max,

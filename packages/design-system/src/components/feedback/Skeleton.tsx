@@ -1,13 +1,19 @@
 import type { HTMLAttributes, Ref } from 'react'
 
 export type SkeletonProps = {
+    /** 폭 (숫자는 px) */
     width?: string | number
+    /** 높이, lines 면 줄마다 높이 (숫자는 px) */
     height?: string | number
+    /** 모서리 반경 (CSS 값) */
     radius?: string
+    /** 원형. width 가 없으면 height 로 지름 */
     circle?: boolean
     /** 여러 줄 (마지막 줄은 짧게) */
     lines?: number
+    /** pulse: 깜빡임 · wave: 빛이 지나감 · none: 정지 */
     animation?: 'pulse' | 'wave' | 'none'
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 

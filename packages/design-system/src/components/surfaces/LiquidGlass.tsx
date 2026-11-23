@@ -5,11 +5,15 @@ export type LiquidGlassProps = {
     refraction?: number
     /** 렌즈 가장자리 두께 비율 0~0.5 */
     bezel?: number
+    /** 흐림 정도 (px) */
     blur?: number
     /** 밝은 배경 위에서 글자가 안 읽히면 어둡게. auto 는 배경 밝기를 모르면 옅게 어둡힌다 */
     legibility?: 'auto' | 'light' | 'dark' | 'none'
+    /** 모서리 둥글기 (px) */
     radius?: number
+    /** 유리 위에 놓을 내용 */
     children?: ReactNode
+    /** 루트 인라인 스타일 */
     style?: CSSProperties
 } & HTMLAttributes<HTMLDivElement>
 

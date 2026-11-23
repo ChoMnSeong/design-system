@@ -4,16 +4,21 @@ import type { Tone } from '../types.js'
 import { IconClose } from '../icons.js'
 
 export type TagProps = {
+    /** 색 톤. 'default' 는 'neutral' 과 같다 */
     tone?: Tone | 'default'
+    /** solid: 채움 · soft: 연한 배경 · outline: 테두리만 */
     appearance?: 'solid' | 'soft' | 'outline'
     /** sm 22 · md 26 */
     size?: 'sm' | 'md'
+    /** 글자 앞 아이콘 */
     icon?: ReactNode
     /** @deprecated icon 을 쓴다 */
     iconLeft?: ReactNode
     /** 닫기 버튼. onClose 와 함께 쓴다 */
     closable?: boolean
+    /** 닫기 버튼을 누를 때 */
     onClose?: () => void
+    /** 닫기 버튼 접근성 이름 (없으면 "{글자} 삭제") */
     closeLabel?: string
     /** 필터 칩: onClick 이 있으면 버튼처럼 동작하고 selected 로 눌림을 보인다 */
     selected?: boolean
@@ -23,9 +28,11 @@ export type TagProps = {
     solid?: boolean
     /** @deprecated appearance 로 통합 */
     variant?: BorderVariant
+    /** DOM 요소 ref */
     ref?: Ref<HTMLSpanElement>
 } & HTMLAttributes<HTMLSpanElement>
 
+/** 분류·필터용 칩 */
 export const Tag = ({
     tone = 'neutral',
     appearance,

@@ -103,16 +103,23 @@ const TONE_ICON: Record<Tone, ReactNode> = {
 /* ───────────────────────── Dialog ───────────────────────── */
 
 export type DialogProps = {
+    /** 제어 모드 열림 */
     open?: boolean
+    /** 비제어 초기 열림 */
     defaultOpen?: boolean
+    /** 열림이 바뀔 때 (새 상태) */
     onOpenChange?: (open: boolean) => void
     /** @deprecated onOpenChange(false) 와 같다 */
     onClose?: () => void
     /** 누르면 열리는 요소 (비제어형) */
     trigger?: ReactElement<any>
+    /** 제목 */
     title?: ReactNode
+    /** 제목 아래 설명 */
     description?: ReactNode
+    /** 본문 내용 */
     children?: ReactNode
+    /** 아래 버튼 영역 (DialogActions) */
     footer?: ReactNode
     /** xs 320 · sm 400 · md 520 · lg 680 · xl 880 · fullscreen */
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen'
@@ -122,14 +129,19 @@ export type DialogProps = {
     scrollBehavior?: 'inside' | 'outside'
     /** 제목 줄을 끌어 옮긴다 */
     draggable?: boolean
+    /** 열릴 때 먼저 포커스할 요소 */
     initialFocus?: RefObject<HTMLElement | null>
     /** false 를 돌려주면 닫지 않는다 (저장 안 한 변경 확인 등) */
     onBeforeClose?: () => boolean | Promise<boolean>
+    /** 바깥 배경을 누르면 닫기 */
     closeOnBackdrop?: boolean
+    /** Esc 로 닫기 */
     closeOnEsc?: boolean
+    /** 오른쪽 위 닫기 버튼 숨김 */
     hideClose?: boolean
 }
 
+/** 화면 가운데 뜨는 모달 대화상자 */
 export const Dialog = ({
     open: openProp,
     defaultOpen,
@@ -241,6 +253,7 @@ export const Dialog = ({
 }
 
 export type DialogActionsProps = HTMLAttributes<HTMLDivElement>
+/** 대화상자 아래 오른쪽 정렬 버튼 묶음 */
 export const DialogActions = ({ style, ...rest }: DialogActionsProps) => (
     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', ...style }} {...rest} />
 )

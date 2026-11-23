@@ -36,12 +36,19 @@ export const formatTime = (t: string, fmt: string) => {
 }
 
 export type TimeColumnsProps = {
+    /** 선택된 시간 ('HH:mm' 또는 'HH:mm:ss') */
     value: string | null
+    /** 칸을 고를 때 (새 시간 문자열) */
     onChange: (value: string) => void
+    /** 분 열 간격 */
     minuteStep?: number
+    /** 초 열 간격. false 면 초 열 없음 */
     secondStep?: number | false
+    /** false 면 1~12시와 오전/오후 열 */
     use24Hours?: boolean
+    /** 이보다 이른 칸은 막는다 */
     minTime?: string
+    /** 이보다 늦은 칸은 막는다 */
     maxTime?: string
     /** 열 높이 */
     height?: number
@@ -146,30 +153,49 @@ type RangeTime = [string | null, string | null]
 export type TimePickerProps = {
     /** 'HH:mm' (secondStep 이 있으면 'HH:mm:ss'). range 면 [시작, 끝] */
     value?: string | null | RangeTime
+    /** 비제어 초기값 */
     defaultValue?: string | null | RangeTime
+    /** 값이 바뀔 때 (새 값, range 면 [시작, 끝]) */
     onValueChange?: (value: any) => void
     /** @deprecated onValueChange 를 쓴다 */
     onChange?: (value: string) => void
+    /** 분 간격 */
     minuteStep?: number
+    /** 초 간격. false 면 초를 고르지 않는다 */
     secondStep?: number | false
+    /** false 면 12시간제 (오전/오후) */
     use24Hours?: boolean
+    /** 가장 이른 시간. 벗어나면 오류로 보인다 */
     minTime?: string
+    /** 가장 늦은 시간. 벗어나면 오류로 보인다 */
     maxTime?: string
+    /** 시작·끝 두 시간을 고른다 */
     range?: boolean
     /** 표시 서식. 기본 24시간 'HH:mm', 12시간 'A hh:mm' */
     format?: string
+    /** 값이 없을 때 문구 (range 가 아닐 때) */
     placeholder?: string
+    /** 값이 있으면 지우기(×) 버튼 */
     clearable?: boolean
+    /** 높이 xs 24 · sm 28 · md 36 · lg 44. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 오류 상태. 범위 밖이거나 시작이 끝보다 늦어도 켜진다 */
     invalid?: boolean
+    /** 읽기 전용. 팝오버가 열리지 않는다 */
     readOnly?: boolean
+    /** 비활성 */
     disabled?: boolean
+    /** 트리거 너비 */
     width?: number | string
+    /** 테두리 상자 인라인 스타일 */
     style?: CSSProperties
+    /** 접근성 이름. range 면 뒤에 시작·끝 */
     'aria-label'?: string
 }
 
+/** 시·분(·초) 열에서 시간을 고르는 입력 */
 export const TimePicker = ({
     value: valueProp,
     defaultValue,

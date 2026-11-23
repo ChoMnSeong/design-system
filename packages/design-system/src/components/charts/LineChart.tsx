@@ -5,24 +5,33 @@ import type { ChartPoint } from './chartUtils.js'
 export type LineChartProps = SimpleChartCommon & {
     /** 선 아래 채움 */
     fill?: boolean
+    /** 곡선으로 */
     smooth?: boolean
+    /** 점 표시. 없으면 16개 이하일 때만 */
     showDots?: boolean
+    /** 모든 선을 점선으로 (시리즈 dashed 가 우선) */
     dashed?: boolean
     /** @deprecated 선 굵기는 2px 고정 */
     lineWidth?: number
+    /** 점 위에 값 글자 */
     showValueOnDot?: boolean
     /** @deprecated axes 로 흡수. 'right' 는 시리즈를 오른쪽 축에, 'none' 은 축 숨김 */
     yAxisPosition?: 'left' | 'right' | 'none'
+    /** x축 라벨 표시 */
     showXAxis?: boolean
     /** 계단선 (설비 상태 · 단가처럼 값이 바뀌는 시점이 중요한 경우) */
     step?: boolean | 'before' | 'after'
+    /** 빈 값(null)을 건너 이어 그린다 */
     connectNulls?: boolean
     /** @deprecated series 로 통합 */
     compareData?: ChartPoint[]
+    /** compareData 선 색 */
     compareColor?: string
+    /** compareData 범례 · tooltip 이름 */
     compareLabel?: string
 }
 
+/** 선 차트 (추이 · 다중 시리즈 · 계단선) */
 export const LineChart = ({
     data,
     labels,

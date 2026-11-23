@@ -4,44 +4,67 @@ import { Menu, MenuItem, MenuLabel } from '../overlay/Menu.js'
 import type { Density } from '../types.js'
 
 export type NavItem = {
+    /** 항목 고유 id (activeId · expanded 기준) */
     id: string
+    /** 표시 이름 */
     label: ReactNode
+    /** 이름 앞 아이콘 (접힌 메뉴에선 이것만 보임) */
     icon?: ReactNode
+    /** 오른쪽 배지 (접힌 메뉴에선 점) */
     badge?: ReactNode
+    /** 링크 주소 (있으면 <a>, 없으면 <button>) */
     href?: string
+    /** 항목을 누를 때 */
     onClick?: () => void
+    /** 하위 항목 */
     children?: NavItem[]
     /** 같은 group 이 이어지면 위에 그룹 라벨을 한 번 단다 */
     group?: string
+    /** 비활성 */
     disabled?: boolean
     /** 권한 없음 등으로 아예 숨김 */
     hidden?: boolean
 }
 
 export type NavigationMenuProps = {
+    /** 메뉴 항목 */
     items: NavItem[]
+    /** 현재 페이지 항목 id (강조 + aria-current) */
     activeId?: string
+    /** 비제어 초기 펼침 id 목록 (없으면 활성 항목의 부모) */
     defaultExpanded?: string[]
+    /** 제어 모드 펼침 id 목록 */
     expanded?: string[]
+    /** 펼침이 바뀔 때 (새 id 목록) */
     onExpandedChange?: (ids: string[]) => void
     /** 아이콘만 보이고 하위 메뉴는 팝오버로 */
     collapsed?: boolean
+    /** 접힘 변경 콜백 (컴포넌트 안에서는 호출하지 않음) */
     onCollapsedChange?: (collapsed: boolean) => void
+    /** vertical: 세로 펼침 목록 · horizontal: 가로, 넘치면 ··· 메뉴 */
     orientation?: 'vertical' | 'horizontal'
+    /** 위에 메뉴 검색창 (세로 메뉴) */
     searchable?: boolean
+    /** 검색창 안내 문구 */
     searchPlaceholder?: string
+    /** 세로 메뉴 항목 높이 compact 26 · default 34 · comfortable 40 (px) */
     density?: Density
     /** 라우터 연결. 기본은 <a href> 또는 <button> */
     renderLink?: (item: NavItem, children: ReactNode, props: Record<string, unknown>) => ReactNode
+    /** nav 접근성 이름 */
     'aria-label'?: string
+    /** nav 요소 class */
     className?: string
+    /** nav 요소 style */
     style?: CSSProperties
+    /** DOM 요소 ref */
     ref?: Ref<HTMLElement>
 } & Omit<HTMLAttributes<HTMLElement>, 'children'>
 
 const textOf = (n: NavItem) => (typeof n.label === 'string' ? n.label : n.id)
 const containsActive = (n: NavItem, id?: string): boolean => !!id && (n.id === id || !!n.children?.some((c) => containsActive(c, id)))
 
+/** 세로·가로·접힘 배치를 지원하는 사이트 메뉴 */
 export const NavigationMenu = ({
     items: itemsProp,
     activeId,
@@ -49,6 +72,8 @@ export const NavigationMenu = ({
     expanded: expandedProp,
     onExpandedChange,
     collapsed,
+    // 접힘은 AppShell 등 바깥에서 바꾼다. DOM 으로 새지 않게 꺼내 둔다
+    onCollapsedChange: _onCollapsedChange,
     orientation = 'vertical',
     searchable,
     searchPlaceholder = '메뉴 검색',

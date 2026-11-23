@@ -14,24 +14,37 @@ import {
 import { useBorderVariant } from '../../provider/useDesignSystem.js'
 
 export type OTPInputProps = {
+    /** 칸 개수 */
     length?: number
+    /** 제어 모드 값 */
     value?: string
+    /** 비제어 초기값 */
     defaultValue?: string
+    /** 값이 바뀔 때 (새 값) */
     onChange?: (value: string) => void
+    /** 모든 칸이 찼을 때 (전체 값) */
     onComplete?: (value: string) => void
+    /** numeric: 숫자만 · alphanumeric: 영문·숫자 */
     type?: 'numeric' | 'alphanumeric'
+    /** 마운트 시 첫 칸에 포커스 */
     autoFocus?: boolean
+    /** 비활성 */
     disabled?: boolean
+    /** 칸 테두리. outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
     /** 입력한 글자를 ● 로 가린다 */
     mask?: boolean
     /** 칸 크기. sm 32 · md 40 · lg 48 */
     size?: Size
+    /** 오류 상태. 칸 테두리를 빨갛게 */
     invalid?: boolean
+    /** 그룹 접근성 이름. 칸마다 "n번째 자리" 가 붙는다 */
     'aria-label'?: string
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
 }
 
+/** 한 칸에 한 글자씩 받는 인증번호 입력 */
 export const OTPInput = ({
     length = 6,
     value: controlled,

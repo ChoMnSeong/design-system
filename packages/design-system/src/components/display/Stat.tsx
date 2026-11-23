@@ -3,23 +3,31 @@ import type { BorderVariant } from '../borderVariant.js'
 import type { Tone } from '../types.js'
 
 export type StatProps = {
+    /** 지표 이름 */
     label: ReactNode
+    /** 지표 값 */
     value: ReactNode
+    /** 값 아래 보조 설명 */
     helper?: ReactNode
     /** 증감. tone 이 없으면 trend 와 숫자 부호로 정한다 */
     delta?: { value: ReactNode; tone?: Tone; direction?: 'up' | 'down' }
+    /** 라벨 오른쪽 아이콘 */
     icon?: ReactNode
     /** plain: 테두리 없음 · card: 카드 표면 */
     appearance?: 'plain' | 'card'
     /** @deprecated appearance="card" */
     variant?: BorderVariant
+    /** 값 글자 sm 22 · md 30 · lg 38 (px) */
     size?: 'sm' | 'md' | 'lg'
     /** 목표. value 가 숫자면 달성률 막대를 그린다 */
     target?: number
+    /** 아래에 그릴 추세선 데이터 (2개 이상) */
     sparkline?: number[]
     /** up-good: 오를수록 좋음(생산량) · down-good: 내릴수록 좋음(불량률) */
     trend?: 'up-good' | 'down-good'
+    /** 값 대신 스켈레톤 표시 */
     loading?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
@@ -38,6 +46,7 @@ const Spark = ({ data }: { data: number[] }) => {
     )
 }
 
+/** 라벨·값·증감·목표를 보여 주는 지표 카드 */
 export const Stat = ({
     label,
     value,

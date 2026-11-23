@@ -6,8 +6,11 @@ import type { FieldSize } from '../types.js'
 import { FieldBox, useFormSize } from '../form/Field.js'
 
 export type TagInputProps = {
+    /** 제어 모드 값 */
     value?: string[]
+    /** 비제어 초기값 */
     defaultValue?: string[]
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (tags: string[]) => void
     /** 이 글자를 치거나 붙여넣으면 태그로 나눈다. Enter 는 항상 동작. 기본 [',', '\n', '\t'] */
     separators?: string[]
@@ -15,16 +18,27 @@ export type TagInputProps = {
     validate?: (tag: string) => boolean
     /** 같은 값을 두 번 넣지 않는다. 기본 true */
     unique?: boolean
+    /** 최대 태그 수. 넘는 입력은 버린다 */
     maxTags?: number
+    /** 태그가 없을 때 안내 문구 */
     placeholder?: string
+    /** 입력 상자 크기. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 오류 상태. validate 에 실패한 태그가 있어도 켜진다 */
     invalid?: boolean
+    /** 읽기 전용. 입력을 막고 × 버튼을 숨긴다 */
     readOnly?: boolean
+    /** 비활성. × 버튼을 숨긴다 */
     disabled?: boolean
+    /** 부모 너비를 꽉 채운다 */
     fullWidth?: boolean
+    /** 테두리 상자 인라인 스타일 */
     style?: CSSProperties
+    /** 입력란 접근성 이름 */
     'aria-label'?: string
+    /** 입력란 id (label 연결용) */
     id?: string
     /** 태그 글꼴을 고정폭으로 (LOT·코드 값) */
     mono?: boolean
@@ -32,6 +46,7 @@ export type TagInputProps = {
 
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
+/** Enter·구분자로 끊어 태그로 쌓는 입력 */
 export const TagInput = ({
     value: valueProp,
     defaultValue = [],

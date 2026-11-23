@@ -11,11 +11,17 @@ import { createPortal } from 'react-dom'
 import { mergeStyles } from '../types.js'
 
 export type ImageProps = {
+    /** 이미지 주소 */
     src: string
+    /** 대체 텍스트 */
     alt?: string
+    /** 폭 (숫자는 px, img width 속성으로도 전달) */
     width?: number | string
+    /** 높이 (숫자는 px, img height 속성으로도 전달) */
     height?: number | string
+    /** 가로세로 비율 (예: 1.5, "16/9") */
     aspectRatio?: number | string
+    /** 틀 안에 맞추는 방식 (object-fit) */
     fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'
     /** 반경 토큰(xs~3xl · full) 또는 CSS 값 */
     radius?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full' | (string & {})
@@ -23,10 +29,13 @@ export type ImageProps = {
     preview?: boolean
     /** 이미지 아래 설명 (figure · figcaption) */
     caption?: ReactNode
+    /** 로드 실패 시 대신 보일 내용 (없으면 "이미지 없음") */
     fallback?: ReactNode
+    /** 로드가 끝나기 전 가운데 보일 내용 */
     placeholder?: ReactNode
     /** 기본 'lazy'. 첫 화면에 보이는 이미지에만 'eager' 를 준다. */
     loading?: 'lazy' | 'eager'
+    /** 바깥 틀 DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<
     ImgHTMLAttributes<HTMLImageElement>,
@@ -36,6 +45,7 @@ export type ImageProps = {
 const dim = (v: number | string | undefined) =>
     v === undefined ? undefined : typeof v === 'number' ? `${v}px` : v
 
+/** 로딩·실패·크게 보기를 처리하는 이미지 */
 export const Image = ({
     src,
     alt = '',

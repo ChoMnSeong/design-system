@@ -9,16 +9,21 @@ const badgeText = (n: number | string) => (typeof n === 'number' && n > 99 ? '99
 /* ───────── 공지 띠 ───────── */
 
 export type AnnouncementBarProps = {
+    /** 공지 내용 */
     children: ReactNode
+    /** 오른쪽 닫기 버튼 */
     dismissible?: boolean
     /** 닫은 뒤 숨기는 기간(일) */
     dismissDays?: number
     /** 닫힘 기억 키 (localStorage) */
     storageKey?: string
+    /** 닫기를 누를 때 */
     onDismiss?: () => void
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 맨 위 공지 띠. 닫으면 dismissDays 동안 숨긴다 */
 export const AnnouncementBar = ({ children, dismissible = true, dismissDays = 7, storageKey = 'ds-announce', onDismiss, style }: AnnouncementBarProps) => {
     const [hidden, setHidden] = useState(() => {
         try {
@@ -51,18 +56,23 @@ export const AnnouncementBar = ({ children, dismissible = true, dismissDays = 7,
 
 /* ───────── 큰 메뉴 ───────── */
 
-export type MegaMenuColumn = { title: ReactNode; links: Array<{ label: ReactNode; href?: string; badge?: ReactNode }> }
-export type MegaMenuCategory = { key: string; label: ReactNode; columns: MegaMenuColumn[]; promo?: ReactNode }
+export type MegaMenuColumn = { /** 열 제목 */ title: ReactNode; /** 링크 목록 (badge 는 이름 뒤에 붙는다) */ links: Array<{ label: ReactNode; href?: string; badge?: ReactNode }> }
+export type MegaMenuCategory = { /** 카테고리 키 */ key: string; /** 왼쪽 목록 이름 */ label: ReactNode; /** 오른쪽에 펼칠 링크 열 */ columns: MegaMenuColumn[]; /** 이 카테고리 프로모 (공통 promo 대신) */ promo?: ReactNode }
 
 export type MegaMenuProps = {
+    /** 왼쪽 카테고리 목록 */
     categories: MegaMenuCategory[]
+    /** 처음 펼칠 카테고리 key (없으면 첫 번째) */
     defaultCategory?: string
     /** 모든 카테고리 공통 프로모 */
     promo?: ReactNode
+    /** 링크를 직접 그린다 (라우터 Link 등) */
     renderLink?: (link: { label: ReactNode; href?: string }) => ReactNode
+    /** Esc 를 누를 때 */
     onClose?: () => void
 }
 
+/** 카테고리별 링크 열을 펼치는 큰 메뉴. 카테고리에 마우스 · 포커스를 두면 바뀐다 */
 export const MegaMenu = ({ categories, defaultCategory, promo, renderLink, onClose }: MegaMenuProps) => {
     const [active, setActive] = useState(defaultCategory ?? categories[0]?.key)
     const cat = categories.find((c) => c.key === active) ?? categories[0]
@@ -96,18 +106,25 @@ export const MegaMenu = ({ categories, defaultCategory, promo, renderLink, onClo
 
 /* ───────── 머리말 ───────── */
 
-export type SiteHeaderAction = { icon: ReactNode; label: string; badge?: number | string; onClick?: () => void; href?: string }
-export type SiteHeaderNavItem = { key: string; label: ReactNode; href?: string; highlight?: boolean; mega?: MegaMenuCategory[] }
+export type SiteHeaderAction = { /** 아이콘 */ icon: ReactNode; /** 이름 (aria-label 겸 key) */ label: string; /** 숫자 배지 (0 이면 숨김, 99 초과는 99+) */ badge?: number | string; /** 누를 때 (href 가 없을 때) */ onClick?: () => void; /** 있으면 링크(a)로 그린다 */ href?: string }
+export type SiteHeaderNavItem = { /** 항목 키 */ key: string; /** 이름 */ label: ReactNode; /** 링크 주소 */ href?: string; /** 빨간 글자로 강조 */ highlight?: boolean; /** 있으면 마우스 · 포커스 시 큰 메뉴를 펼친다 */ mega?: MegaMenuCategory[] }
 
 export type SiteHeaderProps = {
+    /** 1단 로고 자리 */
     logo: ReactNode
     /** 'double' = 1단 + 카테고리 2단 */
     layout?: 'single' | 'double'
+    /** 1단 검색창 자리 (모바일에서 숨김) */
     search?: ReactNode
+    /** 1단 오른쪽 아이콘 버튼 (장바구니 등) */
     actions?: SiteHeaderAction[]
+    /** 2단 카테고리 메뉴 (layout="double" 일 때) */
     nav?: SiteHeaderNavItem[]
+    /** 현재 페이지로 표시할 nav key */
     activeNav?: string
+    /** nav 항목을 누를 때 (key). 주면 링크 이동을 막는다 */
     onNavSelect?: (key: string) => void
+    /** 스크롤해도 위에 붙어 있기 */
     sticky?: boolean
     /** 아래로 스크롤하면 2단만 숨긴다 */
     hideRowOnScroll?: boolean
@@ -117,10 +134,13 @@ export type SiteHeaderProps = {
     onMenuClick?: () => void
     /** 스크롤을 감지할 요소 (기본 window) */
     scrollContainer?: () => HTMLElement | null
+    /** 맨 위 공지 띠 자리 (AnnouncementBar) */
     announcement?: ReactNode
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 사이트 머리말. 로고 · 검색 · 아이콘 버튼 1단, 카테고리 2단, 큰 메뉴 */
 export const SiteHeader = ({
     logo, layout = 'double', search, actions = [], nav = [], activeNav, onNavSelect, sticky = true, hideRowOnScroll = true, transparentOnTop, onMenuClick, scrollContainer, announcement, style,
 }: SiteHeaderProps) => {
@@ -211,15 +231,21 @@ export const SiteHeader = ({
 /* ───────── 꼬리말 ───────── */
 
 export type SiteFooterProps = {
+    /** 맨 위 혜택 줄 (아이콘 · 제목 · 설명) */
     benefits?: Array<{ icon: ReactNode; title: ReactNode; description?: ReactNode }>
+    /** 고객센터 블록 (제목 · 전화 · 운영 시간 · 버튼) */
     support?: { title?: ReactNode; phone: ReactNode; hours?: ReactNode; actions?: ReactNode }
+    /** 링크 열 (제목 · 링크 목록) */
     columns?: Array<{ title: ReactNode; links: Array<{ label: ReactNode; href?: string }> }>
     /** 사업자 정보 (전자상거래법 표시) — 접어서 보여 준다 */
     legal?: { summary?: ReactNode; items: Array<[ReactNode, ReactNode]>; copyright?: ReactNode; defaultOpen?: boolean }
+    /** 맨 아래 자유 영역 */
     bottom?: ReactNode
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 사이트 꼬리말. 혜택 · 고객센터 · 링크 열 · 사업자 정보 */
 export const SiteFooter = ({ benefits, support, columns = [], legal, bottom, style }: SiteFooterProps) => (
     <footer data-ds-site-footer="" style={style}>
         <Container>

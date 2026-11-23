@@ -96,12 +96,19 @@ const assignRef = <T,>(ref: unknown, node: T) => {
 /** items prop 으로 메뉴를 그릴 때 쓰는 항목 정의 (SplitButton · ContextMenu · Toolbar overflow 공용). */
 export type MenuItemDef =
     | {
+          /** 항목 종류. 생략하면 일반 항목 */
           type?: 'item'
+          /** 항목 글자 */
           label: ReactNode
+          /** 앞 아이콘 */
           icon?: ReactNode
+          /** 오른쪽 단축키 표시 */
           shortcut?: ReactNode
+          /** 글자 색. 위험한 동작은 danger */
           tone?: Tone
+          /** 선택 불가 */
           disabled?: boolean
+          /** 항목을 누를 때 */
           onSelect?: () => void
       }
     | { type: 'separator' }
@@ -130,15 +137,23 @@ export const renderMenuItems = (items: MenuItemDef[]) =>
 export type MenuPlacement = 'auto' | 'top' | 'bottom' | 'left' | 'right'
 
 export type MenuProps = {
+    /** 누르면 메뉴가 열리는 요소 */
     trigger: ReactElement<any>
     /** children 대신 항목 정의로 그릴 수 있다. */
     items?: MenuItemDef[]
+    /** 메뉴 내용 (MenuItem 등) */
     children?: ReactNode
+    /** 트리거와 맞출 끝 */
     align?: 'start' | 'center' | 'end'
+    /** 나오는 쪽. auto 는 아래 공간이 모자라면 위 */
     placement?: MenuPlacement
+    /** 메뉴 최소 폭 (px) */
     minWidth?: number
+    /** 제어 모드 열림 */
     open?: boolean
+    /** 비제어 초기 열림 */
     defaultOpen?: boolean
+    /** 열림이 바뀔 때 (새 상태) */
     onOpenChange?: (open: boolean) => void
     /** 메뉴의 접근성 이름. 없으면 트리거를 가리킨다. */
     'aria-label'?: string
@@ -151,6 +166,7 @@ const useMenuId = () => {
     return ref.current
 }
 
+/** 트리거를 누르면 여는 드롭다운 메뉴 */
 export const Menu = ({
     trigger,
     items,
@@ -252,16 +268,21 @@ export const Menu = ({
 /* ───────────────────────── 항목 ───────────────────────── */
 
 type ItemBase = {
+    /** 앞 아이콘 */
     icon?: ReactNode
+    /** 오른쪽 단축키 표시 */
     shortcut?: ReactNode
+    /** 글자 색. 위험한 동작은 danger */
     tone?: Tone
     /** @deprecated tone="danger" 를 쓴다. */
     danger?: boolean
+    /** 선택 불가 */
     disabled?: boolean
 }
 
 export type MenuItemProps = ItemBase & HTMLAttributes<HTMLButtonElement>
 
+/** 메뉴 항목. 누르면 메뉴를 닫는다 (preventDefault 로 막음) */
 export const MenuItem = ({
     icon,
     shortcut,
@@ -299,13 +320,17 @@ export const MenuItem = ({
 }
 
 export type MenuCheckboxItemProps = Omit<ItemBase, 'icon' | 'danger'> & {
+    /** 제어 모드 체크 */
     checked?: boolean
+    /** 비제어 초기 체크 */
     defaultChecked?: boolean
+    /** 체크가 바뀔 때 (새 상태) */
     onCheckedChange?: (checked: boolean) => void
     /** 선택 후 메뉴를 닫을지. 표시 열처럼 여러 개를 연달아 고르는 경우가 많아 기본은 열어 둔다. */
     closeOnSelect?: boolean
 } & Omit<HTMLAttributes<HTMLButtonElement>, 'onChange'>
 
+/** 눌러서 켜고 끄는 체크 메뉴 항목 */
 export const MenuCheckboxItem = ({
     checked: checkedProp,
     defaultChecked = false,
@@ -352,13 +377,19 @@ type RadioCtx = { value: string | undefined; select: (v: string) => void }
 const RadioContext = createContext<RadioCtx | null>(null)
 
 export type MenuRadioGroupProps = {
+    /** 제어 모드 선택 값 */
     value?: string
+    /** 비제어 초기 선택 값 */
     defaultValue?: string
+    /** 선택이 바뀔 때 (새 값) */
     onValueChange?: (value: string) => void
+    /** 고른 뒤 메뉴 닫기 */
     closeOnSelect?: boolean
+    /** MenuRadioItem 들 */
     children: ReactNode
 } & Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'>
 
+/** MenuRadioItem 중 하나만 고르는 묶음 */
 export const MenuRadioGroup = ({
     value: valueProp,
     defaultValue,
@@ -389,9 +420,11 @@ export const MenuRadioGroup = ({
 }
 
 export type MenuRadioItemProps = Omit<ItemBase, 'icon' | 'danger'> & {
+    /** 고르면 그룹에 넘길 값 */
     value: string
 } & HTMLAttributes<HTMLButtonElement>
 
+/** MenuRadioGroup 안의 단일 선택 항목 */
 export const MenuRadioItem = ({
     value,
     shortcut,
@@ -428,14 +461,21 @@ export const MenuRadioItem = ({
 /* ───────────────────────── 하위 메뉴 ───────────────────────── */
 
 export type MenuSubProps = {
+    /** 하위 메뉴를 여는 항목 글자 */
     label: ReactNode
+    /** 앞 아이콘 */
     icon?: ReactNode
+    /** 열기 불가 */
     disabled?: boolean
+    /** children 대신 항목 정의로 그린다 */
     items?: MenuItemDef[]
+    /** 하위 메뉴 내용 */
     children?: ReactNode
+    /** 하위 메뉴 최소 폭 (px) */
     minWidth?: number
 }
 
+/** 올리거나 → 키로 옆에 펼치는 하위 메뉴 */
 export const MenuSub = ({
     label,
     icon,
@@ -547,10 +587,12 @@ export const MenuSub = ({
 
 /* ───────────────────────── 구분선 · 라벨 ───────────────────────── */
 
+/** 메뉴 항목 사이 구분선 */
 export const MenuSeparator = (props: HTMLAttributes<HTMLDivElement>) => (
     <div role="separator" data-ds-menu-separator="" {...props} />
 )
 
+/** 메뉴 안 묶음 제목 */
 export const MenuLabel = (props: HTMLAttributes<HTMLDivElement>) => (
     <div role="presentation" data-ds-menu-label="" {...props} />
 )
@@ -560,14 +602,19 @@ export const MenuLabel = (props: HTMLAttributes<HTMLDivElement>) => (
 export type ContextMenuProps = {
     /** 우클릭 대상. */
     children: ReactElement<any>
+    /** 메뉴 항목 정의 */
     items?: MenuItemDef[]
     /** items 대신 메뉴 내용을 직접 그린다. */
     content?: ReactNode
+    /** 메뉴 최소 폭 (px) */
     minWidth?: number
+    /** 우클릭 메뉴 끄기 */
     disabled?: boolean
+    /** 열림이 바뀔 때 (새 상태) */
     onOpenChange?: (open: boolean) => void
 }
 
+/** 우클릭 · Shift+F10 으로 여는 메뉴 */
 export const ContextMenu = ({
     children,
     items,

@@ -9,8 +9,11 @@ export type SplitButtonProps = Omit<ButtonProps, 'iconRight' | 'shape' | 'iconOn
     items: MenuItemDef[]
     /** 화살표 버튼의 접근성 이름. */
     menuLabel?: string
+    /** 메뉴를 화살표 버튼의 시작/끝 쪽에 맞춤 */
     menuAlign?: 'start' | 'end'
+    /** 메뉴 최소 폭 (px) */
     menuMinWidth?: number
+    /** 주 동작 버튼 내용 */
     children: ReactNode
 }
 

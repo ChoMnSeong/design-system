@@ -2,14 +2,21 @@ import { useId, useState, type CSSProperties, type MouseEvent, type ReactNode } 
 import { mergeStyles, type Tone } from '../types.js'
 
 export type RatingProps = {
+    /** 제어 모드 값 */
     value?: number
+    /** 비제어 초기값 */
     defaultValue?: number
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: number) => void
     /** @deprecated onValueChange 를 쓴다. */
     onChange?: (value: number) => void
+    /** 별 개수 */
     max?: number
+    /** 별 크기 sm 14 · md 18 · lg 24 */
     size?: 'sm' | 'md' | 'lg'
+    /** 표시만 하고 클릭·호버를 막는다 */
     readOnly?: boolean
+    /** 같은 값을 다시 누르면 0 으로 */
     allowClear?: boolean
     /** Allow 0.5 step ratings via left/right half click. */
     allowHalf?: boolean
@@ -19,6 +26,7 @@ export type RatingProps = {
     tone?: Tone
     /** 별 대신 쓸 모양. 채움은 currentColor 로 그려진다 (예: 하트 svg) */
     icon?: ReactNode
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
 }
 
@@ -74,6 +82,7 @@ const Star = ({
     </svg>
 )
 
+/** 별(또는 icon)을 눌러 점수를 매기는 평점 */
 export const Rating = ({
     value: controlled,
     defaultValue = 0,

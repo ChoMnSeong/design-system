@@ -5,29 +5,41 @@ import type { Tone } from '../types.js'
 export type PieDatum = { label: string; value: number; color?: string; tone?: Tone }
 
 export type PieChartProps = {
+    /** 조각 목록 (라벨 · 값 · 색) */
     data: PieDatum[]
+    /** 지름 (px) */
     size?: number
+    /** 가운데를 비운 도넛 모양 */
     donut?: boolean
+    /** 도넛 고리 두께 (px) */
     thickness?: number
     /** right · bottom · none */
     legend?: 'right' | 'bottom' | 'none'
     /** @deprecated legend 를 쓴다 */
     showLegend?: boolean
+    /** 조각 사이 간격 각도 (도) */
     padAngle?: number
+    /** 첫 조각 시작 각도 (도, 12시부터 시계방향) */
     startAngle?: number
     /** 조각 위 글자: value · percent · none */
     labelType?: 'value' | 'percent' | 'none'
     /** @deprecated labelType="percent" */
     showValueOnSlice?: boolean
+    /** 조각 위 글자 형식 (값, 합계) */
     formatValue?: (n: number, total: number) => string
     /** 이 비율(%) 미만 조각은 '기타' 로 묶는다 */
     minSlice?: number
+    /** 조각을 눌렀을 때 (조각, 인덱스) */
     onSliceClick?: (datum: PieDatum, index: number) => void
+    /** 조각에 마우스를 올리면 값 · 비율 표시 */
     tooltip?: boolean
     /** 강조할 조각 (제어형) */
     activeIndex?: number
+    /** 접근성 이름 (없으면 조각별 비율) */
     'aria-label'?: string
+    /** 바깥 요소 style */
     style?: CSSProperties
+    /** 바깥 요소 class */
     className?: string
 }
 
@@ -42,6 +54,7 @@ const arc = (cx: number, cy: number, r: number, ri: number, a0: number, a1: numb
     return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} L ${x2} ${y2} A ${ri} ${ri} 0 ${large} 0 ${x3} ${y3} Z`
 }
 
+/** 항목 비율을 조각으로 보여 주는 원형 차트 */
 export const PieChart = ({
     data: dataProp,
     size = 200,
@@ -141,10 +154,13 @@ export const PieChart = ({
 }
 
 export type DonutChartProps = Omit<PieChartProps, 'donut'> & {
+    /** 가운데 값 아래 설명 */
     centerLabel?: ReactNode
+    /** 가운데 큰 값 */
     centerValue?: ReactNode
 }
 
+/** 가운데에 값 · 설명을 넣는 도넛 차트 */
 export const DonutChart = ({ centerLabel, centerValue, size = 200, thickness = 28, ...rest }: DonutChartProps) => (
     <PieChart {...rest} donut size={size} thickness={thickness}>
         {(centerLabel || centerValue) && (

@@ -19,14 +19,19 @@ export type ToggleProps = Omit<
     ButtonProps,
     'appearance' | 'selected' | 'variant' | 'onChange' | 'loading' | 'confirm'
 > & {
+    /** 제어 모드 눌림 상태 */
     pressed?: boolean
+    /** 비제어 초기 눌림 상태 */
     defaultPressed?: boolean
+    /** 눌림 상태가 바뀔 때 (새 상태) */
     onValueChange?: (pressed: boolean) => void
     /** @deprecated onValueChange 를 쓴다. */
     onPressedChange?: (pressed: boolean) => void
+    /** outline: 테두리 · ghost: 배경 없음 · soft: 연한 배경 */
     appearance?: ToggleAppearance
     /** ToggleGroup 안에서 이 항목을 가리키는 값. */
     value?: string
+    /** DOM 요소 ref */
     ref?: Ref<HTMLButtonElement>
 }
 
@@ -86,31 +91,46 @@ export const Toggle = ({
 }
 
 type SingleProps = {
+    /** single: 하나만 켜짐 · multiple: 여러 개 켜짐 */
     type?: 'single'
+    /** 제어 모드 값 (켜진 항목의 value, 없으면 null) */
     value?: string | null
+    /** 비제어 초기값 */
     defaultValue?: string | null
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: string | null) => void
     /** single 에서 이미 켜진 항목을 다시 눌러 끌 수 있는지. */
     allowEmpty?: boolean
 }
 type MultipleProps = {
+    /** single: 하나만 켜짐 · multiple: 여러 개 켜짐 */
     type: 'multiple'
+    /** 제어 모드 값 (켜진 항목 value 배열) */
     value?: string[]
+    /** 비제어 초기값 */
     defaultValue?: string[]
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: string[]) => void
+    /** multiple 에서는 쓰지 않음 */
     allowEmpty?: never
 }
 
 export type ToggleGroupProps = (SingleProps | MultipleProps) & {
+    /** 자식 Toggle 의 기본 appearance */
     appearance?: ToggleAppearance
+    /** 자식 Toggle 의 기본 톤 */
     tone?: Tone
+    /** 자식 Toggle 의 기본 크기 */
     size?: ButtonSize
     /** 기본: single 은 붙여서(세그먼트처럼), multiple 은 띄워서. */
     attached?: boolean
+    /** 배치 방향. 방향키 이동도 이 축을 따름 */
     orientation?: 'horizontal' | 'vertical'
+    /** value 를 지정한 Toggle 들 */
     children: ReactNode
 } & Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'>
 
+/** 여러 Toggle 중 하나 또는 여러 개를 켜는 그룹 */
 export const ToggleGroup = (props: ToggleGroupProps) => {
     const {
         type = 'single',

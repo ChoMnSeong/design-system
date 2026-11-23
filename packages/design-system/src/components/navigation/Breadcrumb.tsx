@@ -3,23 +3,32 @@ import { IconChevronDown, IconMoreHorizontal } from '../icons.js'
 import { Menu, type MenuItemDef } from '../overlay/Menu.js'
 
 export type BreadcrumbItem = {
+    /** 표시 이름 */
     label: ReactNode
+    /** 링크 주소 (있으면 <a>) */
     href?: string
+    /** 항목을 누를 때 */
     onClick?: () => void
+    /** 이름 앞 아이콘 */
     icon?: ReactNode
     /** 형제 페이지로 바로 이동하는 드롭다운 */
     menu?: MenuItemDef[]
 }
 
 export type BreadcrumbProps = {
+    /** 경로 항목 (마지막이 현재 페이지) */
     items: BreadcrumbItem[]
+    /** 항목 사이 구분자 */
     separator?: ReactNode
     /** 넘으면 가운데를 ··· 로 접는다 (처음 1개 + 마지막 maxItems-1 개) */
     maxItems?: number
+    /** 글자 sm 12 · md 13 (px) */
     size?: 'sm' | 'md'
+    /** 라우터 링크로 바꿔 그림 (항목, 내용). 마지막 항목 제외 */
     renderLink?: (item: BreadcrumbItem, children: ReactNode) => ReactNode
 } & HTMLAttributes<HTMLElement>
 
+/** 현재 페이지까지의 경로 표시 */
 export const Breadcrumb = ({ items, separator = '/', maxItems, size = 'md', renderLink, ...rest }: BreadcrumbProps) => {
     const collapse = maxItems && items.length > maxItems
     const head = collapse ? items.slice(0, 1) : items

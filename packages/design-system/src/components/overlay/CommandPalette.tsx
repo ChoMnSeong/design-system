@@ -5,35 +5,52 @@ import { Kbd } from '../display/Kbd.js'
 import { useModalBehavior, useOverlayState } from './Dialog.js'
 
 export type CommandItem = {
+    /** 항목 키 (최근 기록에도 쓰인다) */
     id: string
+    /** 항목 이름. 검색 대상 */
     label: string
+    /** 이름 아래 보조 설명 */
     description?: string
+    /** 앞 아이콘 */
     icon?: ReactNode
+    /** 묶어 보일 그룹 이름 */
     group?: string
+    /** 검색에만 쓰는 추가 단어 */
     keywords?: string[]
+    /** 오른쪽 단축키 표시. 공백으로 키를 나눈다 */
     shortcut?: string
+    /** 실행 불가 */
     disabled?: boolean
+    /** 항목을 실행할 때 (실행 뒤 창이 닫힌다) */
     onSelect: () => void
 }
 
 export type CommandPaletteProps = {
+    /** 제어 모드 열림 */
     open?: boolean
+    /** 비제어 초기 열림 */
     defaultOpen?: boolean
+    /** 열림이 바뀔 때 (새 상태) */
     onOpenChange?: (open: boolean) => void
     /** @deprecated onOpenChange(false) */
     onClose?: () => void
+    /** 고정 명령 목록 */
     items?: CommandItem[]
     /** 서버 검색. 입력이 바뀔 때(200ms 뒤) 불린다. 결과는 items 뒤에 붙는다 */
     loadItems?: (query: string) => Promise<CommandItem[]>
+    /** 검색 입력 안내 글자 */
     placeholder?: string
+    /** 결과가 없을 때 보일 내용 */
     emptyMessage?: ReactNode
     /** 전역 단축키. 'mod' 는 macOS 에서 ⌘, 그 밖에서 Ctrl. false 면 끈다 */
     hotkey?: string | false
     /** 최근 실행한 항목을 맨 위 '최근' 그룹에 보인다. 문자열이면 localStorage 키 */
     recent?: boolean | string
+    /** 아래 안내 줄. 없으면 ↑↓ 이동 · Enter 실행 */
     footer?: ReactNode
     /** 점수(0 이면 제외). 기본은 라벨 앞부분 일치 > 포함 > 키워드 */
     filter?: (item: CommandItem, query: string) => number
+    /** 최대 폭. md 560 · lg 720 */
     size?: 'md' | 'lg'
 }
 
@@ -60,6 +77,7 @@ const matchesHotkey = (e: globalThis.KeyboardEvent, hk: string) => {
     return e.key.toLowerCase() === key && e.metaKey === need.meta && e.ctrlKey === need.ctrl && e.shiftKey === need.shift && e.altKey === need.alt
 }
 
+/** 단축키로 여는 명령 검색 · 실행 창 */
 export const CommandPalette = ({
     open: openProp,
     defaultOpen,

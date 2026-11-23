@@ -10,7 +10,9 @@ import { useBorderVariant } from '../../provider/useDesignSystem.js'
 export type BoxSurface = 'page' | 'panel' | 'card' | 'overlay' | 'inset' | 'none'
 
 export type BoxProps = {
+    /** 배경 · 테두리 · 그림자를 가져올 표면 토큰 */
     surface?: BoxSurface
+    /** 테두리 방식. 없으면 Provider 설정 */
     variant?: BorderVariant
     /** px 숫자 또는 CSS 길이. 토큰은 space(3) */
     padding?: number | string
@@ -18,6 +20,7 @@ export type BoxProps = {
     radius?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full' | (string & {})
     /** 옅은 톤 배경 */
     tone?: Tone
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
@@ -52,6 +55,7 @@ const surfaceStyles = (
     })
 }
 
+/** 표면 · 여백 · 모서리를 토큰으로 주는 기본 상자 */
 export const Box = ({
     surface = 'none',
     variant: variantProp,

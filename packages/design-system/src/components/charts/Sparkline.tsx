@@ -2,10 +2,15 @@ import type { SVGAttributes } from 'react'
 import type { Tone } from '../types.js'
 
 export type SparklineProps = {
+    /** 값 배열 (2개 미만이면 그리지 않음) */
     data: number[]
+    /** line: 선 · bar: 막대 · area: 선 + 채움 */
     type?: 'line' | 'bar' | 'area'
+    /** 너비 (px 또는 CSS 길이) */
     width?: number | string
+    /** 높이 (px) */
     height?: number
+    /** 색 톤 */
     tone?: Tone
     /** 마지막 점 강조 */
     showLast?: boolean
@@ -13,6 +18,7 @@ export type SparklineProps = {
     highlightLast?: boolean
     /** 기준선 (목표 등) */
     reference?: number
+    /** 있으면 img 로 읽고, 없으면 보조기기에서 숨김 */
     'aria-label'?: string
 } & Omit<SVGAttributes<SVGSVGElement>, 'type'>
 

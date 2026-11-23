@@ -22,7 +22,9 @@ export type AppShellProps = {
     headerActions?: ReactNode
     /** 메뉴 항목. 주면 아이콘 · 선택 표시 · 접힘이 맞춰진 NavigationMenu 를 그린다 */
     navigation?: NavItem[]
+    /** 선택 표시할 메뉴 항목 id */
     activeNavId?: string
+    /** 하위 없는 메뉴 항목을 누를 때 (항목). 항목 onClick 이 우선 */
     onNavigate?: (item: NavItem) => void
     /** 사이드바 아래 */
     sidebarFooter?: ReactNode
@@ -30,20 +32,27 @@ export type AppShellProps = {
     collapseButton?: 'header' | 'sidebar' | 'none'
     /** ⌘B / Ctrl+B 로 접기 (기본 true) */
     collapseShortcut?: boolean
+    /** 사이드바 내용을 직접 그린다. 주면 navigation 대신 쓴다 */
     sidebar?: ReactNode
     /** 맨 아래 상태 줄 (PLC 연결 · 마지막 갱신 · 버전) */
     footer?: ReactNode
+    /** 펼친 사이드바 폭 (px) */
     sidebarWidth?: number
+    /** 제어 모드 사이드바 접힘 */
     sidebarCollapsed?: boolean
+    /** 비제어 초기 사이드바 접힘 */
     defaultSidebarCollapsed?: boolean
+    /** 접힘이 바뀔 때 (새 상태) */
     onSidebarCollapsedChange?: (collapsed: boolean) => void
     /** 접힌 사이드바 폭 */
     collapsedWidth?: number
     /** 현장 모니터: 헤더 · 사이드바를 숨기고 글자를 키운다 */
     kiosk?: boolean
+    /** 본문(main)에 그릴 화면 내용 */
     children: ReactNode
 } & HTMLAttributes<HTMLDivElement>
 
+/** 머리말 · 사이드바 · 본문 · 상태 줄로 짠 앱 전체 틀 */
 export const AppShell = ({
     header,
     brand,
@@ -135,8 +144,11 @@ export const AppShell = ({
 /* ───────────────────────── PageHeader ───────────────────────── */
 
 export type PageHeaderProps = {
+    /** 페이지 제목 (h1) */
     title: ReactNode
+    /** 제목 아래 설명 문단 */
     description?: ReactNode
+    /** 제목 위 경로 표시 */
     breadcrumb?: ReactNode
     /** 오른쪽 버튼 */
     actions?: ReactNode
@@ -146,9 +158,11 @@ export type PageHeaderProps = {
     meta?: ReactNode
     /** 제목 옆 (상태 배지) */
     extra?: ReactNode
+    /** 뒤로 버튼을 누를 때. 주면 제목 앞에 버튼이 생긴다 */
     onBack?: () => void
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 
+/** 화면 맨 위 제목 · 설명 · 동작 버튼 · 탭 묶음 */
 export const PageHeader = ({ title, description, breadcrumb, actions, tabs, meta, extra, onBack, ...rest }: PageHeaderProps) => (
     <div data-ds-page-header="" {...rest}>
         {breadcrumb && <div data-slot="breadcrumb">{breadcrumb}</div>}
@@ -175,9 +189,13 @@ export type FilterBarProps = {
     columns?: number
     /** 접었을 때 보일 줄 수. 넘치는 조건은 "조건 N개 더보기" */
     collapsedRows?: number
+    /** 비제어 초기 펼침 (넘친 조건까지 보이기) */
     defaultExpanded?: boolean
+    /** 조회 버튼 · Enter 로 제출할 때 */
     onSearch?: () => void
+    /** 초기화 버튼을 누를 때. 주면 버튼이 보인다 */
     onReset?: () => void
+    /** 조회 버튼 글자 */
     searchLabel?: ReactNode
     /** 적용된 조건 칩 */
     appliedChips?: Array<{ label: ReactNode; onRemove?: () => void }>
@@ -185,6 +203,7 @@ export type FilterBarProps = {
     extra?: ReactNode
 } & Omit<HTMLAttributes<HTMLFormElement>, 'onReset'>
 
+/** 조회 조건 · 조회/초기화 버튼 · 적용 칩을 묶은 검색 폼 */
 export const FilterBar = ({
     fields,
     columns = 4,
@@ -265,13 +284,17 @@ export const FilterBar = ({
 /* ───────────────────────── Splitter ───────────────────────── */
 
 export type SplitterProps = {
+    /** horizontal 좌우 분할 · vertical 위아래 분할 */
     direction?: 'horizontal' | 'vertical'
     /** 첫 패널 크기. 숫자는 px, '40%' 처럼 퍼센트도 된다 */
     defaultSize?: number | string
+    /** 패널 최소 크기 (px). maxSize 가 없으면 둘째 패널에도 */
     minSize?: number
+    /** 첫 패널 최대 크기 (px) */
     maxSize?: number
     /** 손잡이를 두 번 누르면 첫 패널을 접는다 */
     collapsible?: boolean
+    /** 끌거나 방향키로 크기를 바꿀 때 (첫 패널 px) */
     onResize?: (px: number) => void
     /** localStorage 키. 크기를 기억한다 */
     stateKey?: string
@@ -279,6 +302,7 @@ export type SplitterProps = {
     children: [ReactNode, ReactNode]
 } & HTMLAttributes<HTMLDivElement>
 
+/** 손잡이로 크기를 조절하는 두 패널 분할 */
 export const Splitter = ({
     direction = 'horizontal',
     defaultSize = '50%',

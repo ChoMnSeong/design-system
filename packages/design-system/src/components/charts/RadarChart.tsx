@@ -2,17 +2,24 @@ import { chartColor } from './CartesianChart.js'
 import { useId, type CSSProperties, type ReactNode } from 'react'
 
 export type RadarSeries = {
+    /** 범례 · tooltip 이름 */
     label?: string
     /** label 별칭 (비교 모드) */
     name?: string
+    /** axes 순서의 값 */
     values: number[]
+    /** 직접 색 (tone 보다 우선) */
     color?: string
+    /** 색 톤 */
     tone?: import('../types.js').Tone
 }
 
 export type RadarChartProps = {
+    /** 축 이름 (12시부터 시계방향) */
     axes: string[]
+    /** 그릴 시리즈 */
     series: RadarSeries[]
+    /** 너비 · 높이 (px) */
     size?: number
     /** 하나면 모든 축 공통, 배열이면 축별 최댓값 (단위가 다른 지표 비교) */
     max?: number | number[]
@@ -20,6 +27,7 @@ export type RadarChartProps = {
     legend?: 'top' | 'bottom' | 'none'
     /** 점에 마우스를 올리면 값 표시 (title) */
     tooltip?: boolean
+    /** 격자 단계 수 */
     levels?: number
     /** @deprecated legend 를 쓴다 */
     showLegend?: boolean
@@ -33,11 +41,13 @@ export type RadarChartProps = {
     gridFilled?: boolean
     /** 축 라벨 커스텀 렌더 (값 등 추가 표시 가능). */
     axisLabelRender?: (axis: string, idx: number) => ReactNode
+    /** 영역 채움 투명도 (0~1) */
     fillOpacity?: number
     /** 꼭짓점 사이를 부드럽게 */
     curve?: 'linear' | 'smooth'
     /** 오른쪽 요약 칸 (비교 수치 표) */
     aside?: ReactNode
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -65,6 +75,7 @@ const smoothClosed = (pts: ReadonlyArray<readonly number[]>) => {
     return d + ' Z'
 }
 
+/** 여러 지표를 축으로 놓고 비교하는 방사형 차트 */
 export const RadarChart = ({
     axes,
     series,

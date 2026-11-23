@@ -18,32 +18,50 @@ export type CalendarMode = 'single' | 'range' | 'multiple'
 export type CalendarPicker = 'date' | 'week' | 'month' | 'quarter' | 'year'
 
 export type DayState = {
+    /** 선택됨 (week 면 그 주 전체) */
     selected: boolean
+    /** 기간 사이 (양 끝 제외) */
     inRange: boolean
+    /** 기간 시작일 */
     rangeStart: boolean
+    /** 기간 끝일 */
     rangeEnd: boolean
+    /** 오늘 */
     today: boolean
+    /** 보이는 달 밖의 날짜 */
     outside: boolean
+    /** 고를 수 없음 */
     disabled: boolean
+    /** holidays 에 든 날 */
     holiday: boolean
+    /** 일요일 0 · 토요일 6 · 평일 null */
     weekend: 0 | 6 | null
 }
 
 type RangeValue = [string | null, string | null]
 
 export type CalendarProps = {
+    /** single: 날짜 하나 · range: 기간 · multiple: 여러 날짜 */
     mode?: CalendarMode
+    /** 고르는 단위. week 는 그 주 시작일, month · quarter · year 는 첫날이 값 */
     picker?: CalendarPicker
     /** single: 'YYYY-MM-DD', range: [시작, 끝], multiple: 날짜 배열 */
     value?: string | null | RangeValue | string[]
+    /** 비제어 초기값 */
     defaultValue?: string | null | RangeValue | string[]
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: any) => void
     /** @deprecated onValueChange 를 쓴다 (single 에서만 호출) */
     onChange?: (value: string) => void
+    /** 요일 · 달 이름 로케일 (없으면 Provider 설정) */
     locale?: string
+    /** 주 시작 요일 0 일요일 · 1 월요일 (없으면 Provider 설정) */
     weekStartsOn?: 0 | 1
+    /** 고를 수 있는 첫날 'YYYY-MM-DD' */
     minDate?: string
+    /** 고를 수 있는 마지막 날 'YYYY-MM-DD' */
     maxDate?: string
+    /** true 를 돌려주면 그 날은 못 고른다 */
     disabledDates?: (date: Date) => boolean
     /** 공휴일. 빨간 글자로 보인다 */
     holidays?: string[] | ((date: Date) => boolean)
@@ -59,13 +77,16 @@ export type CalendarProps = {
     showToday?: boolean
     /** 칸 높이. renderDay 를 쓰면 46 이 알맞다 */
     cellHeight?: number
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
+    /** 달력 이름 (스크린 리더) */
     'aria-label'?: string
 }
 
 const toList = (v: CalendarProps['value']): string[] =>
     v == null ? [] : Array.isArray(v) ? (v.filter(Boolean) as string[]) : [v]
 
+/** 날짜 · 기간 · 여러 날짜를 고르는 달력. 주 · 월 · 분기 · 연 단위도 */
 export const Calendar = ({
     mode = 'single',
     picker = 'date',

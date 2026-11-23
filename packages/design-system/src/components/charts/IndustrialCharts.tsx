@@ -18,14 +18,21 @@ const fmtN = (n: number) => n.toLocaleString('ko-KR', { maximumFractionDigits: 2
 /* ───────────────────────── Pareto ───────────────────────── */
 
 export type ParetoChartProps = {
+    /** 항목별 값 (불량 유형 · 건수) */
     data: Array<{ label: string; value: number }>
+    /** desc: 큰 값부터 · none: 입력 순서 */
     sort?: 'desc' | 'none'
     /** 누적 기준선 (0.8 = 80%). 이 안의 항목을 강조한다 */
     vitalFew?: number
+    /** 건수 형식 (왼쪽 축 · tooltip) */
     formatValue?: (n: number) => string
+    /** 누적 비율 형식 (오른쪽 축 · tooltip) */
     formatPercent?: (n: number) => string
+    /** 그림 영역 높이 (px) */
     height?: number
+    /** 차트 svg 의 접근성 이름 */
     'aria-label'?: string
+    /** 차트 요소 style */
     style?: CSSProperties
 }
 
@@ -72,20 +79,31 @@ export const NELSON: ControlRule[] = [
 ]
 
 export type ControlChartProps = {
+    /** 측정값 (숫자 배열 또는 x 라벨 · y 값) */
     data: number[] | Array<{ x: string; y: number }>
+    /** 중심선 (없으면 평균) */
     cl?: number
+    /** 관리 상한 (없으면 CL + 3σ) */
     ucl?: number
+    /** 관리 하한 (없으면 CL - 3σ) */
     lcl?: number
     /** 규격 한계 (고객 요구) */
     usl?: number
+    /** 규격 하한 */
     lsl?: number
+    /** 이상 판정 규칙 (이름 또는 직접 목록) */
     rules?: 'western-electric' | 'nelson' | ControlRule[]
     /** ±1σ · ±2σ 음영 */
     sigmaZones?: boolean
+    /** 규칙을 어긴 점이 있을 때 (점 인덱스, 규칙) */
     onViolation?: (points: number[], rule: ControlRule) => void
+    /** 축 · 한계선 라벨 값 형식 */
     formatValue?: (n: number) => string
+    /** 그림 영역 높이 (px) */
     height?: number
+    /** 차트 svg 의 접근성 이름 */
     'aria-label'?: string
+    /** 차트 요소 style */
     style?: CSSProperties
 }
 
@@ -157,15 +175,23 @@ export const ControlChart = ({ data, cl, ucl, lcl, usl, lsl, rules = 'western-el
 /* ───────────────────────── Bullet ───────────────────────── */
 
 export type BulletChartProps = {
+    /** 실적 값 */
     value: number
+    /** 목표 눈금 */
     target?: number
     /** 뒤 배경 구간 (불량 · 보통 · 양호). to 는 누적 상한 */
     ranges?: Array<{ to: number; label?: string }>
+    /** 끝 값 (없으면 값 · 목표 · 구간 최대 + 5%) */
     max?: number
+    /** 실적 막대 톤 */
     tone?: Tone
+    /** 앞쪽 이름 */
     label?: ReactNode
+    /** 값 · 목표 글자 형식 */
     formatValue?: (n: number) => string
+    /** horizontal: 가로 · vertical: 세로 */
     orientation?: 'horizontal' | 'vertical'
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -199,13 +225,19 @@ export const BulletChart = ({ value, target, ranges = [], max: maxProp, tone = '
 /* ───────────────────────── Waterfall ───────────────────────── */
 
 export type WaterfallChartProps = {
+    /** 단계 목록 (total: 합계 막대 · delta: 증감) */
     steps: Array<{ label: string; value: number; type?: 'total' | 'delta' }>
     /** 증가 · 감소 톤 (원가처럼 증가가 나쁘면 increase='danger') */
     increase?: Tone
+    /** 감소 막대 톤 */
     decrease?: Tone
+    /** 막대 끝을 잇는 점선 */
     connectors?: boolean
+    /** 축 눈금 · 막대 값 형식 */
     formatValue?: (n: number) => string
+    /** 높이 (px) */
     height?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -270,19 +302,31 @@ export const WaterfallChart = ({ steps, increase = 'success', decrease = 'danger
 /* ───────────────────────── Heatmap ───────────────────────── */
 
 export type HeatmapProps = {
+    /** 행 이름 */
     rows: string[]
+    /** 열 이름 */
     columns: string[]
+    /** [행][열] 값. null 은 빈 칸 */
     values: Array<Array<number | null>>
     /** sequential: 낮음 → 높음 · diverging: 가운데(0) 기준 양쪽 */
     scale?: 'sequential' | 'diverging'
+    /** 색 범위 최솟값 (없으면 데이터 최소) */
     min?: number
+    /** 색 범위 최댓값 (없으면 데이터 최대) */
     max?: number
+    /** sequential 색 톤 */
     tone?: Tone
+    /** 칸 · 범례 값 형식 */
     formatValue?: (n: number) => string
+    /** 칸 안에 값 글자 */
     showValues?: boolean
+    /** 칸을 눌렀을 때 (행, 열 인덱스) */
     onCellClick?: (row: number, col: number) => void
+    /** 칸 높이 (px) */
     cellHeight?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
+    /** 표 접근성 이름 */
     'aria-label'?: string
 }
 
@@ -347,15 +391,23 @@ export const Heatmap = ({ rows, columns, values, scale = 'sequential', min, max,
 export type StatusSegment = { from: Date | string; to: Date | string; status: string; note?: string }
 
 export type StatusTimelineProps = {
+    /** 행(설비)별 이름 · 상태 구간 */
     rows: Array<{ id: string; label: ReactNode; segments: StatusSegment[] }>
+    /** 상태 키별 이름 · 색 */
     statusMap: Record<string, { label: string; tone?: Tone; color?: string }>
+    /** 시간 축 범위 (시작, 끝) */
     range: [Date | string, Date | string]
+    /** 현재 시각 세로선 */
     now?: Date | string
+    /** 강조할 행 · 구간 */
     highlight?: { rowId: string; from: Date | string; to: Date | string }
+    /** 구간을 눌렀을 때 (행 id, 구간) */
     onSegmentClick?: (rowId: string, seg: StatusSegment) => void
     /** 드래그로 구간 확대, 더블클릭으로 되돌림 */
     zoom?: boolean
+    /** 행 높이 (px) */
     rowHeight?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -443,27 +495,42 @@ export const StatusTimeline = ({ rows, statusMap, range, now, highlight, onSegme
 /* ───────────────────────── Gantt ───────────────────────── */
 
 export type GanttTask = {
+    /** 작업 id (parent · dependencies 에서 참조) */
     id: string
+    /** 왼쪽 목록에 보일 이름 */
     name: ReactNode
+    /** 시작일 */
     start: Date | string
+    /** 종료일 */
     end: Date | string
     /** 0~100 */
     progress?: number
+    /** 상위 작업 id (접을 수 있는 트리) */
     parent?: string
+    /** milestone 이면 start 위치에 마름모 */
     type?: 'task' | 'milestone'
+    /** 막대 톤 (없으면 상위 작업은 neutral) */
     tone?: Tone
 }
 
 export type GanttChartProps = {
+    /** 작업 목록 (parent 로 트리) */
     tasks: GanttTask[]
+    /** 선후 관계 화살표 (FS · SS · FF) */
     dependencies?: Array<{ from: string; to: string; type?: 'FS' | 'SS' | 'FF' }>
+    /** 시간 축 단위 (칸 폭 · 머리글 간격) */
     scale?: 'day' | 'week' | 'month'
+    /** 오늘 세로선 */
     today?: Date | string
     /** 막대를 끌어 일정 이동 (양끝은 기간 조정) */
     onTaskChange?: (task: GanttTask) => void
+    /** 제어 모드 접힌 작업 id */
     collapsed?: string[]
+    /** 접힘이 바뀔 때 (접힌 id 목록) */
     onCollapsedChange?: (ids: string[]) => void
+    /** 행 높이 (px) */
     rowHeight?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 

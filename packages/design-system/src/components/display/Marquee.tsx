@@ -15,16 +15,21 @@ const KEYFRAMES = `
 `.trim()
 
 export type MarqueeProps = {
+    /** 흘러가는 방향 */
     direction?: 'left' | 'right' | 'up' | 'down'
     /** Animation duration in seconds. Lower = faster. Default 12. */
     speed?: number
+    /** 마우스를 올리면 멈춤 */
     pauseOnHover?: boolean
     /** Gap between items WITHIN children (not between repeats). */
     gap?: string | number
+    /** 반복해서 흘릴 내용 */
     children: ReactNode
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
+/** 내용을 복제해 끊김 없이 흘려 보내는 마퀴 */
 export const Marquee = ({
     direction = 'left',
     speed = 12,

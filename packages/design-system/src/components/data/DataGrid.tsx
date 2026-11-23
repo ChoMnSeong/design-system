@@ -12,32 +12,47 @@ import { AdvancedFilterEditor, CellEditor, GridSideBar, SetFilterList, cellClass
 
 export * from './dataGridModel.js'
 
-export type CellChange<T extends GridRow = GridRow> = { rowId: string; field: string; oldValue: any; newValue: any; row: T }
-export type SavedView = { name: string; filterModel?: FilterModel; sortModel?: SortItem[]; groupBy?: string[]; hidden?: string[] }
+export type CellChange<T extends GridRow = GridRow> = { /** 행 id */ rowId: string; /** 열 field */ field: string; /** 바뀌기 전 값 */ oldValue: any; /** 새 값 */ newValue: any; /** 바뀌기 전 행 데이터 */ row: T }
+export type SavedView = { /** 보기 이름 (선택 목록에 보인다) */ name: string; /** 적용할 필터 */ filterModel?: FilterModel; /** 적용할 정렬 */ sortModel?: SortItem[]; /** 적용할 행 그룹 */ groupBy?: string[]; /** 숨길 열 field */ hidden?: string[] }
 export type StatusBarItem = 'count' | 'selected' | 'sum' | 'avg' | 'min' | 'max' | 'changes'
 
 export type DataGridProps<T extends GridRow = GridRow> = {
+    /** 행 데이터 */
     rows: T[]
+    /** 열 정의 (children 으로 다단 헤더) */
     columns: GridColumn<T>[]
+    /** 행 id 를 돌려준다 (없으면 row.id, 그것도 없으면 자동) */
     getRowId?: (row: T) => string
     /* 헤더 · 열 */
+    /** 제어 모드 정렬 (앞 항목부터 우선) */
     sortModel?: SortItem[]
+    /** 비제어 초기 정렬 */
     defaultSortModel?: SortItem[]
+    /** 정렬이 바뀔 때 (새 정렬) */
     onSortModelChange?: (m: SortItem[]) => void
+    /** 빠른 검색어 (모든 열 표시값에서 찾는다). 주면 입력칸보다 우선 */
     quickFilter?: string
     /** 빠른 검색 입력칸을 위 막대에 둔다 */
     showQuickFilter?: boolean
     /* 필터 */
+    /** 제어 모드 필터 (field → 조건) */
     filterModel?: FilterModel
+    /** 비제어 초기 필터 */
     defaultFilterModel?: FilterModel
+    /** 필터가 바뀔 때 (새 필터) */
     onFilterModelChange?: (m: FilterModel) => void
+    /** true 면 위 막대에 고급 필터 버튼. 객체면 제어 모드 조건 */
     advancedFilter?: AdvancedFilter | boolean
+    /** 고급 필터 조건이 바뀔 때 (새 조건) */
     onAdvancedFilterChange?: (f: AdvancedFilter) => void
+    /** 위 막대 '저장된 보기' 목록. 고르면 필터 · 정렬 · 그룹 · 숨김을 바꾼다 */
     savedViews?: SavedView[]
     /* 편집 · 선택 · 상태 막대 */
+    /** 셀 값이 바뀔 때 (변경 내용). 붙여넣기 · 되돌리기 포함 */
     onCellValueChanged?: (c: CellChange<T>) => void
     /** true 면 바뀐 값을 모아 두었다가 onSaveChanges 로 한꺼번에 넘긴다 */
     pendingChanges?: boolean
+    /** '변경 저장'을 누를 때 (모은 변경 목록) */
     onSaveChanges?: (changes: CellChange<T>[]) => void
     /** 범위 선택 + 채우기 핸들 */
     cellSelection?: boolean
@@ -45,41 +60,66 @@ export type DataGridProps<T extends GridRow = GridRow> = {
     clipboard?: boolean
     /** 되돌리기 깊이. true = 20 */
     undoRedo?: boolean | number
+    /** 아래 상태 막대 항목. true 면 count · sum · avg · changes (합계 등은 선택 범위 기준) */
     statusBar?: StatusBarItem[] | boolean
     /* 행 그룹 · 피벗 · 도구 패널 */
+    /** 제어 모드 행 그룹 열(field) 순서 */
     groupBy?: string[]
+    /** 비제어 초기 행 그룹 */
     defaultGroupBy?: string[]
+    /** 행 그룹이 바뀔 때 (새 field 목록) */
     onGroupByChange?: (g: string[]) => void
+    /** 열 머리를 끌어 놓아 그룹을 만드는 위 패널 */
     groupPanel?: boolean
+    /** 처음 펼쳐 둘 단계 수 (그룹 · 트리) */
     groupDefaultExpanded?: number
+    /** 오른쪽 도구 패널 (열 표시 · 필터). true 면 둘 다 */
     sideBar?: boolean | Array<'columns' | 'filters'>
+    /** 피벗. groupBy 행 × columns 값마다 values 를 집계한 열 */
     pivot?: { columns: string[]; values: string[] }
     /** 'total' 이면 aggFunc 로 합계 행을 만든다 */
     pinnedBottomRow?: 'total' | T
     /* 트리 · 마스터-디테일 */
+    /** 행의 트리 경로를 돌려준다. 주면 트리로 그린다 */
     getDataPath?: (row: T) => string[]
     /** 트리에서 자식 값을 부모에 집계 */
     treeAggregate?: boolean
+    /** 트리 이름 열의 머리 글 */
     treeColumnName?: ReactNode
+    /** 행 아래 펼치는 상세 (마스터-디테일). 주면 가상화 끔 */
     renderDetail?: (row: T) => ReactNode
     /* 상태 · 대용량 */
+    /** 불러오는 중 스피너 (hasMore 가 있고 행이 있으면 맨 아래 줄에) */
     loading?: boolean
+    /** 오류 내용. 본문 대신 보인다 */
     error?: ReactNode
+    /** '다시 시도'를 누를 때 (error 일 때 버튼) */
     onRetry?: () => void
+    /** 행이 없을 때 문구 */
     emptyText?: ReactNode
+    /** 본문 높이 */
     height?: number | string
+    /** 행 높이(px). 없으면 density 를 따른다 */
     rowHeight?: number
+    /** 행 높이 compact 30 · default 36 · comfortable 44 */
     density?: 'compact' | 'default' | 'comfortable'
     /** 이 행 수를 넘으면 화면에 보이는 행만 그린다 (기본 100, false 끔) */
     virtualize?: boolean | number
+    /** 페이지당 행 수. 주면 상태 막대에 페이지 넘김 (그룹 · 트리 제외) */
     pageSize?: number
     /** 끝 근처로 스크롤하면 호출 (무한 스크롤) */
     onLoadMore?: () => void
+    /** 더 불러올 행이 있는지 (onLoadMore 호출 조건) */
     hasMore?: boolean
+    /** 주면 내보내기 메뉴 (CSV · Excel) 를 두고 파일 이름으로 쓴다 */
     exportFileName?: string
+    /** 위 막대에 넣을 요소 */
     toolbar?: ReactNode
+    /** 그리드 이름 (스크린 리더) */
     'aria-label'?: string
+    /** 바깥 요소 클래스 */
     className?: string
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
@@ -92,6 +132,7 @@ const useControlled = <V,>(value: V | undefined, def: V, cb?: (v: V) => void) =>
     return [v, set] as const
 }
 
+/** 엑셀형 데이터 그리드. 정렬 · 필터 · 그룹 · 피벗 · 트리 · 셀 편집 · 가상화 */
 export const DataGrid = <T extends GridRow>(props: DataGridProps<T>) => {
     const {
         rows: rowsProp, columns: colsProp, getRowId, quickFilter: qfProp, showQuickFilter, savedViews, onCellValueChanged, pendingChanges, onSaveChanges,

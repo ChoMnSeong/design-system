@@ -7,25 +7,35 @@ import { useState, type CSSProperties, type ReactNode } from 'react'
 export type MediaRatio = '1' | '4/3' | '16/9' | '2/3' | '3/4' | number
 
 export type MediaProps = {
+    /** 이미지 주소. 없으면 자리 표시만 */
     src?: string
     /** 대체 텍스트 (장식이면 "") */
     alt: string
+    /** 가로/세로 비율. 숫자면 그대로 aspect-ratio */
     ratio?: MediaRatio
     /** blur: placeholderSrc 를 흐리게 · color: placeholderColor 단색 */
     placeholder?: 'blur' | 'color' | 'none'
+    /** 불러오는 동안 흐리게 깔 작은 이미지 주소 */
     placeholderSrc?: string
+    /** 자리 표시 단색 (blur 인데 placeholderSrc 가 없을 때도) */
     placeholderColor?: string
+    /** 화면 가까이 올 때 불러오기 (loading="lazy") */
     lazy?: boolean
+    /** cover: 잘라서 채움 · contain: 전체가 보이게 */
     fit?: 'cover' | 'contain'
+    /** 모서리 둥글기. 숫자면 px */
     radius?: number | string
     /** 이미지 위에 얹는 요소 (배지 · 찜 버튼 · 이어보기 막대) */
     overlay?: ReactNode
     /** 이미지 아래쪽 글. 가장자리에서 띄우고 아래만 어둡게 깔아 읽히게 한다 */
     caption?: ReactNode
+    /** 바깥 상자 스타일 */
     style?: CSSProperties
+    /** 바깥 상자 클래스 */
     className?: string
 }
 
+/** 비율을 고정한 이미지. 불러오는 동안 흐린 이미지나 단색을 깐다 */
 export const Media = ({ src, alt, ratio = '1', placeholder = 'blur', placeholderSrc, placeholderColor, lazy = true, fit = 'cover', radius, overlay, caption, style, className }: MediaProps) => {
     const [loaded, setLoaded] = useState(false)
     const r = typeof ratio === 'number' ? String(ratio) : ratio.replace('/', ' / ')
@@ -43,27 +53,34 @@ export const Media = ({ src, alt, ratio = '1', placeholder = 'blur', placeholder
 /* ───────── Price ───────── */
 
 export type PriceProps = {
+    /** 판매가 */
     value: number
     /** 정가 — 있으면 취소선 + 할인율 */
     listPrice?: number
+    /** 통화 코드 (ISO 4217). 'KRW' 는 "62,300원", 그 밖은 Intl 통화 형식 */
     currency?: string
+    /** 숫자 · 통화 형식 로케일 */
     locale?: string
-    /** 'KRW' 는 "62,300원", 그 밖은 Intl 통화 형식 */
+    /** 단위 가격 문구 (예: "100g당 2,580원") */
     unitPrice?: ReactNode
     /** 쿠폰 적용가 */
     coupon?: number
+    /** 판매가를 흐리게 + '품절' 표시, 쿠폰가 숨김 */
     soldOut?: boolean
+    /** 글자 크기 sm 16 · md 18 · lg 26 */
     size?: 'sm' | 'md' | 'lg'
     /** stacked: 정가를 위 줄에 · inline: 판매가 뒤에 작게 (목록 카드용, 카드 폭 168 이하면 정가를 숨김) */
     layout?: 'stacked' | 'inline'
     /** 할인이 없어도 정가 줄 높이를 비워 둔다. 목록에서 카드 높이 · 가격 위치를 맞출 때 */
     reserveListRow?: boolean
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
 export const formatPrice = (n: number, currency = 'KRW', locale = 'ko-KR') =>
     currency === 'KRW' ? `${n.toLocaleString(locale)}원` : new Intl.NumberFormat(locale, { style: 'currency', currency }).format(n)
 
+/** 판매가 · 정가 · 할인율 · 쿠폰가 표시. KRW 는 "원" 단위 */
 export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', unitPrice, coupon, soldOut, size = 'md', layout = 'stacked', reserveListRow, style }: PriceProps) => {
     const rate = listPrice && listPrice > value ? Math.round((1 - value / listPrice) * 100) : 0
     const krw = currency === 'KRW'
@@ -87,14 +104,19 @@ export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', un
 /* ───────── RatingDisplay ───────── */
 
 export type RatingDisplayProps = {
+    /** 평균 별점 (소수 첫째 자리까지 표시) */
     value: number
+    /** 리뷰 수 */
     count?: number
     /** [5점, 4점, 3점, 2점, 1점] 개수 또는 비율 */
     distribution?: number[]
     /** inline: ★4.6 (1,284) · compact: 4.6 · 리뷰 1,284 · summary: 큰 숫자 + 분포 */
     layout?: 'inline' | 'compact' | 'summary'
+    /** 만점 (별 개수) */
     max?: number
+    /** 별 크기(px). summary 의 큰 별은 18 고정 */
     size?: number
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
@@ -105,6 +127,7 @@ const Stars = ({ value, max, size }: { value: number; max: number; size: number 
     </span>
 )
 
+/** 별점과 리뷰 수 표시. summary 는 점수별 분포 막대까지 */
 export const RatingDisplay = ({ value, count, distribution, layout = 'inline', max = 5, size = 14, style }: RatingDisplayProps) => {
     const label = `별점 ${value.toFixed(1)}점${count != null ? `, 리뷰 ${count.toLocaleString()}개` : ''}`
     if (layout === 'summary') {
@@ -145,13 +168,17 @@ export const RatingDisplay = ({ value, count, distribution, layout = 'inline', m
 /* ───────── RankNumber ───────── */
 
 export type RankNumberProps = {
+    /** 순위 숫자 */
     value: number
     /** outline: 큰 외곽선 숫자 (TOP 10) · solid · badge: 작은 사각 배지 */
     appearance?: 'outline' | 'solid' | 'badge'
+    /** 숫자 크기(px). badge 는 24px 고정 */
     size?: number
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 순위 숫자 (TOP 10 목록 등) */
 export const RankNumber = ({ value, appearance = 'outline', size = 64, style }: RankNumberProps) => (
     <span data-ds-rank="" data-appearance={appearance} aria-label={`${value}위`} style={{ ...style, '--_s': `${size}px` } as CSSProperties}>
         {value}
@@ -165,12 +192,15 @@ export type WatchProgressProps = {
     value: number
     /** 남은 시간 문구 (예: "38분 남음") */
     remaining?: ReactNode
+    /** 막대 아래 왼쪽 글 (overlay 면 숨김) */
     label?: ReactNode
     /** 썸네일 아래쪽에 겹쳐 놓기 */
     overlay?: boolean
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 이어보기 진행 막대 */
 export const WatchProgress = ({ value, remaining, label, overlay, style }: WatchProgressProps) => {
     const pct = Math.round(Math.max(0, Math.min(1, value)) * 100)
     return (

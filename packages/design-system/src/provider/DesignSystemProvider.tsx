@@ -29,21 +29,32 @@ import { ComponentStyles } from './ComponentStyles.js'
 import { TypographyStyles } from './TypographyStyles.js'
 
 export type FontFamilyOverrides = {
+    /** 본문 글꼴 */
     sans?: string
+    /** 세리프 글꼴 */
     serif?: string
+    /** 고정폭 글꼴 (코드 · 숫자) */
     mono?: string
+    /** 제목용 글꼴 */
     display?: string
 }
 
 export type DesignSystemProviderProps = {
+    /** 색 팔레트 (이름 또는 객체). 바뀌면 컨텍스트 값도 이 값으로 */
     palette?: PaletteName | Palette | CustomPalette
+    /** 표면 스타일 (minimal · neumorphism · glassmorphism · brutalism · retro) */
     variant?: VariantName
+    /** light · dark 색 모드 */
     mode?: Mode
+    /** 컨텍스트로 공유하는 기본 테두리 스타일 */
     borderVariant?: BorderVariant
     /** fontFamily 토큰 일부/전체 덮어쓰기. tokenOverrides의 단축. */
     fonts?: FontFamilyOverrides
+    /** 팔레트 색 단계 일부 덮어쓰기 */
     paletteOverrides?: PaletteOverrides
+    /** 기본 토큰 일부 덮어쓰기 */
     tokenOverrides?: Partial<BaseTokens>
+    /** root: <html> 에 CSS 변수 적용 · scope: 감싸는 div 에만 적용 */
     applyTo?: 'root' | 'scope'
     /** 날짜·숫자 로케일. DatePicker · Calendar 의 기본값이 된다. */
     locale?: string
@@ -53,8 +64,11 @@ export type DesignSystemProviderProps = {
     preset?: string | ThemePreset
     /** glassmorphism 배경 · 재질 */
     glass?: GlassOptions
+    /** applyTo="scope" 일 때 감싸는 div 의 class */
     className?: string
+    /** applyTo="scope" 일 때 감싸는 div 의 style */
     style?: CSSProperties
+    /** 테마를 적용할 앱 영역 */
     children: ReactNode
 }
 
@@ -103,6 +117,7 @@ const applyVarsToElement = (
     return nextKeys
 }
 
+/** 테마 CSS 변수 · 컴포넌트 스타일 · 컨텍스트를 제공하는 최상위 Provider */
 export const DesignSystemProvider = ({
     palette: paletteProp,
     variant: variantProp,

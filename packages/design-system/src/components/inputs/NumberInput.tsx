@@ -14,13 +14,19 @@ import { IconChevronDown, IconChevronUp, IconMinus, IconPlus } from '../icons.js
 import { FieldBox, useFormSize } from '../form/Field.js'
 
 export type NumberInputProps = {
+    /** 제어 모드 값. 비어 있으면 null */
     value?: number | null
+    /** 비제어 초기값 */
     defaultValue?: number | null
+    /** 값이 바뀔 때 (새 값, 비우면 null) */
     onValueChange?: (value: number | null) => void
     /** @deprecated onValueChange 를 쓴다. 빈 값이면 호출되지 않는다. */
     onChange?: (value: number) => void
+    /** 최솟값 */
     min?: number
+    /** 최댓값 */
     max?: number
+    /** 스테퍼·위아래 화살표 키로 바뀌는 양 */
     step?: number
     /** 소수 자릿수. 표시와 반올림에 쓴다. */
     precision?: number
@@ -32,17 +38,27 @@ export type NumberInputProps = {
     unit?: ReactNode
     /** both: 양쪽 −/+, right: 오른쪽 위아래 화살표, none: 없음 */
     stepper?: 'both' | 'right' | 'none'
+    /** 음수 입력 허용 */
     allowNegative?: boolean
     /** 포커스가 빠질 때 min·max 안으로 맞춘다. false 면 범위를 벗어난 값은 invalid 로 보인다. */
     clampOnBlur?: boolean
+    /** 오류 상태. 범위를 벗어나도 오류로 보인다 */
     invalid?: boolean
+    /** 읽기 전용. 스테퍼도 막는다 */
     readOnly?: boolean
+    /** 비활성 */
     disabled?: boolean
+    /** 높이 xs 24 · sm 28 · md 36 · lg 44. 없으면 Form 값 */
     size?: FieldSize
+    /** outlined 테두리 · filled 채운 배경 · underline 밑줄 · ghost 투명 */
     variant?: BorderVariant
+    /** 값이 없을 때 안내 문구 */
     placeholder?: string
+    /** 부모 너비를 꽉 채운다 */
     fullWidth?: boolean
+    /** 테두리 상자 인라인 스타일 */
     style?: CSSProperties
+    /** DOM 요소 ref */
     ref?: Ref<HTMLInputElement>
 } & Omit<
     InputHTMLAttributes<HTMLInputElement>,
@@ -52,6 +68,7 @@ export type NumberInputProps = {
 const round = (n: number, p?: number) =>
     p === undefined ? n : Math.round(n * 10 ** p) / 10 ** p
 
+/** 천 단위 서식과 스테퍼가 있는 숫자 입력 */
 export const NumberInput = ({
     value: valueProp,
     defaultValue = null,

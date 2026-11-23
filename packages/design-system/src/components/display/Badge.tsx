@@ -7,6 +7,7 @@ export type BadgeAppearance = 'solid' | 'soft' | 'outline'
 export type BadgeProps = {
     /** 'default' 는 'neutral' 과 같다 */
     tone?: Tone | 'default'
+    /** solid: 채움 · soft: 연한 배경 · outline: 테두리만 */
     appearance?: BadgeAppearance
     /** xs 18 · sm 20 · md 22 */
     size?: 'xs' | 'sm' | 'md'
@@ -16,14 +17,17 @@ export type BadgeProps = {
     max?: number
     /** 주의를 끄는 맥동 링 */
     pulse?: boolean
+    /** 글자 앞 아이콘 */
     icon?: ReactNode
     /** @deprecated appearance="solid" */
     solid?: boolean
     /** @deprecated appearance 로 통합 (outlined → outline) */
     variant?: BorderVariant
+    /** DOM 요소 ref */
     ref?: Ref<HTMLSpanElement>
 } & HTMLAttributes<HTMLSpanElement>
 
+/** 상태·개수를 표시하는 작은 라벨 */
 export const Badge = ({
     tone = 'neutral',
     appearance,

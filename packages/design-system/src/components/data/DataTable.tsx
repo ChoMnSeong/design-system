@@ -30,30 +30,46 @@ import type { Density, Option, Tone } from '../types.js'
 export type DataTableKey = string | number
 
 export type DataTableFilter =
-    | { type: 'text'; placeholder?: string }
-    | { type: 'select'; options: Option[]; placeholder?: string }
-    | { type: 'number' }
+    | { /** 포함하는 글 */ type: 'text'; /** 입력칸 안내 문구 */ placeholder?: string }
+    | { /** 값이 같은 것 */ type: 'select'; /** 선택지 */ options: Option[]; /** 선택 안내 문구 */ placeholder?: string }
+    | { /** 비교식 (">100", "<=5", "10..20") */ type: 'number' }
 
 export type Aggregate<T> = 'sum' | 'avg' | 'count' | 'min' | 'max' | ((rows: T[]) => ReactNode)
 
 export type DataTableColumn<T> = {
+    /** 열 키. accessor 가 없으면 row[id] 를 값으로 */
     id: string
+    /** 머리 글 */
     header: ReactNode
+    /** 행에서 값을 꺼낸다 (정렬 · 검색 · 필터 기준) */
     accessor?: (row: T) => unknown
+    /** 셀을 직접 그린다 (행, { 값, 행 번호 }) */
     cell?: (row: T, ctx: { value: unknown; rowIndex: number }) => ReactNode
+    /** 머리를 눌러 정렬 (오름 → 내림 → 해제) */
     sortable?: boolean
+    /** 열 폭(px) */
     width?: number
+    /** 폭 조절 최소(px) */
     minWidth?: number
+    /** 폭 조절 최대(px) */
     maxWidth?: number
+    /** 셀 글 정렬 */
     align?: 'left' | 'right' | 'center'
+    /** 머리에 필터 버튼을 단다 */
     filter?: DataTableFilter
+    /** 가로 스크롤해도 왼쪽 · 오른쪽에 고정 */
     pinned?: 'left' | 'right'
+    /** 머리 끝을 끌어 폭 조절 (더블클릭하면 원래대로) */
     resizable?: boolean
     /** 열 설정에서 숨길 수 있는지. 기본 true */
     hideable?: boolean
+    /** 처음에 숨김 */
     hidden?: boolean
+    /** editable 표에서 더블클릭 · Enter · F2 로 여는 편집기 */
     editor?: 'input' | 'number' | 'select' | 'date'
+    /** select 편집기 선택지 */
     editorOptions?: Option[]
+    /** 그룹 소계 · 합계 행 집계. 함수면 (행들) → 표시 */
     aggregate?: Aggregate<T>
     /** 값 표시 서식 (cell 이 없을 때) */
     format?: (value: unknown, row: T) => ReactNode
@@ -61,68 +77,105 @@ export type DataTableColumn<T> = {
     columns?: DataTableColumn<T>[]
     /** 'bar' 면 값을 InlineBar 로 그린다 (barMax · barTone) */
     type?: 'bar'
+    /** bar 막대 최댓값 */
     barMax?: number
+    /** bar 막대 톤 (값, 행) */
     barTone?: (value: number, row: T) => Tone | undefined
 }
 
-export type DataTableSort = { columnId: string; direction: 'asc' | 'desc' } | null
+export type DataTableSort = { /** 정렬 열 id */ columnId: string; /** 오름 · 내림차순 */ direction: 'asc' | 'desc' } | null
 
 export type DataTableQuery = {
+    /** 정렬 (없으면 null) */
     sort: DataTableSort
+    /** 열 id → 필터 입력값 */
     filters: Record<string, string>
+    /** 검색어 */
     search: string
+    /** 페이지 번호 (1부터) */
     page: number
+    /** 페이지당 행 수 (페이지 없으면 0) */
     pageSize: number
 }
 
 export type DataTableProps<T> = {
+    /** 열 정의 (columns 를 넣으면 다단 헤더) */
     columns: DataTableColumn<T>[]
+    /** 행 데이터 */
     data: T[]
+    /** 행 키를 돌려준다 (선택 · 펼침 기준, 없으면 인덱스) */
     rowKey?: (row: T, index: number) => DataTableKey
+    /** 행을 누를 때 (행) */
     onRowClick?: (row: T) => void
+    /** 툴바 왼쪽 제목 (CSV 파일 이름에도 쓴다) */
     title?: ReactNode
     /** 툴바 오른쪽에 붙는 버튼 */
     actions?: ReactNode
     /** client: 정렬·필터·페이지를 표가 직접 · server: onQueryChange 로 알리고 data 는 현재 페이지만 */
     mode?: 'client' | 'server'
+    /** 불러오는 중. 행이 없으면 스켈레톤, 있으면 로딩 막대 */
     loading?: boolean
+    /** server 모드 전체 행 수 (페이지 계산용) */
     totalCount?: number
+    /** server 모드에서 정렬 · 필터 · 검색 · 페이지가 바뀔 때 (조건) */
     onQueryChange?: (q: DataTableQuery) => void
+    /** 페이지 크기 · 크기 선택지. false 면 페이지 없이 전부 */
     pagination?: { pageSize?: number; pageSizeOptions?: number[] } | false
     /** @deprecated pagination.pageSize 를 쓴다 */
     pageSize?: number
+    /** 툴바 검색칸 */
     showSearch?: boolean
+    /** 검색칸 안내 문구 */
     searchPlaceholder?: string
+    /** 검색할 키나 함수 (없으면 모든 열 값) */
     searchKeys?: (keyof T | ((row: T) => string))[]
+    /** 행이 없을 때 내용 */
     empty?: ReactNode
     /** @deprecated empty 를 쓴다 */
     emptyState?: ReactNode
+    /** 행 선택 방식. single 라디오 · multiple 체크박스 */
     selection?: 'none' | 'single' | 'multiple'
+    /** 제어 모드 선택 키 */
     selectedKeys?: DataTableKey[]
+    /** 선택이 바뀔 때 (키 목록, 행 목록) */
     onSelectionChange?: (keys: DataTableKey[], rows: T[]) => void
     /** 선택했을 때 위에 뜨는 일괄 작업 줄 */
     bulkActions?: (selected: T[]) => ReactNode
+    /** 행 아래 상세 펼치기 (render · 펼칠 수 있는 행 판정) */
     expandable?: { render: (row: T) => ReactNode; rowExpandable?: (row: T) => boolean }
     /** 행 바탕 톤 (불량률 초과 등) */
     rowTone?: (row: T) => Tone | undefined
     /** 그룹 행 + 소계 (aggregate 열) */
     groupBy?: keyof T | ((row: T) => string)
+    /** editor 가 있는 열의 셀 편집 켜기 */
     editable?: boolean
+    /** 셀 편집을 마칠 때 (행, 열 id, 새 값) */
     onCellEdit?: (row: T, columnId: string, value: unknown) => void
+    /** 보이는 행만 그린다 (maxHeight 필요 · 80행 초과 · expandable 없을 때) */
     virtualized?: boolean
+    /** 스크롤해도 머리 고정 */
     stickyHeader?: boolean
+    /** 스크롤 영역 최대 높이(px) */
     maxHeight?: number
+    /** 셀 여백 · 행 높이 */
     density?: Density
+    /** 줄마다 번갈아 배경 */
     striped?: boolean
+    /** 셀 사이 세로 구분선 */
     bordered?: boolean
+    /** outlined(바깥 테두리) · underline(행 구분선만) · filled(헤더 배경) · ghost(구분선 없음) */
     variant?: BorderVariant
     /** 내보내기 버튼. 없으면 CSV 만 브라우저에서 바로 내려받는다 */
     onExport?: (format: 'csv' | 'xlsx', rows: T[]) => void
+    /** 툴바에 내보내기 메뉴 */
     exportable?: boolean
     /** localStorage 키. 열 너비 · 숨김을 기억한다 */
     stateKey?: string
+    /** 바깥 요소 클래스 */
     className?: string
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 }
 
@@ -289,6 +342,7 @@ const numberMatch = (v: number, q: string) => {
 
 /* ───────────────────────── DataTable ───────────────────────── */
 
+/** 정렬 · 필터 · 검색 · 페이지 · 선택 · 그룹 · 편집을 갖춘 표 */
 export const DataTable = <T,>({
     columns: columnsProp,
     data,

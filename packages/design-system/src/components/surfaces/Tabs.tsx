@@ -31,23 +31,33 @@ const Ctx = createContext<TabsCtx | null>(null)
 export type TabsAppearance = 'underline' | 'pill' | 'enclosed' | 'segmented'
 
 export type TabsProps = {
+    /** 제어 모드 선택 탭 */
     value?: string
+    /** 비제어 초기 선택 탭 */
     defaultValue?: string
+    /** 선택 탭이 바뀔 때 (새 값) */
     onValueChange?: (v: string) => void
+    /** underline 밑줄 · pill 알약 · enclosed 문서 탭 · segmented 분절 */
     appearance?: TabsAppearance
     /** @deprecated appearance 를 쓴다 */
     variant?: 'underline' | 'pill'
+    /** 탭 높이. sm 30 · md 38 · lg 44 */
     size?: 'sm' | 'md' | 'lg'
+    /** horizontal 위 탭 줄 · vertical 왼쪽 세로 탭 */
     orientation?: 'horizontal' | 'vertical'
     /** 탭이 넘칠 때: scroll 가로 스크롤 · menu 넘친 탭을 ··· 메뉴로 */
     overflow?: 'scroll' | 'menu'
     /** 한 번 연 패널은 숨겨도 마운트 유지 (폼 입력 보존) */
     keepMounted?: boolean
+    /** TabList · TabPanel */
     children: ReactNode
+    /** 루트 인라인 스타일 */
     style?: CSSProperties
+    /** 루트 클래스 */
     className?: string
 }
 
+/** 탭을 눌러 패널을 바꿔 보는 묶음 */
 export const Tabs = ({
     value: valueProp,
     defaultValue,
@@ -90,6 +100,7 @@ export const Tabs = ({
     )
 }
 
+/** 탭 버튼 줄. 방향키 · Home · End 로 이동 */
 export const TabList = ({ children, ...rest }: HTMLAttributes<HTMLDivElement>) => {
     const ctx = useContext(Ctx)!
     const ref = useRef<HTMLDivElement | null>(null)
@@ -164,16 +175,23 @@ export const TabList = ({ children, ...rest }: HTMLAttributes<HTMLDivElement>) =
 }
 
 export type TabProps = {
+    /** 탭 키 (TabPanel 의 value 와 짝) */
     value: string
+    /** 탭 글자 */
     children: ReactNode
+    /** 선택 불가 */
     disabled?: boolean
+    /** 앞 아이콘 */
     icon?: ReactNode
+    /** 글자 뒤 배지 (개수 등) */
     badge?: ReactNode
     /** 닫기 버튼 (enclosed 문서 탭) */
     closable?: boolean
+    /** 닫기 버튼 · Delete 키로 닫을 때 */
     onClose?: () => void
 } & Omit<HTMLAttributes<HTMLButtonElement>, 'onClick'>
 
+/** 탭 버튼 하나 */
 export const Tab = ({ value, children, disabled, icon, badge, closable, onClose, ...rest }: TabProps) => {
     const ctx = useContext(Ctx)!
     const on = ctx.value === value
@@ -218,8 +236,14 @@ export const Tab = ({ value, children, disabled, icon, badge, closable, onClose,
     )
 }
 
-export type TabPanelProps = { value: string; children: ReactNode } & HTMLAttributes<HTMLDivElement>
+export type TabPanelProps = {
+    /** 짝인 Tab 의 value */
+    value: string
+    /** 패널 내용 */
+    children: ReactNode
+} & HTMLAttributes<HTMLDivElement>
 
+/** 선택된 탭일 때 보이는 내용 영역 */
 export const TabPanel = ({ value, children, ...rest }: TabPanelProps) => {
     const ctx = useContext(Ctx)!
     const on = ctx.value === value

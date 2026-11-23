@@ -31,17 +31,27 @@ export const chartColor = (t?: Tone | string, i = 0): string => {
 }
 
 export type ChartSeries = {
+    /** bar: 막대 · line: 선 · area: 선 아래 채움 */
     type?: 'bar' | 'line' | 'area'
+    /** data 행에서 값을 읽을 키 */
     key: string
+    /** 범례 · tooltip 이름 (없으면 key) */
     label?: string
+    /** 톤 또는 CSS 색 (없으면 순서대로 팔레트) */
     tone?: Tone | string
     /** 같은 stack 이름끼리 쌓는다 */
     stack?: string
+    /** 값을 읽을 세로축 (right: 오른쪽 보조축) */
     axis?: 'left' | 'right'
+    /** 곡선으로 (선 · 영역) */
     smooth?: boolean
+    /** 계단선. true 는 after (선 · 영역) */
     step?: boolean | 'before' | 'after'
+    /** 점선으로 (선 · 영역) */
     dashed?: boolean
+    /** 처음부터 숨김 (범례를 눌러 켠다) */
     hidden?: boolean
+    /** 점 표시. 없으면 16개 이하일 때만 */
     showDots?: boolean
 }
 export type AxisOpts = { format?: (n: number) => string; min?: number; max?: number; ticks?: number; label?: string; hidden?: boolean }
@@ -49,38 +59,63 @@ export type ReferenceLine = { value: number; label?: string; axis?: 'left' | 'ri
 export type Band = { from: number; to: number; axis?: 'left' | 'right'; tone: Tone | string; label?: string }
 
 export type CartesianChartProps = {
+    /** x축 범주 라벨 */
     labels: string[]
     /** labels 와 같은 순서의 행. 값이 null 이면 빈칸 */
     data: Array<Record<string, number | null | undefined>>
+    /** 그릴 시리즈 (data 키 · 모양 · 축) */
     series: ChartSeries[]
+    /** 축별 형식 · 범위 · 눈금 수 · 숨김 */
     axes?: { left?: AxisOpts; right?: AxisOpts; x?: { format?: (l: string, i: number) => string; hidden?: boolean; every?: number } }
+    /** grouped: 나란히 · stacked: 쌓기 · overlap: 겹치기 */
     barMode?: 'grouped' | 'stacked' | 'overlap'
+    /** normal: 값 그대로 · percent: 100% 기준으로 쌓기 */
     stackMode?: 'normal' | 'percent'
+    /** horizontal 이면 가로 막대 (선 · 영역은 안 그림) */
     orientation?: 'vertical' | 'horizontal'
+    /** 기준선 (목표 · 한계값) */
     referenceLines?: ReferenceLine[]
+    /** 값 구간 음영 (허용 범위 등) */
     bands?: Band[]
+    /** x 위치(라벨 · 인덱스)의 세로 표시선 (세로 차트만) */
     annotations?: Array<{ x: string | number; label: string; tone?: Tone | string }>
+    /** 범례 위치. 항목을 누르면 시리즈 숨김 */
     legend?: 'top' | 'bottom' | 'none'
+    /** shared: 열의 모든 시리즈 · single: 올린 시리즈만 */
     tooltip?: 'shared' | 'single' | 'none'
     /** 아래에 전체 미니 차트 + 구간 선택 (긴 기간) */
     brush?: boolean
+    /** 막대 · 점을 눌렀을 때 (시리즈, 인덱스) */
     onPointClick?: (series: ChartSeries, index: number) => void
+    /** 스켈레톤 표시 */
     loading?: boolean
+    /** labels · series 가 비었을 때 보일 내용 */
     empty?: ReactNode
+    /** 그림 영역 높이 (px) */
     height?: number
+    /** compact: 눈금 3개 · 막대 사이 좁게 */
     density?: 'compact' | 'default'
+    /** 값 축 격자선 */
     showGrid?: boolean
     /** 빈 값(null)을 건너 이어 그린다 */
     connectNulls?: boolean
+    /** 막대 · 점 위에 값 글자 */
     showValues?: boolean
+    /** 막대 모서리 둥글게 */
     rounded?: boolean
+    /** 막대 사이 간격 비율 (칸 너비 대비 0~1) */
     barGap?: number
+    /** 작은 값도 보이게 하는 막대 최소 길이 (px) */
     minBarHeight?: number
     /** 막대 색을 값으로 정한다 */
     barTone?: (value: number, seriesKey: string, index: number) => Tone | string | undefined
+    /** 차트 svg 의 접근성 이름 */
     'aria-label'?: string
+    /** 바깥 요소 class */
     className?: string
+    /** 바깥 요소 style */
     style?: CSSProperties
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 }
 
@@ -107,6 +142,7 @@ const stepPath = (pts: [number, number][], mode: 'before' | 'after') =>
         })
         .join(' ')
 
+/** 막대 · 선 · 영역을 한 좌표축에 섞어 그리는 기본 차트 */
 export const CartesianChart = ({
     labels: allLabels,
     data: allData,

@@ -8,36 +8,54 @@ export type AggFunc = 'sum' | 'avg' | 'min' | 'max' | 'count' | ((values: any[])
 export type CellRendererPreset = 'bar' | 'sparkline' | 'badge' | 'avatar' | 'delta'
 export type ValueFormatterPreset = 'number' | 'percent' | 'date'
 
-export type CellParams<T extends GridRow = GridRow> = { value: any; row: T; field: string; rowIndex: number }
+export type CellParams<T extends GridRow = GridRow> = { /** 셀 값 */ value: any; /** 행 데이터 */ row: T; /** 열 field */ field: string; /** 데이터 행 번호 (0부터) */ rowIndex: number }
 
 export type GridColumn<T extends GridRow = GridRow> = {
+    /** 행 데이터 키. 열 식별자 겸 값 위치 */
     field: string
+    /** 머리 글 (없으면 field) */
     headerName?: ReactNode
     /** 열 그룹 (다단 헤더) */
     children?: GridColumn<T>[]
+    /** 열 폭(px) */
     width?: number
+    /** 최소 폭(px). 폭 조절 · 너비 맞춤의 하한 */
     minWidth?: number
     /** 남는 폭을 나눠 가지는 비율 */
     flex?: number
+    /** 가로 스크롤해도 왼쪽 · 오른쪽에 고정 */
     pinned?: 'left' | 'right' | false
+    /** false 면 머리 클릭 정렬 끔 */
     sortable?: boolean
+    /** false 면 폭 조절 손잡이 숨김 */
     resizable?: boolean
+    /** 필터 종류. 함수면 (값, 행, 필터 조건) 으로 직접 판정 */
     filter?: 'text' | 'number' | 'date' | 'set' | false | ((value: any, row: T, model: any) => boolean)
     /** 헤더 아래 필터 줄 */
     floatingFilter?: boolean
     /** set 필터 후보값 (서버 값이면 함수) */
     filterValues?: string[] | (() => Promise<string[]>)
+    /** 열 메뉴 항목. 빈 배열이면 메뉴 버튼 숨김 */
     menu?: Array<'sort' | 'pin' | 'autosize' | 'hide' | 'group'>
+    /** 처음에 숨김 */
     hide?: boolean
+    /** 셀 글 정렬 */
     align?: 'left' | 'right' | 'center'
+    /** 행에서 값을 꺼낸다 (없으면 row[field]) */
     valueGetter?: (row: T) => any
+    /** 표시 서식. 프리셋 또는 (값, 행) → 글 */
     valueFormatter?: ValueFormatterPreset | ((value: any, row: T) => string)
+    /** 더블클릭 · Enter · F2 로 편집. 함수면 행마다 판정 */
     editable?: boolean | ((row: T) => boolean)
+    /** 편집기 종류 또는 직접 그리는 함수 (없으면 숫자 number · 그 밖 text) */
     cellEditor?: 'text' | 'number' | 'select' | 'date' | ((p: { value: any; row: T; onCommit: (v: any) => void; onCancel: () => void }) => ReactNode)
+    /** select 편집기 선택지 */
     cellEditorOptions?: Array<{ value: string; label: ReactNode }>
     /** 오류 문구를 돌려주면 저장하지 않는다 */
     validate?: (value: any, row: T) => string | null
+    /** 그룹 행 · 합계 행 · 트리 · 피벗 집계 방식 */
     aggFunc?: AggFunc
+    /** 셀 렌더러 프리셋 또는 직접 그리는 함수 */
     cellRenderer?: CellRendererPreset | ((p: CellParams<T>) => ReactNode)
     /** 프리셋 렌더러 옵션: bar { max, tone } · badge { toneMap } · delta { goodWhen } */
     cellRendererParams?: Record<string, any>
@@ -45,15 +63,15 @@ export type GridColumn<T extends GridRow = GridRow> = {
     cellClassRules?: Record<string, (p: CellParams<T>) => boolean>
 }
 
-export type SortItem = { key: string; dir: 'asc' | 'desc' }
+export type SortItem = { /** 정렬할 열 field */ key: string; /** 오름 · 내림차순 */ dir: 'asc' | 'desc' }
 export type FilterModelItem =
-    | { type: 'text'; value: string }
-    | { type: 'number'; op: '=' | '>' | '<' | '>=' | '<=' | 'between'; value: number; value2?: number }
-    | { type: 'date'; from?: string; to?: string }
-    | { type: 'set'; values: string[] }
+    | { /** 포함 검색 */ type: 'text'; /** 찾을 글 (대소문자 무시) */ value: string }
+    | { /** 숫자 비교 */ type: 'number'; /** 비교 연산 */ op: '=' | '>' | '<' | '>=' | '<=' | 'between'; /** 비교 값 (between 의 시작) */ value: number; /** between 의 끝 */ value2?: number }
+    | { /** 날짜 기간 */ type: 'date'; /** 시작일 'YYYY-MM-DD' */ from?: string; /** 끝일 'YYYY-MM-DD' */ to?: string }
+    | { /** 값 목록 */ type: 'set'; /** 남길 값들 (비면 모두) */ values: string[] }
 export type FilterModel = Record<string, FilterModelItem>
-export type AdvancedCondition = { field: string; op: 'contains' | '=' | '!=' | '>' | '<' | '>=' | '<='; value: string }
-export type AdvancedFilter = { join: 'AND' | 'OR'; conditions: AdvancedCondition[] }
+export type AdvancedCondition = { /** 비교할 열 field */ field: string; /** 비교 연산 (contains 는 포함) */ op: 'contains' | '=' | '!=' | '>' | '<' | '>=' | '<='; /** 비교 값 */ value: string }
+export type AdvancedFilter = { /** 조건 결합 방식 */ join: 'AND' | 'OR'; /** 조건 목록 */ conditions: AdvancedCondition[] }
 
 /* ───────────────────────── 열 ───────────────────────── */
 

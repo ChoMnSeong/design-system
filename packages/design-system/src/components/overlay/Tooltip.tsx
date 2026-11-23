@@ -2,14 +2,23 @@ import { cloneElement, isValidElement, useEffect, useId, useRef, useState, type 
 import { PopoverPositioner } from './Popover.js'
 
 export type TooltipProps = {
+    /** 말풍선 내용. 비어 있으면 띄우지 않는다 */
     content: ReactNode
+    /** 설명을 붙일 대상 요소 */
     children: ReactElement<any>
+    /** 열림 지연 (ms) */
     delay?: number
+    /** 말풍선이 나오는 쪽 */
     side?: 'top' | 'bottom' | 'left' | 'right'
+    /** 트리거와 맞출 끝 */
     align?: 'start' | 'center' | 'end'
+    /** 말풍선 꼬리 */
     arrow?: boolean
+    /** 최대 폭 (px) */
     maxWidth?: number
+    /** 말풍선 끄기 */
     disabled?: boolean
+    /** 말풍선 색. accent · danger 는 진한 배경 */
     tone?: 'neutral' | 'accent' | 'danger'
 }
 

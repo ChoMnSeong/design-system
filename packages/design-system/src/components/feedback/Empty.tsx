@@ -17,18 +17,25 @@ const PRESETS: Record<EmptyPreset, { icon: (s: number) => ReactNode; title: stri
 }
 
 export type EmptyProps = {
+    /** 위쪽 아이콘 (preset 아이콘보다 우선) */
     icon?: ReactNode
+    /** 제목 (preset 제목보다 우선) */
     title?: ReactNode
+    /** 제목 아래 설명 */
     description?: ReactNode
+    /** 아래쪽 버튼 등 동작 */
     action?: ReactNode
     /** 자주 쓰는 빈 상태: 아이콘과 제목 기본값을 채운다 */
     preset?: EmptyPreset
+    /** 아이콘 원 sm 36 · md 48 · lg 64 (px), 여백·글자도 비례 */
     size?: 'sm' | 'md' | 'lg'
     /** compact: 아이콘 옆에 글자를 한 줄로 (표 안 · 좁은 카드) */
     appearance?: 'default' | 'compact'
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 
+/** 데이터가 없을 때 보여 주는 빈 상태 */
 export const Empty = ({ icon, title, description, action, preset, size = 'md', appearance = 'default', ref, ...rest }: EmptyProps) => {
     const p = preset ? PRESETS[preset] : undefined
     const s = size === 'sm' ? 20 : size === 'lg' ? 32 : 24

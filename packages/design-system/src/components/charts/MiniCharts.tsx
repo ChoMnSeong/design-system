@@ -7,6 +7,7 @@ const fmt = (n: number) => n.toLocaleString('ko-KR', { maximumFractionDigits: 1 
 /* ───────────────────────── SegmentMeter ───────────────────────── */
 
 export type SegmentMeterProps = {
+    /** 구간 목록 (값 · 이름 · 색 · 증감) */
     segments: Array<{ value: number; label?: ReactNode; tone?: Tone; color?: string; delta?: ReactNode }>
     /** 없으면 합계 */
     max?: number
@@ -14,12 +15,17 @@ export type SegmentMeterProps = {
     remainder?: 'track' | 'hatch' | 'none'
     /** 위쪽 표시 + 아래 눈금 (목표 · 한계) */
     markers?: Array<{ at: number; label?: ReactNode; icon?: ReactNode }>
+    /** 아래 눈금 (객체면 min · max · format 지정) */
     showScale?: boolean | { min?: number; max?: number; format?: (n: number) => string }
     /** 범례: true 한 줄 · 'rows' 값 · 증감을 행으로 */
     legend?: boolean | 'rows'
+    /** 막대 높이 sm 6 · md 12 · lg 20 */
     size?: 'sm' | 'md' | 'lg'
+    /** 구간 사이 간격 (px) */
     gap?: number
+    /** 접근성 이름 (없으면 구간 이름 · 값) */
     'aria-label'?: string
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -81,7 +87,9 @@ export const SegmentMeter = ({ segments, max: maxProp, remainder = 'track', mark
 export type UptimeCell = { at?: string; status: string; note?: ReactNode }
 
 export type UptimeBarProps = {
+    /** 칸별 상태 키 또는 칸 정보 (오래된 것부터) */
     data: Array<string | UptimeCell>
+    /** 상태 키별 이름 · 색 */
     statusMap: Record<string, { label: string; tone?: Tone; color?: string }>
     /** 칸 수. 데이터가 적으면 앞쪽을 no-data 로 채운다 */
     cells?: number
@@ -89,11 +97,17 @@ export type UptimeBarProps = {
     showUptime?: boolean | ((data: UptimeCell[]) => ReactNode)
     /** 가동으로 셀 상태 키 (가동률 계산) */
     upStatus?: string
+    /** hover 내용 직접 렌더 (칸, 인덱스) */
     tooltip?: (cell: UptimeCell, index: number) => ReactNode
+    /** 강조할 칸 인덱스 */
     highlight?: number
+    /** 칸 높이 sm 18 · md 28 */
     size?: 'sm' | 'md'
+    /** 칸을 눌렀을 때 (칸, 인덱스) */
     onCellClick?: (cell: UptimeCell, index: number) => void
+    /** 왼쪽 위 제목 */
     label?: ReactNode
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -156,17 +170,25 @@ export const UptimeBar = ({ data, statusMap, cells = 90, showUptime = true, upSt
 /* ───────────────────────── InlineBar ───────────────────────── */
 
 export type InlineBarProps = {
+    /** 현재 값 (diverging 이면 음수 가능) */
     value: number
+    /** 막대가 가득 차는 값 */
     max?: number
+    /** 색 톤 (없으면 diverging 은 증감에 따라) */
     tone?: Tone
     /** 목표 세로 눈금 */
     target?: number
     /** 가운데 0 기준 좌우 (증감률) */
     diverging?: boolean
+    /** 값 글자 위치 (true · start: 앞 · end: 뒤) */
     showValue?: boolean | 'start' | 'end'
+    /** 값 뒤 단위 */
     suffix?: ReactNode
+    /** 너비 (px 또는 CSS 길이) */
     width?: number | string
+    /** 값 글자 형식 */
     format?: (n: number) => string
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -201,16 +223,25 @@ export const InlineBar = ({ value, max = 100, tone, target, diverging, showValue
 /* ───────────────────────── StepChart ───────────────────────── */
 
 export type StepChartProps = {
+    /** 상태 구간 목록 (시작 · 끝 · 상태) */
     data: Array<{ from: Date | string; to: Date | string; level: string }>
     /** 위 → 아래 순서 */
     levels: string[]
+    /** 상태별 톤 */
     levelTone?: Record<string, Tone>
+    /** 강조할 상태 (굵은 선 · 라벨) */
     highlight?: string | string[]
+    /** 구간 사이 이음선 (dashed · solid · none) */
     connector?: 'dashed' | 'solid' | 'none'
+    /** 시간 축 범위 (없으면 data 처음 ~ 끝) */
     xDomain?: [Date | string, Date | string]
+    /** 시간 눈금 형식 */
     xFormat?: (d: Date) => string
+    /** 축 · 라벨 없이 선만 */
     compact?: boolean
+    /** 높이 (px) */
     height?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -260,19 +291,29 @@ export const StepChart = ({ data, levels, levelTone = {}, highlight, connector =
 /* ───────────────────────── MiniGauge (arc · lollipop) ───────────────────────── */
 
 export type MiniGaugeProps = {
+    /** 현재 값 */
     value: number
+    /** 범위 최솟값 */
     min?: number
+    /** 범위 최댓값 */
     max?: number
     /** arc: 반원 · lollipop: 가로 막대 + 점 */
     variant?: 'arc' | 'lollipop'
+    /** 색 구간. 값이 속한 구간 색으로 표시 */
     zones?: Array<{ from: number; to: number; tone?: Tone; color?: string }>
+    /** arc 값 표시: needle 바늘 · segment 채움 · dot 점 */
     marker?: 'needle' | 'segment' | 'dot'
     /** 구간 경계 눈금 */
     ticks?: number[]
+    /** 값 옆 상태 글자 (값, 속한 구간) */
     statusLabel?: (value: number, zone?: { tone?: Tone }) => ReactNode
+    /** 값 글자 형식 */
     format?: (n: number) => string
+    /** 값 뒤 단위 */
     unit?: ReactNode
+    /** 너비 (px) */
     width?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 
@@ -344,6 +385,7 @@ export const MiniGauge = ({ value, min = 0, max = 100, variant = 'arc', zones = 
 export type TargetPoint = { x: number; y: number; id?: string; label?: ReactNode }
 
 export type TargetScatterProps = {
+    /** 측정점 (중심 기준 x · y 편차) */
     points: TargetPoint[]
     /** 공차 원 (안쪽부터) */
     rings?: Array<{ r: number; label?: string; tone?: Tone }>
@@ -353,8 +395,11 @@ export type TargetScatterProps = {
     colorBy?: 'ring' | ((p: TargetPoint) => Tone)
     /** 아래 분포 막대 */
     distribution?: 'x' | 'y' | false
+    /** 점을 눌렀을 때 (점) */
     onPointClick?: (p: TargetPoint) => void
+    /** 너비 · 높이 (px) */
     size?: number
+    /** 바깥 요소 style */
     style?: CSSProperties
 }
 

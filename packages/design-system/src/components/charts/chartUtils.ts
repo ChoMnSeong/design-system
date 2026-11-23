@@ -59,12 +59,20 @@ export const tooltipBoxStyle: CSSProperties = {
 }
 
 export type CommonChartProps = {
+    /** 점 목록 (라벨 · 값) */
     data: ChartPoint[]
+    /** 높이 (px) */
     height?: number
+    /** 격자선 */
     showGrid?: boolean
+    /** 축 눈금 글자 */
     showLabels?: boolean
+    /** 선 · 막대 색 */
     color?: string
+    /** 값 글자 형식 */
     formatValue?: (n: number) => string
+    /** false 면 tooltip 을 끈다 */
     interactive?: boolean
+    /** 바깥 요소 style */
     style?: CSSProperties
 }

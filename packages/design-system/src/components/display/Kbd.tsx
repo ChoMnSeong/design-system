@@ -7,9 +7,11 @@ export type KbdProps = {
     size?: KbdSize
     /** 키 조합. 각 키를 Kbd 로 그리고 사이에 '+' 를 넣는다. children 대신 쓴다. */
     keys?: string[]
+    /** DOM 요소 ref */
     ref?: Ref<HTMLElement>
 } & HTMLAttributes<HTMLElement>
 
+/** 키보드 키 표시 */
 export const Kbd = ({ size = 'sm', keys, children, ref, ...rest }: KbdProps) => {
     if (keys && keys.length > 0) {
         return (

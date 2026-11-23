@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState, type HTMLAttributes, type Ref } from 'react'
 
 export type ScrollAreaProps = {
+    /** 최대 높이. 숫자는 px */
     maxHeight?: number | string
+    /** 스크롤 방향. both 는 가로 · 세로 모두 */
     direction?: 'vertical' | 'horizontal' | 'both'
     /** auto: 필요할 때 · always: 항상 · hover: 올렸을 때만 */
     scrollbar?: 'auto' | 'always' | 'hover'
     /** 더 스크롤할 내용이 있는 쪽 가장자리에 그림자 */
     shadow?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & HTMLAttributes<HTMLDivElement>
 
+/** 스크롤바 표시 · 가장자리 그림자를 다루는 스크롤 영역 */
 export const ScrollArea = ({ maxHeight, direction = 'vertical', scrollbar = 'auto', shadow, style, ref, onScroll, children, ...rest }: ScrollAreaProps) => {
     const inner = useRef<HTMLDivElement | null>(null)
     const [edges, setEdges] = useState({ top: false, bottom: false, left: false, right: false })

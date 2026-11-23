@@ -20,10 +20,13 @@ export type DashboardGridProps = {
     dense?: boolean
     /** 화면 배치를 글자로: ['kpi kpi oee', 'trend trend oee'] (Item 의 area 와 짝) */
     areas?: Resp<string[]>
+    /** 단계 기준 폭(px). 기본 sm 640 · md 1024 · lg 1440 */
     breakpoints?: Partial<Record<BP, number>>
     /** 드래그로 순서 바꾸기 · 오른쪽 아래 모서리로 크기 조절 */
     editable?: boolean
+    /** 편집으로 순서 · 크기가 바뀔 때 (전체 배치) */
     onLayoutChange?: (layout: DashboardLayoutItem[]) => void
+    /** DashboardGrid.Item 들 */
     children: ReactNode
 } & HTMLAttributes<HTMLDivElement>
 
@@ -34,7 +37,7 @@ const at = <T,>(v: Resp<T> | undefined, bp: BP | 'base'): T | undefined => {
 }
 
 /** 불규칙(bento) 대시보드 배치 */
-export const DashboardGrid = ({ columns = 12, rowHeight = 120, gap = 12, dense, areas, breakpoints, editable, onLayoutChange, children, style, ...rest }: DashboardGridProps) => {
+const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, areas, breakpoints, editable, onLayoutChange, children, style, ...rest }: DashboardGridProps) => {
     const id = useId().replace(/[^a-zA-Z0-9]/g, '')
     const bps = { ...BREAK, ...breakpoints }
     const items = Children.toArray(children).filter(isValidElement) as ReactElement<DashboardGridItemProps>[]
@@ -119,16 +122,23 @@ export const DashboardGrid = ({ columns = 12, rowHeight = 120, gap = 12, dense, 
 }
 
 export type DashboardGridItemProps = {
+    /** 배치(onLayoutChange)에서 쓰는 항목 키. 없으면 순서 번호 */
     id?: string
+    /** 차지할 열 수. 단계별 { sm, md, lg } 도 된다 */
     colSpan?: Resp<number>
+    /** 차지할 줄 수. 단계별 { sm, md, lg } 도 된다 */
     rowSpan?: Resp<number>
     /** areas 의 이름 */
     area?: string
+    /** 칸 내용 (카드 등) */
     children?: ReactNode
+    /** 인라인 스타일. 배치 스타일 위에 덮는다 */
     style?: CSSProperties
+    /** 내부용. 그리드가 넣는 항목 키 */
     _id?: string
 } & Omit<HTMLAttributes<HTMLDivElement>, 'style'>
 
+/** DashboardGrid 의 한 칸. 편집 모드에서 끌기 · 크기 조절 */
 export const DashboardGridItem = ({ id: _ignored, colSpan, rowSpan, area, children, style, _id, ...rest }: DashboardGridItemProps) => {
     const ctx = useContext(GridCtx)
     const cs = typeof colSpan === 'number' ? colSpan : (colSpan?.sm ?? 1)
@@ -182,5 +192,5 @@ export const DashboardGridItem = ({ id: _ignored, colSpan, rowSpan, area, childr
     )
 }
 
-/** DashboardGrid.Item */
-;(DashboardGrid as unknown as { Item: typeof DashboardGridItem }).Item = DashboardGridItem
+/** 대시보드 bento 배치. 칸은 DashboardGrid.Item(= DashboardGridItem) 으로 넣는다 */
+export const DashboardGrid = Object.assign(DashboardGridRoot, { Item: DashboardGridItem })

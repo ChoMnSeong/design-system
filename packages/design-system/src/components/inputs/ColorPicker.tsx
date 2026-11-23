@@ -58,18 +58,25 @@ const splitHexAlpha = (v: string): [string, number] => {
 }
 
 export type ColorPickerProps = {
+    /** 제어 모드 값 */
     value?: string
+    /** 비제어 초기값 */
     defaultValue?: string
+    /** 색이 바뀔 때 (format 형식 문자열) */
     onChange?: (value: string) => void
     /** 바뀐 값을 format 형식 문자열로 받는다 */
     onValueChange?: (value: string) => void
+    /** 팝오버에 보일 색 견본 (hex) */
     swatches?: string[]
+    /** 비활성 */
     disabled?: boolean
     /** onChange · onValueChange 로 내보낼 형식. value 는 hex(#rrggbb, #rrggbbaa) 로 받는다 */
     format?: ColorFormat
     /** 투명도 슬라이더를 보인다 */
     alpha?: boolean
+    /** 트리거 높이 xs 24 · sm 28 · md 36 · lg 44 */
     size?: FieldSize
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
 }
 
@@ -100,6 +107,7 @@ const normalizeHex = (s: string): string => {
     return h.toLowerCase()
 }
 
+/** 견본·hex 입력으로 색을 고르는 팝오버 피커 */
 export const ColorPicker = ({
     value: controlled,
     defaultValue = '#a35def',

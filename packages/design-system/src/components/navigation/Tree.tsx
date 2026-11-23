@@ -11,27 +11,40 @@ import { IconChevronRight, IconSearch } from '../icons.js'
 import type { Density } from '../types.js'
 
 export type TreeNode = {
+    /** 노드 고유 id */
     id: string
+    /** 표시 이름 */
     label: ReactNode
+    /** 이름 앞 아이콘 */
     icon?: ReactNode
     /** 오른쪽 끝 배지 (개수 · 수량 등) */
     badge?: ReactNode
     /** 행에 마우스를 올리거나 선택했을 때 보이는 동작 (··· 메뉴 등) */
     actions?: ReactNode
+    /** 선택 · 체크 · 드래그 불가 */
     disabled?: boolean
+    /** 자식 노드 */
     children?: TreeNode[]
     /** loadChildren 을 쓸 때: 아직 안 불러왔지만 자식이 있는 노드 */
     hasChildren?: boolean
 }
 
 export type TreeProps = {
+    /** 최상위 노드 목록 */
     data: TreeNode[]
+    /** 비제어 초기 펼침 id 목록 */
     defaultExpanded?: string[]
+    /** 제어 모드 펼침 id 목록 */
     expanded?: string[]
+    /** 펼침이 바뀔 때 (새 id 목록) */
     onExpandedChange?: (ids: string[]) => void
+    /** none: 선택 안 함 · single: 하나 · multiple: Ctrl/⌘ 클릭으로 추가 */
     selectable?: 'none' | 'single' | 'multiple'
+    /** 제어 모드 선택 id 목록 */
     selected?: string[]
+    /** 비제어 초기 선택 id 목록 */
     defaultSelected?: string[]
+    /** 선택이 바뀔 때 (새 id 목록) */
     onSelectedChange?: (ids: string[]) => void
     /** @deprecated selected 를 쓴다 */
     selectedId?: string
@@ -39,23 +52,33 @@ export type TreeProps = {
     onSelect?: (id: string) => void
     /** 체크박스. 부모를 체크하면 자식 전체, 자식 일부면 부모는 부분 체크 */
     checkable?: boolean
+    /** 제어 모드 체크 id 목록 */
     checked?: string[]
+    /** 비제어 초기 체크 id 목록 */
     defaultChecked?: string[]
+    /** 체크가 바뀔 때 (체크된 잎 + 자식 전부 체크된 부모 id) */
     onCheckedChange?: (ids: string[]) => void
     /** 펼칠 때 자식을 불러온다 */
     loadChildren?: (node: TreeNode) => Promise<TreeNode[]>
     /** 위에 검색창. 일치하는 노드와 조상만 남기고 펼친다 */
     searchable?: boolean
+    /** 검색창 안내 문구 */
     searchPlaceholder?: string
+    /** 검색 일치 판정 (노드, 검색어). 없으면 라벨 포함 여부 */
     filter?: (node: TreeNode, query: string) => boolean
     /** 끌어서 옮기기 */
     draggable?: boolean
+    /** 노드를 놓을 때 (끌린 id, 대상 id, 대상 앞·안·뒤) */
     onMove?: (dragId: string, targetId: string, position: 'before' | 'inside' | 'after') => void
     /** 보이는 행만 그린다 (행 높이 고정) */
     virtualized?: boolean
+    /** virtualized 목록의 최대 높이 (px) */
     height?: number
+    /** 행 높이 compact 26 · default 30 · comfortable 36 (px) */
     density?: Density
+    /** 바깥 요소 style */
     style?: CSSProperties
+    /** 트리 접근성 이름 */
     'aria-label'?: string
 }
 
@@ -66,6 +89,7 @@ const textOf = (n: TreeNode) => (typeof n.label === 'string' || typeof n.label =
 const leafIds = (n: TreeNode): string[] =>
     n.children && n.children.length ? n.children.flatMap(leafIds) : [n.id]
 
+/** 펼침 · 선택 · 체크 · 끌어 옮기기를 지원하는 트리 */
 export const Tree = ({
     data,
     defaultExpanded = [],

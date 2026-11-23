@@ -2,14 +2,23 @@ import { useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { FieldSize, Option } from '../types.js'
 
 export type SegmentedControlProps<V extends string = string> = {
+    /** 칸으로 그릴 선택지 */
     options: Option<V>[]
+    /** 제어 모드 값 */
     value?: V
+    /** 비제어 초기값. 없으면 첫 옵션 */
     defaultValue?: V
+    /** 값이 바뀔 때 (새 값) */
     onValueChange?: (value: V) => void
+    /** 칸 높이 xs 20 · sm 22 · md 28 · lg 36 */
     size?: FieldSize
+    /** 부모 너비를 채우고 칸을 같은 폭으로 */
     fullWidth?: boolean
+    /** 모든 칸 비활성 */
     disabled?: boolean
+    /** 루트 요소 인라인 스타일 */
     style?: CSSProperties
+    /** 그룹 접근성 이름 */
     'aria-label'?: string
 }
 

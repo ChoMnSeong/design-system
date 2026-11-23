@@ -9,22 +9,35 @@ import { LuCaptions, LuMaximize, LuPause, LuPlay, LuSettings, LuSkipForward, LuV
 export type VideoControl = 'play' | 'seek' | 'volume' | 'speed' | 'quality' | 'cc' | 'full'
 
 export type VideoPlayerProps = {
+    /** 영상 주소 */
     src: string
+    /** 재생 전 보이는 이미지 주소 */
     poster?: string
+    /** 위쪽에 겹쳐 보이는 제목 */
     title?: ReactNode
+    /** 제목 위 작은 글 (title 이 있을 때만) */
     subtitle?: ReactNode
+    /** 자막 트랙 (lang · label · src). 자막 버튼 · 설정에서 고른다 */
     subtitles?: Array<{ lang: string; label?: string; src: string }>
     /** 구간 건너뛰기 (초) */
     skip?: { from: number; to: number; label?: ReactNode }
     /** 끝나기 전 다음 화 안내 */
     next?: { title: ReactNode; at: number; onPlay?: () => void }
+    /** 보일 컨트롤. speed · quality 는 설정 메뉴 안에 */
     controls?: VideoControl[]
+    /** 설정 메뉴의 화질 선택지. 첫 값이 처음 선택값 */
     qualities?: string[]
+    /** 화질을 고를 때 (화질 이름). 영상 주소 교체는 부모가 */
     onQualityChange?: (q: string) => void
+    /** 시작 위치(초) */
     startAt?: number
+    /** 재생 위치가 바뀔 때 (현재 초, 전체 초) */
     onProgress?: (time: number, duration: number) => void
+    /** 불러오면 바로 재생 */
     autoPlay?: boolean
+    /** 모서리 둥글기(px) */
     radius?: number
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
@@ -34,6 +47,7 @@ const fmtT = (s: number) => {
     return `${h ? `${h}:${String(m).padStart(2, '0')}` : m}:${String(x).padStart(2, '0')}`
 }
 
+/** 영상 재생기. 건너뛰기 · 다음 화 안내 · 화질 · 배속 · 자막 설정 */
 export const VideoPlayer = ({
     src, poster, title, subtitle, subtitles = [], skip, next, controls = ['play', 'seek', 'volume', 'speed', 'quality', 'cc', 'full'], qualities = ['자동', '1080p', '720p', '480p'], onQualityChange, startAt, onProgress, autoPlay, radius, style,
 }: VideoPlayerProps) => {
@@ -148,20 +162,29 @@ export const VideoPlayer = ({
 /* ───────── BottomSheet ───────── */
 
 export type BottomSheetProps = {
+    /** 열림 여부 */
     open: boolean
+    /** 닫으려 할 때 (false). 배경 클릭 · Esc · 아래로 끌어 내리기 */
     onOpenChange: (open: boolean) => void
     /** 화면 높이 비율. 끌어서 이 지점들에 멈춘다 */
     snapPoints?: number[]
+    /** 열릴 때 멈출 snapPoints 번호 */
     defaultSnap?: number
+    /** 뒤를 어둡게 덮는다. 누르면 닫힘 */
     dim?: boolean
+    /** 머리 제목 */
     title?: ReactNode
+    /** 본문 내용 (넘치면 스크롤) */
     children?: ReactNode
+    /** 아래 영역 (버튼 등) */
     footer?: ReactNode
     /** 포털 없이 부모(position: relative) 안에 그린다 — 미리보기용 */
     inline?: boolean
+    /** 시트 이름 (없으면 문자열 title) */
     'aria-label'?: string
 }
 
+/** 모바일 하단 시트. 손잡이를 끌어 높이를 바꾼다 */
 export const BottomSheet = ({ open, onOpenChange, snapPoints = [0.5, 0.9], defaultSnap = 0, dim = true, title, children, footer, inline, ...rest }: BottomSheetProps) => {
     const [snap, setSnap] = useState(defaultSnap)
     const [drag, setDrag] = useState<number | null>(null)
@@ -207,20 +230,24 @@ export const BottomSheet = ({ open, onOpenChange, snapPoints = [0.5, 0.9], defau
 
 /* ───────── MobileTabBar ───────── */
 
-export type MobileTabItem = { key: string; icon: ReactNode; activeIcon?: ReactNode; label: string; badge?: number | string; href?: string }
+export type MobileTabItem = { /** 탭 키 (value 와 비교) */ key: string; /** 아이콘 */ icon: ReactNode; /** 선택됐을 때 아이콘 */ activeIcon?: ReactNode; /** 아이콘 아래 이름 */ label: string; /** 숫자 배지 (0 이면 숨김, 99 초과는 99+) */ badge?: number | string; /** 있으면 링크(a)로 그린다 */ href?: string }
 
 export type MobileTabBarProps = {
     /** 5개 이하 */
     items: MobileTabItem[]
+    /** 선택된 탭 key */
     value?: string
+    /** 탭을 누를 때 (탭 key) */
     onChange?: (key: string) => void
     /** 아래 홈 막대 여백 */
     safeArea?: boolean
     /** 화면 아래 고정 대신 흐름 안에 — 미리보기용 */
     inline?: boolean
+    /** 바깥 요소 스타일 */
     style?: CSSProperties
 }
 
+/** 모바일 화면 아래 고정 탭 바 */
 export const MobileTabBar = ({ items, value, onChange, safeArea = true, inline, style }: MobileTabBarProps) => {
     if (items.length > 5) console.warn('MobileTabBar: 탭은 5개 이하를 권장합니다')
     return (

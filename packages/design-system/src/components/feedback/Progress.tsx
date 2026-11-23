@@ -1,31 +1,40 @@
 import type { HTMLAttributes, ReactNode, Ref } from 'react'
 import type { Tone } from '../types.js'
 
-export type ProgressSegment = { value: number; tone?: Tone; label?: ReactNode }
+export type ProgressSegment = { /** 구간 값 (max 기준) */ value: number; /** 구간 톤 (없으면 tone) */ tone?: Tone; /** 구간 이름 (문자열이면 title) */ label?: ReactNode }
 
 export type ProgressProps = {
+    /** 현재 값 */
     value?: number
+    /** 최대값 (100% 기준) */
     max?: number
     /** bar 높이 xs 3 · sm 4 · md 8 · lg 12 / circle 지름 xs 32 · sm 40 · md 56 · lg 72 */
     size?: 'xs' | 'sm' | 'md' | 'lg'
+    /** 채움 색 톤 */
     tone?: Tone
     /** 값 글자 위치 */
     valueLabel?: 'none' | 'end' | 'inside'
     /** @deprecated valueLabel="end" */
     showLabel?: boolean
+    /** 값 글자 형식 (value, max). 없으면 반올림한 % */
     formatValue?: (value: number, max: number) => string
+    /** 진행률을 모를 때 반복 애니메이션 */
     indeterminate?: boolean
     /** bar · segmented(여러 구간 누적) · circle */
     appearance?: 'bar' | 'segmented' | 'circle'
+    /** segmented 구간 목록. 주면 기본 appearance 가 segmented */
     segments?: ProgressSegment[]
     /** 목표 마커 (max 기준 값) */
     target?: number
+    /** 진행 막대의 접근성 이름 */
     'aria-label'?: string
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'children'>
 
 const CIRCLE: Record<string, number> = { xs: 32, sm: 40, md: 56, lg: 72 }
 
+/** 막대·구간·원형으로 진행률을 보여 주는 표시기 */
 export const Progress = ({
     value = 0,
     max = 100,

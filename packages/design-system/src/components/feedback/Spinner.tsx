@@ -6,17 +6,21 @@ const SIZE: Record<string, number> = { xs: 12, sm: 16, md: 24, lg: 32 }
 export type SpinnerProps = {
     /** xs 12 · sm 16 · md 24 · lg 32 또는 px */
     size?: 'xs' | 'sm' | 'md' | 'lg' | number | string
+    /** 선 두께 (px). 없으면 24px 이상 3 · 미만 2 */
     thickness?: number
     /** @deprecated tone 을 쓴다 */
     color?: string
+    /** 회전 링 색 톤 */
     tone?: Tone
     /** 스크린리더용 이름. overlay 면 화면에도 보인다 */
     label?: string
     /** 부모 영역 전체를 반투명하게 덮는다 (부모는 position: relative) */
     overlay?: boolean
+    /** DOM 요소 ref */
     ref?: Ref<HTMLSpanElement>
 } & HTMLAttributes<HTMLSpanElement>
 
+/** 로딩 중임을 알리는 회전 링 */
 export const Spinner = ({ size = 'sm', thickness, color, tone = 'accent', label = '불러오는 중', overlay, style, ref, ...rest }: SpinnerProps) => {
     const px = typeof size === 'number' ? size : (SIZE[size] ?? size)
     const dim = typeof px === 'number' ? `${px}px` : px

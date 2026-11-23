@@ -1,16 +1,21 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react'
 
-export type DescriptionItem = { label: ReactNode; value: ReactNode; span?: number }
+export type DescriptionItem = { /** 라벨 (dt) */ label: ReactNode; /** 값 (dd) */ value: ReactNode; /** 차지할 칸 수 (열 수를 넘지 않음) */ span?: number }
 
 export type DescriptionsProps = {
+    /** 라벨 · 값 항목 목록 */
     items: DescriptionItem[]
     /** 한 줄의 항목 수. 객체면 컨테이너 폭 기준 { 0: 1, 640: 2, 960: 3 } */
     columns?: number | Record<number, number>
     /** horizontal: 라벨 왼쪽 · vertical: 라벨 위 */
     layout?: 'horizontal' | 'vertical'
+    /** 칸마다 테두리 + 라벨 칸 배경 */
     bordered?: boolean
+    /** 라벨 칸 폭(px) */
     labelWidth?: number
+    /** sm 은 글자 13px · 간격 좁게 */
     size?: 'sm' | 'md'
+    /** 위에 붙는 제목 */
     title?: ReactNode
 } & Omit<HTMLAttributes<HTMLDListElement>, 'title'>
 

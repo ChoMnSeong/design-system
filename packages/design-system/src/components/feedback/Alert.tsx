@@ -4,7 +4,9 @@ import type { Tone } from '../types.js'
 import { IconClose, IconError, IconInfo, IconSuccess, IconWarning } from '../icons.js'
 
 export type AlertProps = {
+    /** 색과 기본 아이콘. danger·warning 은 role="alert" */
     tone?: Tone
+    /** 굵은 제목 */
     title?: ReactNode
     /** 기본 아이콘을 바꾼다. null 이면 아이콘 없음 */
     icon?: ReactNode
@@ -16,10 +18,13 @@ export type AlertProps = {
     actions?: ReactNode
     /** 화면 맨 위 공지처럼 전체 폭, 모서리 없음 */
     banner?: boolean
+    /** sm: 여백·글자 작게 (12px) · md: 기본 */
     size?: 'sm' | 'md'
     /** onClose 없이도 닫기 버튼으로 스스로 숨는다 */
     closable?: boolean
+    /** 닫기 버튼을 누를 때. 있으면 닫기 버튼 표시 */
     onClose?: () => void
+    /** DOM 요소 ref */
     ref?: Ref<HTMLDivElement>
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title'>
 
@@ -32,6 +37,7 @@ const ICON: Record<Tone, (s: number) => ReactNode> = {
     danger: (s) => <IconError size={s} />,
 }
 
+/** 아이콘·제목·본문으로 상황을 알리는 안내 상자 */
 export const Alert = ({
     tone = 'info',
     title,
