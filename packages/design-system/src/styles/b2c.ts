@@ -138,6 +138,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-media] [data-slot="overlay"] > * { pointer-events: auto; }
 [data-ds-price] { display: inline-flex; flex-direction: column; gap: 2px; font-variant-numeric: tabular-nums; color: ${FG}; }
 [data-ds-price] [data-slot="list"] { font-size: .85em; color: ${FG3}; text-decoration: line-through; }
+[data-ds-price] [data-slot="list"][data-placeholder] { visibility: hidden; }
 [data-ds-price] [data-slot="row"] { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 [data-ds-price] [data-slot="rate"] { color: var(--ds-tone-danger-text); font-weight: 800; }
 [data-ds-price] [data-slot="value"] { font-weight: 800; letter-spacing: -.01em; }

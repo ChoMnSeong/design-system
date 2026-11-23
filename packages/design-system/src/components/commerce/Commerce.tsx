@@ -56,20 +56,22 @@ export type PriceProps = {
     size?: 'sm' | 'md' | 'lg'
     /** 정가를 같은 줄 앞에 (목록 카드용) */
     layout?: 'stacked' | 'inline'
+    /** 할인이 없어도 정가 줄 높이를 비워 둔다. 목록에서 카드 높이 · 가격 위치를 맞출 때 */
+    reserveListRow?: boolean
     style?: CSSProperties
 }
 
 export const formatPrice = (n: number, currency = 'KRW', locale = 'ko-KR') =>
     currency === 'KRW' ? `${n.toLocaleString(locale)}원` : new Intl.NumberFormat(locale, { style: 'currency', currency }).format(n)
 
-export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', unitPrice, coupon, soldOut, size = 'md', layout = 'stacked', style }: PriceProps) => {
+export const Price = ({ value, listPrice, currency = 'KRW', locale = 'ko-KR', unitPrice, coupon, soldOut, size = 'md', layout = 'stacked', reserveListRow, style }: PriceProps) => {
     const rate = listPrice && listPrice > value ? Math.round((1 - value / listPrice) * 100) : 0
     const krw = currency === 'KRW'
     const valueNode = krw ? <>{value.toLocaleString(locale)}<small>원</small></> : formatPrice(value, currency, locale)
     const list = rate > 0 && <span data-slot="list"><span data-ds-sr-only="">정가 </span>{formatPrice(listPrice!, currency, locale)}</span>
     return (
         <span data-ds-price="" data-size={size} data-sold-out={soldOut ? '' : undefined} style={style}>
-            {layout === 'stacked' && list}
+            {layout === 'stacked' && (list || (reserveListRow && <span data-slot="list" data-placeholder="" aria-hidden>&nbsp;</span>))}
             <span data-slot="row">
                 {rate > 0 && <span data-slot="rate" aria-label={`${rate}% 할인`}>{rate}%</span>}
                 <span data-slot="value">{valueNode}</span>
