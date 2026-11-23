@@ -451,7 +451,13 @@ export const DASH_CSS = `
 [data-ds-card-visual][data-bleed="bottom"], [data-ds-card-visual][data-bleed="all"] { margin-bottom: calc(-1 * var(--_pad, 20px)); border-radius: 0 0 inherit inherit; overflow: hidden; }
 [data-ds-card-note] { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--ds-color-border-subtle); font-size: 12px; color: var(--ds-color-foreground-tertiary); }
 [data-ds-card-note] [data-slot="text"] { flex: 1; min-width: 0; }
-[data-ds-dashboard-grid] [data-ds-dashboard-item] > [data-ds-card] { height: 100%; }
+/* 칸 높이(rowHeight × rowSpan) 안에 카드를 맞춘다: 카드는 칸을 꽉 채우고, 남는 높이는 Card.Visual 이 받아 줄어든다.
+   그래도 넘치는 것은 칸 경계에서 자른다 (그림자는 남도록 clip-margin) */
+[data-ds-dashboard-grid] [data-ds-dashboard-item] { overflow: clip; overflow-clip-margin: 12px; }
+[data-ds-dashboard-grid] [data-ds-dashboard-item] > [data-ds-card] { height: 100%; min-height: 0; overflow: hidden; gap: 8px; }
+[data-ds-dashboard-grid] [data-ds-dashboard-item] > [data-ds-card] > * { flex-shrink: 0; }
+[data-ds-dashboard-grid] [data-ds-dashboard-item] [data-ds-card-visual] { flex: 1 1 0; min-height: 20px; height: auto !important; overflow: hidden; }
+[data-ds-dashboard-grid] [data-ds-dashboard-item] [data-ds-card-visual] > svg { height: 100%; }
 [data-ds-dashboard-grid][data-editable] [data-ds-dashboard-item] { cursor: grab; outline: 1px dashed var(--ds-color-border-strong); outline-offset: 2px; border-radius: var(--ds-radius-lg); }
 [data-ds-dashboard-grid] [data-ds-dashboard-item][data-dragging] { opacity: 0.5; }
 [data-ds-dashboard-grid] [data-slot="resize"] { position: absolute; right: 2px; bottom: 2px; width: 14px; height: 14px; cursor: nwse-resize; border-right: 3px solid var(--ds-palette-primary-500); border-bottom: 3px solid var(--ds-palette-primary-500); border-radius: 0 0 4px 0; z-index: 2; }

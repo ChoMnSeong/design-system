@@ -91,8 +91,8 @@ export type CartesianChartProps = {
     loading?: boolean
     /** labels · series 가 비었을 때 보일 내용 */
     empty?: ReactNode
-    /** 그림 영역 높이 (px) */
-    height?: number
+    /** 그림 영역 높이 (px). 'fill' 이면 부모 높이를 채운다 (대시보드 칸 · Card.Visual 안) */
+    height?: number | 'fill'
     /** compact: 눈금 3개 · 막대 사이 좁게 */
     density?: 'compact' | 'default'
     /** 값 축 격자선 */
@@ -124,13 +124,17 @@ const fmtDefault = (n: number) => (Math.abs(n) >= 1000 ? n.toLocaleString('ko-KR
 const useWidth = () => {
     const ref = useRef<HTMLDivElement | null>(null)
     const [w, setW] = useState(600)
+    const [h, setH] = useState(0)
     useEffect(() => {
         if (!ref.current) return
-        const ro = new ResizeObserver((e) => setW(Math.max(160, Math.round(e[0]!.contentRect.width))))
+        const ro = new ResizeObserver((e) => {
+            setW(Math.max(160, Math.round(e[0]!.contentRect.width)))
+            setH(Math.round(e[0]!.contentRect.height))
+        })
         ro.observe(ref.current)
         return () => ro.disconnect()
     }, [])
-    return [ref, w] as const
+    return [ref, w, h] as const
 }
 
 const stepPath = (pts: [number, number][], mode: 'before' | 'after') =>
@@ -174,7 +178,10 @@ export const CartesianChart = ({
     style,
     ref,
 }: CartesianChartProps) => {
-    const [wrapRef, width] = useWidth()
+    const [wrapRef, width, plotH] = useWidth()
+    const fill = height === 'fill'
+    // fill: 그림 영역(plot)이 남는 높이를 받고, 그 높이로 svg 를 그린다
+    const boxH = fill ? '100%' : height
     const [hidden, setHidden] = useState<Set<string>>(() => new Set(series.filter((s) => s.hidden).map((s) => s.key)))
     const [hover, setHover] = useState<number | null>(null)
     const [hoverSeries, setHoverSeries] = useState<string | null>(null)
@@ -249,7 +256,7 @@ export const CartesianChart = ({
     const pad = { top: legend === 'top' ? 8 : 12, right: R && !R.hidden ? 48 : 16, bottom: axes.x?.hidden ? 8 : 26, left: L && !L.hidden ? 48 : 12 }
     if (horizontal) pad.left = 84
     const W = width
-    const H = height
+    const H = fill ? Math.max(60, plotH || 160) : height
     const iw = W - pad.left - pad.right
     const ih = H - pad.top - pad.bottom
     const n = labels.length
@@ -269,14 +276,14 @@ export const CartesianChart = ({
 
     if (loading) {
         return (
-            <div ref={ref} data-ds-chart="" className={className} style={{ height, ...style }} aria-busy="true">
+            <div ref={ref} data-ds-chart="" className={className} style={{ height: boxH, ...style }} aria-busy="true">
                 <span data-ds-skeleton="" style={{ width: '100%', height: '100%' }} />
             </div>
         )
     }
     if (!allLabels.length || !series.length) {
         return (
-            <div ref={ref} data-ds-chart="" data-empty="" className={className} style={{ height, ...style }}>
+            <div ref={ref} data-ds-chart="" data-empty="" className={className} style={{ height: boxH, ...style }}>
                 {empty}
             </div>
         )
@@ -305,9 +312,9 @@ export const CartesianChart = ({
     const tipIndex = tooltip !== 'none' ? hover : null
 
     return (
-        <div ref={ref} data-ds-chart="" className={className} style={style}>
+        <div ref={ref} data-ds-chart="" data-fill={fill ? '' : undefined} className={className} style={fill ? { height: '100%', minHeight: 0, ...style } : style}>
             {legend === 'top' && legendEl}
-            <div ref={wrapRef} data-slot="plot" style={{ position: 'relative' }}>
+            <div ref={wrapRef} data-slot="plot" style={fill ? { position: 'relative', flex: '1 1 0', minHeight: 0, overflow: 'hidden' } : { position: 'relative' }}>
                 <svg
                     width={W}
                     height={H}

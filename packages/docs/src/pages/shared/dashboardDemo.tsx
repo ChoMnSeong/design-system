@@ -2,8 +2,8 @@ import { Button, Card, IconInfo, IconMoreHorizontal, Sparkline } from '@ensnif/d
 
 export const PHOTO = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b4a6b"/><stop offset="1" stop-color="#8a6a3b"/></linearGradient></defs><rect width="400" height="240" fill="url(#g)"/><rect x="40" y="90" width="120" height="90" rx="6" fill="#26324a"/><rect x="200" y="60" width="150" height="120" rx="6" fill="#2a2a2a"/></svg>')
 
-export const KpiCardDemo = () => (
-    <Card>
+export const KpiCardDemo = ({ density }: { density?: 'compact' | 'default' } = {}) => (
+    <Card density={density}>
         <Card.Eyebrow icon={<IconInfo size={14} />}>금일 생산 실적</Card.Eyebrow>
         <Card.Actions>
             <Button size="sm" appearance="ghost" tone="neutral" shape="square" aria-label="더보기" iconLeft={<IconMoreHorizontal size={16} />} />

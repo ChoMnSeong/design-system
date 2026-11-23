@@ -24,8 +24,12 @@ export type DashboardGridProps = {
     breakpoints?: Partial<Record<BP, number>>
     /** 드래그로 순서 바꾸기 · 오른쪽 아래 모서리로 크기 조절 */
     editable?: boolean
-    /** 편집으로 순서 · 크기가 바뀔 때 (전체 배치) */
+    /** 편집으로 순서 · 크기가 바뀔 때 (전체 배치). 저장해 두었다가 defaultLayout · layout 으로 다시 넣는다 */
     onLayoutChange?: (layout: DashboardLayoutItem[]) => void
+    /** 처음 한 번 적용할 저장된 배치 (예: localStorage). 없는 칸은 무시하고, 새 칸은 맨 뒤에 붙는다 */
+    defaultLayout?: DashboardLayoutItem[]
+    /** 제어 모드 배치. 주면 이 값대로 그리고, 편집 결과는 onLayoutChange 로만 알린다 */
+    layout?: DashboardLayoutItem[]
     /** DashboardGrid.Item 들 */
     children: ReactNode
 } & HTMLAttributes<HTMLDivElement>
@@ -36,17 +40,26 @@ const at = <T,>(v: Resp<T> | undefined, bp: BP | 'base'): T | undefined => {
     return (v as Partial<Record<BP, T>>)[bp as BP]
 }
 
+const mergeLayout = (items: ReactElement<DashboardGridItemProps>[], saved?: DashboardLayoutItem[]): DashboardLayoutItem[] => {
+    const byId = new Map((saved ?? []).map((l) => [l.id, l]))
+    let tail = Math.max(-1, ...(saved ?? []).map((l) => l.order))
+    return items.map((c, i) => {
+        const p = c.props
+        const id = p.id ?? String(i)
+        const s = byId.get(id)
+        if (s) return { id, colSpan: Math.max(1, s.colSpan), rowSpan: Math.max(1, s.rowSpan), order: s.order }
+        return { id, colSpan: (typeof p.colSpan === 'number' ? p.colSpan : undefined) ?? 1, rowSpan: (typeof p.rowSpan === 'number' ? p.rowSpan : undefined) ?? 1, order: saved ? ++tail : i }
+    })
+}
+
 /** 불규칙(bento) 대시보드 배치 */
-const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, areas, breakpoints, editable, onLayoutChange, children, style, ...rest }: DashboardGridProps) => {
+const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, areas, breakpoints, editable, onLayoutChange, defaultLayout, layout: layoutProp, children, style, ...rest }: DashboardGridProps) => {
     const id = useId().replace(/[^a-zA-Z0-9]/g, '')
     const bps = { ...BREAK, ...breakpoints }
     const items = Children.toArray(children).filter(isValidElement) as ReactElement<DashboardGridItemProps>[]
-    const [layout, setLayout] = useState<DashboardLayoutItem[]>(() =>
-        items.map((c, i) => {
-            const p = c.props
-            return { id: p.id ?? String(i), colSpan: (typeof p.colSpan === 'number' ? p.colSpan : undefined) ?? 1, rowSpan: (typeof p.rowSpan === 'number' ? p.rowSpan : undefined) ?? 1, order: i }
-        }),
-    )
+    const [saved, setSaved] = useState<DashboardLayoutItem[] | undefined>(defaultLayout)
+    // 지금 칸들 기준으로 배치를 맞춘다: 저장된 값이 있으면 그 크기 · 순서, 없으면 props 기본값(새 칸은 맨 뒤)
+    const layout = mergeLayout(items, layoutProp ?? saved)
     const [dragId, setDrag] = useState<string | null>(null)
     // 키보드로 옮기거나 크기를 바꾸면 화면 낭독기에 결과를 알린다
     const [announce, setAnnounce] = useState('')
@@ -61,7 +74,7 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
         if (handle && document.activeElement !== handle) handle.focus()
     }, [layout])
     const commit = (next: DashboardLayoutItem[]) => {
-        setLayout(next)
+        if (!layoutProp) setSaved(next)
         onLayoutChange?.(next)
     }
     const ctx: Ctx = {

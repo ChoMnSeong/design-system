@@ -30,8 +30,8 @@ export type SimpleChartCommon = {
     labels?: string[]
     /** 다중 시리즈. 있으면 data 대신 쓴다 */
     series?: Series[]
-    /** 그림 영역 높이 (px) */
-    height?: number
+    /** 그림 영역 높이 (px). 'fill' 이면 부모 높이를 채운다 */
+    height?: number | 'fill'
     /** 값 축 격자선 */
     showGrid?: boolean
     /** 축 눈금 글자 */
