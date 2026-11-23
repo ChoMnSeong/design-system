@@ -1,4 +1,4 @@
-import { Children, createContext, isValidElement, useContext, useId, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactElement, type ReactNode } from 'react'
+import { Children, createContext, isValidElement, useContext, useEffect, useId, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactElement, type ReactNode } from 'react'
 
 type BP = 'sm' | 'md' | 'lg'
 type Resp<T> = T | Partial<Record<BP, T>>
@@ -50,6 +50,16 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
     const [dragId, setDrag] = useState<string | null>(null)
     // 키보드로 옮기거나 크기를 바꾸면 화면 낭독기에 결과를 알린다
     const [announce, setAnnounce] = useState('')
+    // DOM 순서가 바뀌면 옮겨진 노드의 포커스가 풀릴 수 있어, 옮긴 칸의 손잡이로 다시 둔다
+    const refocus = useRef<string | null>(null)
+    const rootRef = useRef<HTMLDivElement>(null)
+    useEffect(() => {
+        const iid = refocus.current
+        if (!iid) return
+        refocus.current = null
+        const handle = rootRef.current?.querySelector<HTMLElement>(`[data-id="${CSS.escape(iid)}"] > [data-slot="move"]`)
+        if (handle && document.activeElement !== handle) handle.focus()
+    }, [layout])
     const commit = (next: DashboardLayoutItem[]) => {
         setLayout(next)
         onLayoutChange?.(next)
@@ -80,6 +90,7 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
             }
             const a = sorted[i]!
             const b = sorted[j]!
+            refocus.current = iid
             commit(layout.map((l) => (l.id === a.id ? { ...l, order: b.order } : l.id === b.id ? { ...l, order: a.order } : l)))
             setAnnounce(`${j + 1}번째 / ${sorted.length}개`)
         },
@@ -107,6 +118,7 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
         <GridCtx.Provider value={ctx}>
             <style>{css.join('')}</style>
             <div
+                ref={rootRef}
                 data-ds-dashboard-grid=""
                 data-ds-dash={id}
                 data-editable={editable ? '' : undefined}
@@ -120,22 +132,29 @@ const DashboardGridRoot = ({ columns = 12, rowHeight = 120, gap = 12, dense, are
                 }}
                 {...rest}
             >
-                {items.map((c, i) => {
-                    const l = layout[i]
-                    const key = c.props.id ?? String(i)
-                    return (
-                        <DashboardGridItem
-                            key={key}
-                            {...c.props}
-                            data-i={i}
-                            style={{
-                                ...(editable && l ? { gridColumn: `span ${l.colSpan}`, gridRow: `span ${l.rowSpan}`, order: l.order } : null),
-                                ...c.props.style,
-                            }}
-                            _id={key}
-                        />
-                    )
-                })}
+                {/* DOM 순서 자체를 배치 순서로 둔다. CSS order 로만 바꾸면 Tab · 화면 낭독기 순서가 화면과 어긋난다.
+                    편집으로 바꾼 순서 · 크기는 편집을 끈 뒤에도 유지한다 */}
+                {items
+                    .map((c, i) => ({ c, i, l: layout[i] }))
+                    .sort((x, y) => (x.l && y.l ? x.l.order - y.l.order : x.i - y.i))
+                    .map(({ c, i, l }) => {
+                        const key = c.props.id ?? String(i)
+                        const p = c.props
+                        const resized = !!l && ((typeof p.colSpan === 'number' ? p.colSpan : 1) !== l.colSpan || (typeof p.rowSpan === 'number' ? p.rowSpan : 1) !== l.rowSpan)
+                        return (
+                            <DashboardGridItem
+                                key={key}
+                                {...c.props}
+                                data-i={i}
+                                data-id={key}
+                                style={{
+                                    ...((editable || resized) && l ? { gridColumn: `span ${l.colSpan}`, gridRow: `span ${l.rowSpan}` } : null),
+                                    ...c.props.style,
+                                }}
+                                _id={key}
+                            />
+                        )
+                    })}
             </div>
             {editable && (
                 <span data-ds-sr-only="" aria-live="polite">
