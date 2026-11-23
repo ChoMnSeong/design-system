@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { slug } from '../docs/DocContext'
 
 type Props = {
     title?: string
@@ -29,6 +30,7 @@ export const ComponentPreview = ({
                 <div style={{ marginBottom: '12px' }}>
                     {title && (
                         <h3
+                            id={`ex-${slug(title)}`}
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 600,

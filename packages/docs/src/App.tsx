@@ -2,6 +2,9 @@ import { DesignSystemProvider } from '@ensnif/design-system'
 import { Layout } from './layout/Layout'
 import { useRouter } from './router/useRouter'
 import { routeMap } from './router/routes'
+import { DocContext } from './docs/DocContext'
+import { docMeta } from './docs/meta'
+import { DocOutro } from './components/DocParts'
 
 export const App = () => {
     const { route, setRoute } = useRouter()
@@ -16,7 +19,10 @@ export const App = () => {
             applyTo="root"
         >
             <Layout route={route} onNavigate={setRoute}>
-                <Page />
+                <DocContext.Provider value={docMeta[route] ?? null}>
+                    <Page />
+                    <DocOutro />
+                </DocContext.Provider>
             </Layout>
         </DesignSystemProvider>
     )

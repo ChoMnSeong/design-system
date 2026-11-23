@@ -4,7 +4,10 @@
     "version": "0.1.0",
     "type": "module",
     "scripts": {
+        "api": "node scripts/gen-api.mjs",
+        "predev": "node scripts/gen-api.mjs",
         "dev": "vite",
+        "prebuild": "node scripts/gen-api.mjs",
         "build": "tsc && vite build",
         "preview": "vite preview"
     },

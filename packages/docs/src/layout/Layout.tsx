@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { TopNav } from './TopNav'
 import { Sidebar } from './Sidebar'
 import { ThemeDrawer } from './ThemeDrawer'
+import { Toc } from '../components/DocParts'
 import type { RouteId } from '../router/routes'
 import './layout.css'
 
@@ -72,7 +73,10 @@ export const Layout = ({ route, onNavigate, children }: Props) => {
                         window.scrollTo({ top: 0 })
                     }}
                 />
-                <main className="docs-main" inert={menuOpen || undefined}>{children}</main>
+                <div className="docs-content" inert={menuOpen || undefined}>
+                    <main className="docs-main">{children}</main>
+                    <Toc routeKey={route} />
+                </div>
             </div>
             <button
                 type="button"

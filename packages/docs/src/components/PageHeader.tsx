@@ -1,3 +1,5 @@
+import { DocIntro } from './DocParts'
+
 type Props = {
     title: string
     description?: string
@@ -37,5 +39,6 @@ export const PageHeader = ({ title, description }: Props) => (
                 {description}
             </p>
         )}
+        <DocIntro />
     </header>
 )

@@ -5,12 +5,209 @@
     grid-template-columns: 240px minmax(0, 1fr);
 }
 
+.docs-content {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .docs-main {
     min-width: 0;
     width: 100%;
     max-width: 1100px;
     padding: 40px 56px 80px;
     box-sizing: border-box;
+}
+
+/* 넓은 화면: 본문 + 오른쪽 목차 */
+.docs-toc {
+    display: none;
+}
+@media (min-width: 1280px) {
+    .docs-content {
+        grid-template-columns: minmax(0, 1fr) 200px;
+        column-gap: 8px;
+    }
+    .docs-toc {
+        display: block;
+        position: sticky;
+        top: 57px;
+        align-self: start;
+        max-height: calc(100vh - 57px);
+        overflow-y: auto;
+        padding: 40px 16px 40px 0;
+        box-sizing: border-box;
+        font-size: 13px;
+    }
+}
+.docs-toc-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ds-color-foreground-primary);
+    margin-bottom: 8px;
+}
+.docs-toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--ds-color-border-subtle);
+}
+.docs-toc li[data-level='3'] a {
+    padding-left: 22px;
+}
+.docs-toc a {
+    display: block;
+    padding: 4px 10px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    color: var(--ds-color-foreground-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+}
+.docs-toc a:hover {
+    color: var(--ds-color-foreground-primary);
+}
+.docs-toc a[aria-current] {
+    color: var(--ds-tone-accent-text);
+    border-left-color: var(--ds-palette-primary-500);
+    font-weight: 600;
+}
+
+/* 문서 단락 */
+.docs-h2 {
+    margin: 48px 0 16px;
+    padding-top: 8px;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ds-color-foreground-primary);
+    scroll-margin-top: 72px;
+}
+.docs-h2 a {
+    color: inherit;
+    text-decoration: none;
+}
+.docs-h2 a:hover::after {
+    content: ' #';
+    color: var(--ds-color-foreground-tertiary);
+}
+header .docs-h2:first-of-type {
+    margin-top: 32px;
+}
+.docs-h3 {
+    margin: 32px 0 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ds-color-foreground-primary);
+    scroll-margin-top: 72px;
+}
+.docs-main h3[id] {
+    scroll-margin-top: 72px;
+}
+.docs-note,
+.docs-api-desc {
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ds-color-foreground-secondary);
+    max-width: 72ch;
+}
+.docs-muted {
+    color: var(--ds-color-foreground-tertiary);
+    font-size: 13px;
+}
+.docs-extends {
+    margin: 8px 0 0;
+}
+.docs-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ds-color-foreground-secondary);
+}
+.docs-list li + li {
+    margin-top: 4px;
+}
+.docs-main code {
+    font-family: var(--ds-typography-font-family-mono);
+    font-size: 0.92em;
+}
+.docs-api-desc code,
+.docs-note code,
+.docs-list code,
+.docs-extends code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: var(--ds-color-background-muted);
+    color: var(--ds-color-foreground-primary);
+}
+
+/* props 표 */
+.docs-table-wrap {
+    margin-top: 12px;
+    overflow-x: auto;
+    border: 1px solid var(--ds-color-border-subtle);
+    border-radius: var(--ds-radius-md);
+}
+.docs-table-wrap:focus-visible {
+    outline: 2px solid var(--ds-palette-primary-500);
+    outline-offset: 2px;
+}
+.docs-props {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.docs-props th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ds-color-foreground-secondary);
+    background: var(--ds-color-background-muted);
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+.docs-props td {
+    padding: 10px 12px;
+    border-top: 1px solid var(--ds-color-border-subtle);
+    vertical-align: top;
+    color: var(--ds-color-foreground-secondary);
+}
+.docs-props td:nth-child(1) {
+    white-space: nowrap;
+    width: 1%;
+}
+.docs-props td:nth-child(2) {
+    width: 34%;
+}
+.docs-props td:nth-child(3) {
+    white-space: nowrap;
+    width: 1%;
+}
+.docs-prop-name {
+    color: var(--ds-tone-accent-text);
+    font-weight: 600;
+}
+.docs-type {
+    color: var(--ds-color-foreground-primary);
+    word-break: break-word;
+}
+.docs-required {
+    color: var(--ds-tone-danger-text);
+    margin-left: 2px;
+}
+.docs-req-label {
+    color: var(--ds-tone-danger-text);
+    font-weight: 600;
+}
+.docs-props tr[data-deprecated] td {
+    opacity: 0.7;
+}
+.docs-props tr[data-deprecated] .docs-prop-name {
+    text-decoration: line-through;
 }
 
 .docs-sidebar {
