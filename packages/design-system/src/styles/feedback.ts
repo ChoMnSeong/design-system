@@ -1,4 +1,4 @@
-/** Alert · Skeleton · Spinner · Empty (보드 5-01, 5-06). */
+/** Alert · Skeleton · Spinner · Empty. */
 const TONES = ['accent', 'neutral', 'success', 'warning', 'danger', 'info']
 export const FEEDBACK_CSS = `
 ${TONES.map((t) => `[data-ds-alert][data-tone="${t}"], [data-ds-spinner-ring][data-tone="${t}"] { --_c: var(--ds-tone-${t}-text); --_cs: var(--ds-tone-${t}-solid); --_on: var(--ds-tone-${t}-on); }`).join('\n')}
@@ -121,7 +121,7 @@ ${TONES.map((t) => `[data-ds-alert][data-tone="${t}"], [data-ds-spinner-ring][da
 [data-ds-empty][data-appearance="compact"] [data-slot="action"] { margin: 0 0 0 auto; }
 `.trim()
 
-/** Popover · Tooltip · HoverCard (보드 5-04) */
+/** Popover · Tooltip · HoverCard */
 export const POPOVER_CSS = `
 [data-ds-popover-panel] {
     padding: 12px 14px;
@@ -189,7 +189,7 @@ export const POPOVER_CSS = `
 [data-ds-popover]:has(> [data-ds-tooltip]:not([data-tone])) { --_ab: var(--ds-color-foreground-primary); }
 `.trim()
 
-/** Dialog · Drawer (보드 5-03) */
+/** Dialog · Drawer */
 export const OVERLAY_CSS = `
 [data-ds-modal-root] {
     position: fixed;
@@ -318,7 +318,7 @@ ${['accent', 'success', 'warning', 'danger', 'neutral'].map((t) => `[data-ds-dia
 [data-ds-drawer] [data-slot="resize"]:hover { background: color-mix(in oklab, var(--ds-palette-primary-500) 45%, transparent); }
 `.trim()
 
-/** Toast (보드 5-02) */
+/** Toast */
 export const TOAST_CSS = `
 [data-ds-toaster] {
     position: fixed;
@@ -409,7 +409,7 @@ ${['accent', 'neutral', 'success', 'warning', 'danger', 'info'].map((t) => `[dat
 @keyframes ds-toast-progress { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 `.trim()
 
-/** CommandPalette (보드 5-05) */
+/** CommandPalette */
 export const COMMAND_CSS = `
 [data-ds-modal-root][data-command] { align-items: flex-start; padding-top: 12vh; }
 [data-ds-command] {

@@ -1,5 +1,5 @@
 /**
- * Button 스타일 레이어 (v0.3, 디자인 캔버스 보드 1-01 기준).
+ * Button 스타일 레이어.
  *
  * Button 은 hover/active, 유리 테두리(::after), 반사광(::before), 링크 화살표(::after)처럼
  * 인라인 style 로는 표현할 수 없는 것이 많아 스타일을 전부 여기로 옮겼다.

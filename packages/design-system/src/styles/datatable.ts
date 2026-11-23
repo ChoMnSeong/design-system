@@ -1,4 +1,4 @@
-/** DataTable (보드 4-07). 표 기본 모양은 TABLE_CSS 를 같이 쓴다. */
+/** DataTable. 표 기본 모양은 TABLE_CSS 를 같이 쓴다. */
 const TONES = ['accent', 'success', 'warning', 'danger', 'info', 'neutral']
 export const DATATABLE_CSS = `
 [data-ds-datatable] { display: flex; flex-direction: column; gap: 10px; min-width: 0; }

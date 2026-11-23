@@ -1,4 +1,4 @@
-/** Kbd · Toolbar (보드 1-06, 1-07). */
+/** Kbd · Toolbar. */
 export const ACTION_CSS = `
 [data-ds-kbd] {
     display: inline-flex;

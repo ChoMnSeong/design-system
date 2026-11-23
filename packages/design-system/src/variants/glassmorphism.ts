@@ -100,7 +100,7 @@ export const glassmorphism: VariantSpec = {
         return {
             // 그라디언트 폭이 넓으면 흰 글자도 어두운 글자도 한쪽 끝에서 무너진다.
             // 다른 variant 와 같은 600/700/800 계열로 좁혀 흰 글자를 성립시킨다.
-            // 보드 9-12: 그라디언트 → primary600 단색 (유리 위에서 대비를 계산할 수 있게)
+            // 그라디언트 → primary600 단색 (유리 위에서 대비를 계산할 수 있게)
             background: c.primary600,
             // 그라디언트는 대비 계산이 안 되니 가장 밝은 지점(글자에 가장 불리한 곳)으로 판단한다.
             color: c.readable(c.primary600, c.primary700, c.primary800),

@@ -1,5 +1,5 @@
 /**
- * Menu · ContextMenu · SplitButton 메뉴 (보드 1-03, 1-05).
+ * Menu · ContextMenu · SplitButton 메뉴.
  * 활성 항목(마우스 오버·키보드 포커스)은 강조색 12% 바탕 + accent 글자.
  */
 export const MENU_CSS = `

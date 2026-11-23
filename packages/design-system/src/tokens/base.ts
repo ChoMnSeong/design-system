@@ -92,7 +92,7 @@ export const baseTokens: BaseTokens = {
         // 크기 스케일만 있으면 쓰는 쪽이 매번 굵기·행간·자간을 다시 고른다.
         // 역할 단위로 묶어 한 번에 집어 쓰게 한다.
         role: {
-            // B2C 큰 제목 (보드 12-01): 기존 display 위 3단계
+            // B2C 큰 제목: 기존 display 위 3단계
             'hero-lg': { fontSize: '80px', fontWeight: '800', lineHeight: '1.02', letterSpacing: '-0.03em' },
             'hero-md': { fontSize: '64px', fontWeight: '700', lineHeight: '1.05', letterSpacing: '-0.025em' },
             'hero-sm': { fontSize: '48px', fontWeight: '700', lineHeight: '1.08', letterSpacing: '-0.02em' },

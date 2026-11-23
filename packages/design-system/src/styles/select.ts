@@ -1,4 +1,4 @@
-/** Select · ComboBox · MultiSelect · TagInput (보드 2-03). */
+/** Select · ComboBox · MultiSelect · TagInput. */
 export const SELECT_CSS = `
 [data-ds-select] [data-slot="control"][data-placeholder] { color: var(--ds-color-foreground-tertiary); }
 [data-ds-select] [data-slot="value"] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

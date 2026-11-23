@@ -1,4 +1,4 @@
-/** DataGrid (보드 10-01 ~ 10-07). */
+/** DataGrid. */
 const TONES = ['accent', 'success', 'warning', 'danger', 'info', 'neutral']
 export const GRID_CSS = `
 [data-ds-grid] { display: flex; flex-direction: column; gap: 8px; min-width: 0; font-size: 13px; color: var(--ds-color-foreground-primary); }

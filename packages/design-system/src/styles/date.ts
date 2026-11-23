@@ -1,4 +1,4 @@
-/** Calendar · DatePicker · DateRangePicker · TimePicker (보드 3-01, 3-02). */
+/** Calendar · DatePicker · DateRangePicker · TimePicker. */
 export const DATE_CSS = `
 [data-ds-calendar] { --_ch: 34px; font-size: 13px; color: var(--ds-color-foreground-primary); }
 [data-ds-calendar] [data-slot="months"] { display: flex; gap: 20px; }
@@ -177,7 +177,7 @@ export const DATE_CSS = `
 [data-ds-time-columns] [data-slot="col"] > button:disabled { opacity: 0.35; cursor: not-allowed; }
 `.trim()
 
-/** FileUpload (보드 3-03) */
+/** FileUpload */
 export const UPLOAD_CSS = `
 [data-ds-upload] { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 [data-ds-upload] [data-slot="drop"] {

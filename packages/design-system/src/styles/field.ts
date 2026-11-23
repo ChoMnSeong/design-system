@@ -1,5 +1,5 @@
 /**
- * 입력 필드 공통 (보드 2-01 ~ 2-05).
+ * 입력 필드 공통.
  * [data-ds-field] 가 테두리 상자이고 안에 input · 접두/접미 · 버튼이 들어간다.
  *   data-size      xs 24 · sm 28 · md 36 · lg 44
  *   data-variant   outlined · filled · underline · ghost
@@ -196,7 +196,7 @@ export const FIELD_CSS = `
 [data-ds-variant="glassmorphism"][data-ds-mode="dark"] [data-ds-field][data-readonly] { background: rgba(255, 255, 255, 0.03); }
 `.trim()
 
-/** Label · FormField · Form (보드 3-04) */
+/** Label · FormField · Form */
 export const FORM_CSS = `
 [data-ds-label] {
     display: inline-flex;

@@ -1,4 +1,4 @@
-/** B2C 기본 부품 (보드 12-01 ~ 12-06). */
+/** B2C 커머스 부품: 사이트 틀 · 배너 · 상품 표시 · 구매 입력 · 모바일. */
 const FG = 'var(--ds-color-foreground-primary)'
 const FG2 = 'var(--ds-color-foreground-secondary)'
 const FG3 = 'var(--ds-color-foreground-tertiary)'
@@ -7,7 +7,7 @@ const BG = 'var(--ds-surface-card-background)'
 const MUTED = 'var(--ds-color-background-muted)'
 const ACC = 'var(--ds-palette-primary-500)'
 export const B2C_CSS = `
-/* 12-01 */
+/* 큰 제목 · 화면 폭 · 섹션 여백 */
 [data-ds-display] { margin: 0; color: ${FG}; font-family: var(--ds-typography-font-family-display, inherit); text-wrap: balance; }
 ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size: clamp(32px, calc(var(--ds-typography-role-hero-${s}-font-size, 48px) * .55 + 2vw), var(--ds-typography-role-hero-${s}-font-size)); font-weight: var(--ds-typography-role-hero-${s}-font-weight); line-height: var(--ds-typography-role-hero-${s}-line-height); letter-spacing: var(--ds-typography-role-hero-${s}-letter-spacing); }`).join('\n')}
 [data-ds-container] { width: 100%; margin-inline: auto; box-sizing: border-box; padding-inline: 16px; }
@@ -25,7 +25,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-section][data-tone="muted"] { background: ${MUTED}; }
 [data-ds-section][data-tone="inverse"] { background: ${FG}; color: ${BG}; }
 
-/* 12-02 */
+/* 사이트 머리말 · 큰 메뉴 · 꼬리말 · 공지 띠 */
 [data-ds-announce] { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 36px; padding: 0 44px; position: relative; background: ${FG}; color: ${BG}; font-size: 13px; }
 [data-ds-announce] a { color: inherit; }
 [data-ds-announce] > button { all: unset; position: absolute; right: 8px; top: 50%; translate: 0 -50%; width: 28px; height: 28px; display: grid; place-items: center; cursor: pointer; border-radius: 999px; }
@@ -84,7 +84,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-site-footer] [data-slot="legal"] dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 10px 0 0; }
 [data-ds-site-footer] [data-slot="legal"] dd { margin: 0; }
 
-/* 12-03 */
+/* 큰 배너 · 슬라이드 · 가로 줄 */
 [data-ds-hero] { position: relative; overflow: hidden; border-radius: var(--_r, 0); color: ${FG}; }
 [data-ds-hero][data-layout="overlay"], [data-ds-hero][data-layout="center"] { min-height: var(--_h, 520px); display: flex; color: #fff; }
 [data-ds-hero] [data-slot="media"] { position: absolute; inset: 0; }
@@ -127,7 +127,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-rail] [data-slot="track"]::-webkit-scrollbar { display: none; }
 [data-ds-rail] [data-slot="track"] > * { scroll-snap-align: var(--_snap, start); min-width: 0; }
 
-/* 12-04 */
+/* 비율 고정 이미지 · 가격 · 별점 · 순위 · 이어보기 */
 [data-ds-media] { position: relative; overflow: hidden; aspect-ratio: var(--_ratio, 1); border-radius: var(--_r, var(--ds-radius-md)); background: ${MUTED}; }
 [data-ds-media] > img, [data-ds-media] > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: var(--_fit, cover); transition: opacity .3s; }
 [data-ds-media] > img[data-loading] { opacity: 0; }
@@ -166,7 +166,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-watch][data-overlay] { position: absolute; inset-inline: 0; bottom: 0; }
 [data-ds-watch][data-overlay] [data-slot="bar"] { border-radius: 0; height: 4px; }
 
-/* 12-05 */
+/* 수량 · 옵션 · 검색창 */
 [data-ds-qty] { display: inline-flex; align-items: center; border: 1px solid ${BD}; border-radius: var(--ds-radius-md); background: ${BG}; height: 40px; }
 [data-ds-qty][data-size="sm"] { height: 32px; }
 [data-ds-qty] button { all: unset; width: 40px; height: 100%; display: grid; place-items: center; cursor: pointer; color: ${FG}; }
@@ -210,7 +210,7 @@ ${['lg', 'md', 'sm'].map((s) => `[data-ds-display][data-size="${s}"] { font-size
 [data-ds-search] [role="option"] [data-slot="rank"] { width: 16px; font-weight: 800; color: var(--ds-tone-accent-text); font-variant-numeric: tabular-nums; }
 [data-ds-search] mark { background: none; color: var(--ds-tone-accent-text); font-weight: 700; }
 
-/* 12-06 */
+/* 영상 재생기 · 하단 시트 · 하단 탭 */
 [data-ds-video] { position: relative; background: #000; color: #fff; aspect-ratio: 16/9; overflow: hidden; border-radius: var(--_r, var(--ds-radius-md)); font-size: 13px; }
 [data-ds-video] video { width: 100%; height: 100%; display: block; object-fit: contain; }
 [data-ds-video] [data-slot="ui"] { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; transition: opacity .25s; background: linear-gradient(to top, rgb(0 0 0 / .75), transparent 38%); }

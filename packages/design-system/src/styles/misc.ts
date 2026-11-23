@@ -1,4 +1,4 @@
-/** Slider · SegmentedControl (보드 2-05). */
+/** Slider · SegmentedControl. */
 const TONES = ['accent', 'success', 'warning', 'danger', 'info', 'neutral']
 export const MISC_CSS = `
 [data-ds-slider] {

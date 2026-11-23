@@ -1,4 +1,4 @@
-/** Checkbox · Radio · Switch (보드 2-04). 네이티브 input 에 appearance:none 을 입혀 키보드·폼 동작을 그대로 쓴다. */
+/** Checkbox · Radio · Switch. 네이티브 input 에 appearance:none 을 입혀 키보드·폼 동작을 그대로 쓴다. */
 const TONES = ['success', 'warning', 'danger', 'info', 'neutral']
 export const CHOICE_CSS = `
 [data-ds-checkbox], [data-ds-radio] {

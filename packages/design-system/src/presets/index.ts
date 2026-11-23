@@ -1,5 +1,5 @@
 /**
- * 테마 프리셋 (보드 9-11): variant 위에 얹는 브랜드 층.
+ * 테마 프리셋: variant 위에 얹는 브랜드 층.
  * Metric · 제목 글꼴, 강조색(채움 · 글자), 카드 바탕만 바꾼다. 컴포넌트 구조는 그대로.
  */
 export type ThemePreset = {
@@ -65,14 +65,14 @@ export const presetVars = (p: ThemePreset | undefined, mode: 'light' | 'dark'): 
     return out
 }
 
-/* ── glass 배경 (보드 9-12) ── */
+/* ── glass 배경 ── */
 
 export type GlassOptions = {
     /** pattern(공장 배치도, 기본) · neutral(회청 번짐) · tint(보라, 행사·보고 화면) · image */
     backdrop?: 'pattern' | 'neutral' | 'tint' | 'image'
     pattern?: 'plant'
     backdropImage?: string
-    /** glass: CSS 유리 (모든 화면) · liquid: 고정 배경 위 KPI 위젯용 렌즈 (보드 9-16) */
+    /** glass: CSS 유리 (모든 화면) · liquid: 고정 배경 위 KPI 위젯용 렌즈 */
     material?: 'glass' | 'liquid'
 }
 

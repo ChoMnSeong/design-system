@@ -1,4 +1,4 @@
-/** Badge · Tag · Avatar · StatusIndicator · Progress · Stat (보드 4-01 ~ 4-03). */
+/** Badge · Tag · Avatar · StatusIndicator · Progress · Stat. */
 const TONES = ['accent', 'neutral', 'success', 'warning', 'danger', 'info']
 const toneVars = (sel: string) =>
     TONES.map((t) => `${sel}[data-tone="${t}"] { --_c: var(--ds-tone-${t}-text); --_cs: var(--ds-tone-${t}-solid); --_on: var(--ds-tone-${t}-on); }`).join('\n')

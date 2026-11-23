@@ -1,4 +1,4 @@
-/** Card · KpiCard · StatusCard (보드 6-01, 6-02). */
+/** Card · KpiCard · StatusCard. */
 const TONES = ['accent', 'neutral', 'success', 'warning', 'danger', 'info']
 export const CARD_CSS = `
 ${TONES.map((t) => `[data-ds-card][data-tone="${t}"] { --_c: var(--ds-tone-${t}-text); --_cs: var(--ds-tone-${t}-solid); }`).join('\n')}
@@ -85,7 +85,7 @@ ${['success', 'warning', 'danger'].map((t) => `[data-ds-status-card][data-status
 [data-ds-status-card] [data-slot="actions"] { display: inline-flex; gap: 4px; }
 `.trim()
 
-/** Box · Stack · Grid · Divider · ScrollArea (보드 6-03) */
+/** Box · Stack · Grid · Divider · ScrollArea */
 export const PRIMITIVE_CSS = `
 [data-ds-stack-divider] { flex-shrink: 0; align-self: stretch; background: var(--ds-color-border-subtle); }
 [data-ds-stack-divider][data-dir="row"] { width: 1px; }
@@ -122,7 +122,7 @@ ${['accent', 'success', 'warning', 'danger', 'info', 'neutral'].map((t) => `[dat
 [data-ds-scroll-area][data-shadow-left][data-shadow-right] { box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.12), inset -10px 0 8px -8px rgba(0, 0, 0, 0.12); }
 `.trim()
 
-/** Tabs · Accordion (보드 6-04) */
+/** Tabs · Accordion */
 export const TABS_CSS = `
 [data-ds-tabs] { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 [data-ds-tabs][data-orientation="vertical"] { flex-direction: row; gap: 20px; }
@@ -214,7 +214,7 @@ export const TABS_CSS = `
 [data-ds-accordion][data-appearance="flush"] [data-slot="trigger"], [data-ds-accordion][data-appearance="flush"] [data-slot="panel"] { padding-left: 0; padding-right: 0; }
 `.trim()
 
-/** AppShell · PageHeader · FilterBar · Splitter (보드 6-05) */
+/** AppShell · PageHeader · FilterBar · Splitter */
 export const SHELL_CSS = `
 [data-ds-app-shell] {
     display: grid;
@@ -291,7 +291,7 @@ export const SHELL_CSS = `
 [data-ds-splitter] > [data-slot="handle"]:focus-visible { box-shadow: inset 0 0 0 2px var(--ds-color-focus-ring); border-radius: 4px; }
 `.trim()
 
-/** NavigationMenu · Breadcrumb · Pagination · Stepper (보드 7-01 ~ 7-03) */
+/** NavigationMenu · Breadcrumb · Pagination · Stepper */
 export const NAV_CSS = `
 [data-ds-nav] { display: flex; flex-direction: column; gap: 6px; font-size: 13px; min-width: 0; }
 [data-ds-nav] ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -420,7 +420,7 @@ export const NAV_CSS = `
 [data-ds-stepper][data-orientation="vertical"] > li[data-status="finish"]:not(:last-child)::before { background: var(--ds-palette-primary-600); }
 `.trim()
 
-/** 대시보드 카드 · DashboardGrid (보드 9-01 ~ 9-03) */
+/** 대시보드 카드 · DashboardGrid */
 export const DASH_CSS = `
 [data-ds-card][data-surface="inverse"] { background: var(--ds-color-foreground-primary); color: var(--ds-color-background-muted); border-color: transparent; }
 [data-ds-mode="dark"] [data-ds-card][data-surface="inverse"] { background: color-mix(in oklab, var(--ds-color-foreground-primary) 14%, var(--ds-surface-card-background)); color: var(--ds-color-foreground-primary); }
@@ -458,7 +458,7 @@ export const DASH_CSS = `
 [data-ds-dashboard-grid] [data-slot="resize"]:focus-visible { outline: 2px solid var(--ds-palette-primary-500); outline-offset: 2px; }
 `.trim()
 
-/** 테마 프리셋 · Liquid Glass (보드 9-11, 9-16) */
+/** 테마 프리셋 · Liquid Glass */
 export const PRESET_CSS = `
 [data-ds-preset] [data-ds-card-metric] b, [data-ds-preset] [data-ds-kpi] [data-slot="value"] b, [data-ds-preset] [data-ds-page-header] h1 { font-family: var(--ds-font-display, inherit); }
 [data-ds-preset="editorial"] [data-ds-card-eyebrow] { text-transform: uppercase; letter-spacing: 0.08em; }

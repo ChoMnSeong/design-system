@@ -1,4 +1,4 @@
-/** 차트 공통 (보드 8-01 ~ 8-09) */
+/** 차트 공통 */
 export const CHART_CSS = `
 [data-ds-chart] { display: flex; flex-direction: column; gap: 8px; min-width: 0; width: 100%; font-variant-numeric: tabular-nums; }
 [data-ds-chart][data-empty] { align-items: center; justify-content: center; font-size: 13px; color: var(--ds-color-foreground-tertiary); border: 1px dashed var(--ds-color-border-default); border-radius: var(--ds-radius-md); }
@@ -125,7 +125,7 @@ export const INDUSTRIAL_CSS = `
 [data-ds-gantt] [data-slot="grid"] { stroke: var(--ds-color-border-subtle); }
 `.trim()
 
-/** 대시보드 소형 차트 (보드 9-04 ~ 9-10) */
+/** 대시보드 소형 차트 */
 export const MINI_CSS = `
 [data-ds-segment-meter] { display: flex; flex-direction: column; gap: 8px; min-width: 0; --_h: 12px; }
 [data-ds-segment-meter][data-size="sm"] { --_h: 6px; }
